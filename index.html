@@ -1,0 +1,1362 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>SPM 备考本</title>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<style>
+:root{
+  --paper:#f3f6fc;--dot:rgba(58,88,160,.16);--glass:rgba(255,255,255,.74);--glass-line:rgba(255,255,255,.9);--hover:rgba(255,255,255,.6);
+  --shadow:0 0 0 1px rgba(23,38,63,.06),0 28px 60px -30px rgba(40,64,128,.38);
+  --sheet:#ffffff;--sheet2:#f1f4fb;--ink:#17263f;--muted:#5d6b7c;--line:#d3dbe8;--margin:rgba(235,110,110,.42);
+  --hl:#ffe45e;--accent:#17263f;--accent-ink:#ffffff;--ok:#1b7f55;--ok-soft:#d9f0e4;--bad:#c23b32;--bad-soft:#fadcd9;--warn:#8a5a00;--warn-soft:#fff1c9;
+  --blue:#2f55d4;--blue-soft:#e4eafc;
+  --a1:#9ec1ff;--a2:#c3b3ff;--a3:#a9ecd9;--glow:.62;
+  --kai:"Kaiti SC","STKaiti","KaiTi","楷体","AR PL UKai CN","Noto Serif SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans SC","Segoe UI",Roboto,sans-serif;
+  --mx:36px;--pl:54px;
+}
+body[data-theme="night"],body[data-theme="auto"].dark{--paper:#0b1420;--dot:rgba(170,200,255,.11);--glass:rgba(21,33,47,.68);--glass-line:rgba(255,255,255,.09);--hover:rgba(255,255,255,.07);
+  --shadow:0 0 0 1px rgba(255,255,255,.04),0 30px 70px -30px rgba(0,0,0,.7);--sheet:#172331;--sheet2:#1e2c3d;--ink:#e6edf6;--muted:#9fb0c3;--line:#2b3b4f;--margin:rgba(255,130,130,.35);
+  --accent:#e6edf6;--accent-ink:#0b1420;--ok:#6fd1a2;--ok-soft:#163a2c;--bad:#ff8f84;--bad-soft:#43211e;--warn:#f0c46a;--warn-soft:#3a2f14;--blue:#9db0ff;--blue-soft:#222d57;--glow:.34;
+  --a1:#4b6fd6;--a2:#7c5cc4;--a3:#2c8f86}
+body[data-theme="sakura"]{--paper:#fff5f8;--dot:rgba(200,90,130,.14);--a1:#ff9fc2;--a2:#ffcf9e;--a3:#b9c8ff}
+body[data-theme="mint"]{--paper:#f1fbf6;--dot:rgba(40,130,100,.14);--a1:#74e3d1;--a2:#c9ef93;--a3:#8fcfff}
+body[data-theme="paper"]{--paper:#f6efdf;--dot:rgba(150,110,50,.14);--glass:rgba(255,250,238,.78);--a1:#ffd96b;--a2:#ffb98a;--a3:#a7e3a0}
+@media (prefers-color-scheme:dark){body[data-theme="auto"]{--paper:#0b1420;--dot:rgba(170,200,255,.11);--glass:rgba(21,33,47,.68);--glass-line:rgba(255,255,255,.09);--hover:rgba(255,255,255,.07);
+  --shadow:0 0 0 1px rgba(255,255,255,.04),0 30px 70px -30px rgba(0,0,0,.7);--sheet:#172331;--sheet2:#1e2c3d;--ink:#e6edf6;--muted:#9fb0c3;--line:#2b3b4f;--margin:rgba(255,130,130,.35);
+  --accent:#e6edf6;--accent-ink:#0b1420;--ok:#6fd1a2;--ok-soft:#163a2c;--bad:#ff8f84;--bad-soft:#43211e;--warn:#f0c46a;--warn-soft:#3a2f14;--blue:#9db0ff;--blue-soft:#222d57;--glow:.34;
+  --a1:#4b6fd6;--a2:#7c5cc4;--a3:#2c8f86}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 var(--sans);min-height:100vh;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
+h1,h2,h3,h4{margin:0}
+p{margin:.45em 0}
+[hidden]{display:none!important}
+.muted{color:var(--muted)}.fine{font-size:13px}.spacer{flex:1}
+
+/* aurora */
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--paper)}
+.aurora::after{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--dot) 1.1px,transparent 1.3px);background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 55% at 50% 0%,#000 0%,transparent 80%);mask-image:radial-gradient(ellipse 80% 55% at 50% 0%,#000 0%,transparent 80%)}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:var(--glow);will-change:transform}
+.aurora i:nth-child(1){width:60vmax;height:60vmax;left:-16vmax;top:-26vmax;background:var(--a1);animation:d1 40s ease-in-out infinite alternate}
+.aurora i:nth-child(2){width:52vmax;height:52vmax;right:-18vmax;top:4vmax;background:var(--a2);animation:d2 48s ease-in-out infinite alternate}
+.aurora i:nth-child(3){width:48vmax;height:48vmax;left:18vw;bottom:-30vmax;background:var(--a3);animation:d3 56s ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(9vmax,7vmax) scale(1.1)}}@keyframes d2{to{transform:translate(-8vmax,10vmax) scale(.92)}}@keyframes d3{to{transform:translate(-10vmax,-6vmax) scale(1.12)}}
+
+.shell{max-width:940px;margin:0 auto;padding:16px 14px 130px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:10px 4px 14px;flex-wrap:wrap}
+.title h1{font:700 34px/1.1 var(--kai);letter-spacing:.04em}
+.title p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.top .right{display:flex;gap:8px;align-items:center}
+.chip-days{display:flex;align-items:baseline;gap:6px;padding:6px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-weight:700}
+.chip-days b{font:700 22px/1 var(--kai);color:var(--bad)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:7px 16px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);
+  font-weight:700;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--ink);transition:background-color .2s}
+.btn:hover:not(:disabled){background:var(--sheet)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.pri:hover:not(:disabled){opacity:.9;background:var(--accent)}
+.btn.line{border-color:var(--line)}
+.btn.small{min-height:32px;padding:4px 12px;font-size:14px}
+.btn.good{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.btn.badb{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* pills + tabs */
+.subjects{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 12px}
+.subjects::-webkit-scrollbar,.tabs::-webkit-scrollbar{display:none}
+.subjects button{flex:0 0 auto;display:flex;align-items:center;gap:8px;min-height:42px;padding:7px 18px;font-weight:700;border:1px solid var(--glass-line);border-radius:999px;
+  background:var(--glass);color:var(--ink);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 20px -14px rgba(40,64,128,.5)}
+.subjects button:hover:not([aria-pressed=true]){background:var(--sheet)}
+.subjects button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.subjects .sd{width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.7)}
+.subjects .cnt{font-size:12px;font-weight:700;min-width:20px;padding:0 6px;border-radius:999px;background:rgba(127,140,160,.22);line-height:20px;text-align:center}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 12px}
+.tab{flex:0 0 auto;border:1px solid transparent;background:transparent;padding:8px 18px;border-radius:12px 12px 6px 6px;font-weight:700;color:var(--muted);font-size:16px;position:relative}
+.tab:hover{background:var(--hover)}
+.tab.active{background:var(--sheet);color:var(--ink);border-color:var(--line);box-shadow:0 3px 0 -1px var(--hl)}
+.sheet{position:relative;background:var(--glass);border:1px solid var(--glass-line);border-radius:26px;box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  padding:26px 26px 30px var(--pl);min-height:360px;
+  background-image:linear-gradient(90deg,transparent var(--mx),var(--margin) var(--mx),var(--margin) calc(var(--mx) + 2px),transparent calc(var(--mx) + 2px))}
+@media (max-width:640px){.sheet{padding:20px 14px 24px var(--pl);border-radius:20px;--mx:30px;--pl:44px}.subjects button{padding:6px 14px}.title h1{font-size:28px}}
+.sheet h2{font:700 21px/1.4 var(--kai);margin:22px 0 10px}.sheet h2:first-child{margin-top:0}
+.sheet h3{font:700 17px/1.4 var(--kai);margin:18px 0 8px}
+
+/* blocks */
+.notice{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 16px;background:var(--sheet2)}
+.notice p{margin:4px 0 10px}.notice p:last-child{margin-bottom:0}
+.notice.warn{background:var(--warn-soft);border-color:var(--warn)}
+.notice.error{background:var(--bad-soft);border-color:var(--bad);white-space:pre-wrap}
+.notice.ok{background:var(--ok-soft);border-color:var(--ok)}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:0 0 14px}
+.controls label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+.controls .grow{flex:1 1 200px}
+select,input[type=text],input[type=password],input[type=number],input[type=date],textarea{border:1.5px solid var(--line);background:var(--sheet);border-radius:10px;padding:8px 10px;min-height:40px;max-width:100%}
+input[type=text],input[type=password],textarea{width:100%}
+textarea{min-height:90px;resize:vertical;line-height:1.6}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:700;background:var(--sheet2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tag.blue{background:var(--blue-soft);color:var(--blue);border-color:transparent}
+.tag.red{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.tag.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.tag.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.bar{height:8px;border-radius:99px;background:var(--sheet2);overflow:hidden;border:1px solid var(--line)}.bar>i{display:block;height:100%;border-radius:99px;background:var(--blue)}
+.empty{padding:26px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:14px;background:var(--sheet2)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--sheet);padding:5px 14px;border-radius:99px;font-weight:700;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.hl{background:linear-gradient(transparent 58%,var(--hl) 58%)}
+.tip{border-left:4px solid var(--hl);background:var(--warn-soft);padding:8px 12px;border-radius:0 10px 10px 0;margin:10px 0;font-size:.94rem}
+.warnbox{border-left:4px solid var(--bad);background:var(--bad-soft);padding:8px 12px;border-radius:0 10px 10px 0;margin:10px 0;font-size:.94rem}
+.scroll-x{overflow-x:auto}
+
+/* hero */
+.hero{background:var(--sheet);border:1px solid var(--line);border-radius:18px;padding:20px 22px}
+.hero .big{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.hero .num{font:700 clamp(3.4rem,10vw,5.6rem)/1 var(--kai)}
+.hero .lbl{font-size:1.05rem;font-weight:700}
+.omr{display:grid;grid-template-columns:repeat(auto-fill,minmax(20px,1fr));gap:7px;margin-top:16px}
+.omr b{aspect-ratio:1;border-radius:50%;border:2px solid var(--line);display:block}
+.omr b.past{background:var(--muted);border-color:var(--muted);opacity:.7}
+.omr b.today{border-color:var(--bad);background:var(--bad);box-shadow:0 0 0 3px var(--bad-soft)}
+.omr b.exam{border-color:var(--blue);border-width:3px}
+.omr-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:13px;color:var(--muted)}
+.omr-legend span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--line);margin-right:6px;vertical-align:-1px}
+.omr-legend .l-past::before{background:var(--muted);border-color:var(--muted)}
+.omr-legend .l-today::before{background:var(--bad);border-color:var(--bad)}
+.omr-legend .l-exam::before{border-color:var(--blue)}
+
+/* chapters */
+.chap{border:1px solid var(--line);border-radius:12px;background:var(--sheet);margin-bottom:8px}
+.chap>summary{list-style:none;display:flex;gap:10px;align-items:center;padding:10px 14px;cursor:pointer;font-weight:700}
+.chap>summary::-webkit-details-marker{display:none}
+.chap>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+.chap[open]>summary::before{transform:rotate(90deg)}
+.chap>summary .t{flex:1;min-width:0}
+.chap[open]>summary{border-bottom:1px solid var(--line)}
+.chap .body{padding:12px 16px 16px}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.chk input{width:17px;height:17px;accent-color:var(--ok)}
+.subs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.note h4{margin:14px 0 4px;font:700 16px var(--kai)}
+.note ul{margin:.3em 0;padding-left:1.2em}.note li{margin:.2em 0}
+.note table,.md table{border-collapse:collapse;width:100%;margin:8px 0;font-size:.92rem}
+.note th,.note td,.md th,.md td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}
+.note th,.md th{background:var(--sheet2)}
+.note code,.md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--sheet2);padding:1px 6px;border-radius:5px;font-size:.88em}
+.md h1,.md h2,.md h3,.md h4{font-family:var(--kai);line-height:1.4;margin:1.2em 0 .4em}
+.md h2{font-size:19px;background:linear-gradient(transparent 58%,var(--hl) 58%);display:inline-block}
+.md h3{font-size:17px}
+.md>:first-child{margin-top:0}.md>:last-child{margin-bottom:0}
+.md ul,.md ol{padding-left:1.3em}
+.md pre{background:var(--sheet2);padding:10px;border-radius:10px;overflow-x:auto}
+.md blockquote{margin:.6em 0;padding:4px 12px;border-left:4px solid var(--hl);background:var(--warn-soft);border-radius:0 8px 8px 0}
+.md{overflow-wrap:anywhere}
+
+/* quiz/flash */
+.qbox{max-width:760px}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--sheet);padding:10px 12px;border-radius:12px;margin:7px 0}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .bub{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--muted)}
+.opt.sel{border-color:var(--ink)}.opt.sel .bub{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.flash{max-width:620px}
+.face{min-height:230px;border:1.5px solid var(--ink);border-radius:20px;background:var(--sheet);padding:24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 5px 0 var(--ink);cursor:pointer}
+.face .q{font:700 22px/1.5 var(--kai)}.face .a{font-size:17px;white-space:pre-wrap}
+
+/* exam */
+.qcard{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0}
+.qcard .qh{display:flex;gap:8px;align-items:baseline;justify-content:space-between}
+.qno{font:700 18px var(--kai)}
+.part{margin:12px 0 4px;padding-left:12px;border-left:3px solid var(--line)}
+.part .pm{float:right;margin-left:8px}
+.stem{white-space:pre-wrap}
+.score{font:700 44px/1 var(--kai)}
+.fb{margin-top:8px;padding:8px 12px;border-radius:10px;background:var(--sheet2);font-size:.94rem}
+.fb.full{background:var(--ok-soft)}.fb.zero{background:var(--bad-soft)}
+.timerbar{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:8px}
+.timerbar b{font:700 22px var(--kai);font-variant-numeric:tabular-nums}
+
+/* chat */
+.msg{max-width:min(720px,94%);padding:10px 14px;border-radius:16px;margin:8px 0;border:1px solid var(--line);background:var(--sheet)}
+.msg.user{margin-left:auto;background:var(--blue-soft);border-color:transparent}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;background:var(--sheet2);cursor:pointer}
+.drop.over{border-color:var(--blue);background:var(--blue-soft)}
+.res{display:flex;flex-direction:column;gap:3px;text-decoration:none;color:inherit;border:1px solid var(--line);background:var(--sheet);border-radius:12px;padding:11px 14px}
+.res:hover{border-color:var(--ink)}
+.res b{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+table.t{border-collapse:collapse;width:100%;font-size:.92rem}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left}
+table.t th{color:var(--muted);font-weight:700;font-size:13px}
+#toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:99px;font-weight:700;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+#toast.on{opacity:1}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.aurora i,.spin{animation:none}}
+@media print{.aurora,.top,.subjects,.tabs,#petBox,#petBack,.no-print{display:none!important}.sheet{box-shadow:none;border:0;background:#fff}}
+</style>
+</head>
+<body data-theme="auto">
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="shell">
+  <header class="top no-print">
+    <div class="title"><h1>SPM 备考本</h1><p>课本、笔记、模拟卷和 AI 助教，都按 KSSM 整理</p></div>
+    <div class="right"><div class="chip-days" id="daysChip"></div><button class="btn line" id="btnSet">设置</button></div>
+  </header>
+  <nav class="subjects no-print" id="subjects" aria-label="科目"></nav>
+  <nav class="tabs no-print" id="tabs" role="tablist" aria-label="功能"></nav>
+  <main class="sheet" id="sheet"></main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<style id="pet-style">
+#petBox{position:fixed;right:16px;bottom:16px;z-index:30;width:88px;height:88px;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#petBox[hidden]{display:none!important}
+#petDog{pointer-events:auto;display:block;width:88px;height:88px;padding:0;margin:0;border:0;background:none;cursor:grab;touch-action:none;outline:none;font:inherit}
+#petDog:active{cursor:grabbing}
+#petDog:focus-visible{outline:2px dashed var(--accent,#17263f);outline-offset:2px;border-radius:16px}
+#petDog svg{width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 6px 8px rgba(0,0,0,.18))}
+.pet-jump{transform-origin:60px 112px}
+.pet-body{transform-origin:60px 112px;animation:petBreathe 3.4s ease-in-out infinite}
+.pet-head{transform-origin:60px 80px;animation:petHead 7s ease-in-out infinite}
+.pet-tail{transform-origin:84px 100px;animation:petWag 1.6s ease-in-out infinite}
+.pet-eyes{transform-origin:60px 46px;animation:petBlink 4.6s infinite}
+.pet-eye-happy,.pet-eye-sleep,.pet-tongue,.pet-zzz{display:none}
+#petBox.happy .pet-eye-open,#petBox.sleep .pet-eye-open{display:none}
+#petBox.happy .pet-eye-happy{display:inline}
+#petBox.happy .pet-tongue{display:inline}
+#petBox.happy .pet-tail{animation:petWag .28s ease-in-out infinite}
+#petBox.sleep .pet-eye-sleep{display:inline}
+#petBox.sleep .pet-tail{animation:none}
+#petBox.sleep .pet-body{animation-duration:6s}
+#petBox.sleep .pet-head{animation:petNod 6s ease-in-out infinite}
+#petBox.sleep .pet-zzz{display:block}
+#petBox.sleep .pet-zzz text{animation:petZ 3s ease-in-out infinite;opacity:0}
+#petBox.sleep .pet-zzz text:nth-child(2){animation-delay:1s}
+#petBox.sleep .pet-zzz text:nth-child(3){animation-delay:2s}
+#petBox.boing .pet-jump{animation:petBoing .5s cubic-bezier(.3,.7,.4,1)}
+#petBox.wake .pet-jump{animation:petStartle .45s ease-out}
+@keyframes petBreathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.015,1.03)}}
+@keyframes petHead{0%,40%,100%{transform:rotate(0)}48%{transform:rotate(-5deg)}56%{transform:rotate(-5deg)}64%{transform:rotate(0)}}
+@keyframes petNod{0%,100%{transform:rotate(0) translateY(0)}50%{transform:rotate(6deg) translateY(3px)}}
+@keyframes petWag{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(20deg)}}
+@keyframes petBlink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes petBoing{0%{transform:translateY(0) scale(1,1)}25%{transform:translateY(0) scale(1.08,.9)}55%{transform:translateY(-14px) scale(.96,1.06)}80%{transform:translateY(0) scale(1.05,.95)}100%{transform:translateY(0) scale(1,1)}}
+@keyframes petStartle{0%{transform:translateY(0)}30%{transform:translateY(-10px) rotate(-4deg)}60%{transform:translateY(0) rotate(3deg)}100%{transform:translateY(0) rotate(0)}}
+@keyframes petZ{0%{opacity:0;transform:translate(0,6px) scale(.7)}30%{opacity:.9}100%{opacity:0;transform:translate(8px,-14px) scale(1.1)}}
+.pet-heart{position:absolute;left:50%;top:18px;font-size:16px;line-height:1;color:#ff6b8a;pointer-events:none;will-change:transform,opacity;animation:petHeart 1.1s ease-out forwards}
+@keyframes petHeart{0%{opacity:0;transform:translate(-50%,6px) scale(.5)}15%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),-52px) scale(var(--sc,1)) rotate(var(--rot,0deg))}}
+.pet-say{position:absolute;right:62px;bottom:72px;white-space:nowrap;padding:5px 11px;border-radius:14px;font:600 13px/1.4 var(--sans,sans-serif);
+  background:var(--sheet,#fff);color:var(--ink,#17263f);box-shadow:0 0 0 1px var(--line,#d3dbe8),0 8px 18px -8px rgba(0,0,0,.35);
+  opacity:0;transform:translateY(4px) scale(.92);transform-origin:100% 100%;transition:opacity .2s,transform .2s;pointer-events:none}
+.pet-say::after{content:"";position:absolute;right:12px;bottom:-5px;width:9px;height:9px;background:inherit;transform:rotate(45deg);box-shadow:2px 2px 0 0 var(--line,#d3dbe8)}
+.pet-say.on{opacity:1;transform:none}
+.pet-x{position:absolute;right:-4px;top:-4px;width:22px;height:22px;padding:0;border-radius:50%;border:0;cursor:pointer;pointer-events:auto;
+  background:var(--sheet,#fff);color:var(--muted,#5d6b7c);box-shadow:0 0 0 1px var(--line,#d3dbe8);font:600 12px/22px var(--sans,sans-serif);text-align:center;opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s}
+#petBox:hover .pet-x,#petBox.showx .pet-x,.pet-x:focus-visible{opacity:1;transform:none}
+#petBack{position:fixed;right:16px;bottom:16px;z-index:30;width:36px;height:36px;padding:0;border-radius:50%;border:0;cursor:pointer;font-size:18px;line-height:36px;text-align:center;
+  background:var(--sheet,#fff);box-shadow:0 0 0 1px var(--line,#d3dbe8),0 8px 18px -10px rgba(0,0,0,.4);opacity:.85}
+#petBack:hover{opacity:1}
+#petBack[hidden]{display:none!important}
+@media (max-width:640px){#petBox,#petDog{width:68px;height:68px}.pet-say{right:46px;bottom:56px;font-size:12px}}
+@media (prefers-reduced-motion:reduce){.pet-body,.pet-head,.pet-tail,.pet-eyes,#petBox.sleep .pet-zzz text{animation:none!important}#petBox.boing .pet-jump,#petBox.wake .pet-jump{animation:none}}
+@media print{#petBox,#petBack{display:none!important}}
+</style>
+
+<div id="petBox" class="no-print" hidden aria-label="小宠物">
+  <div class="pet-say" id="petSay" role="status" aria-live="polite"></div>
+  <button id="petDog" type="button" aria-label="摸摸小宠物（可以拖动）">
+    <svg id="petSvg" viewBox="0 0 120 120" aria-hidden="true"></svg>
+  </button>
+  <button class="pet-x" id="petHide" type="button" aria-label="收起小宠物" title="收起">✕</button>
+</div>
+<button id="petBack" type="button" hidden aria-label="把小宠物叫回来" title="把小宠物叫回来">🐶</button>
+
+<script>
+/* 小宠物：自成一体（IIFE + try/catch）。只读写自己的 localStorage 键 spm-pet，不读不改考前助手的任何数据、函数或元素。 */
+(function () {
+  try {
+    var KEY = 'spm-pet';
+    var box = document.getElementById('petBox'), dog = document.getElementById('petDog'),
+        say = document.getElementById('petSay'), hideBtn = document.getElementById('petHide'),
+        back = document.getElementById('petBack');
+    if (!box || !dog || !say || !hideBtn || !back) return;
+
+
+    /* ---------- 造型：每种都用同一套动作（呼吸 / 眨眼 / 摇尾巴 / 睡觉），只是长相不同 ---------- */
+    function eyesG(o) {
+      return '<g class="pet-eyes"><g class="pet-eye-open">' + o.open + '</g>' +
+        '<g class="pet-eye-happy" fill="none" stroke="' + o.ink + '" stroke-width="3" stroke-linecap="round"><path d="M40.5 48 q5.5 -7 11 0"/><path d="M68.5 48 q5.5 -7 11 0"/></g>' +
+        '<g class="pet-eye-sleep" fill="none" stroke="' + o.ink + '" stroke-width="2.6" stroke-linecap="round"><path d="M41 47 q5 4 10 0"/><path d="M69 47 q5 4 10 0"/></g></g>';
+    }
+    var DARK_EYE = '<circle cx="46" cy="47" r="4.4" fill="#3a2a22"/><circle cx="74" cy="47" r="4.4" fill="#3a2a22"/><circle cx="47.5" cy="45.4" r="1.5" fill="#fff"/><circle cx="75.5" cy="45.4" r="1.5" fill="#fff"/>';
+    var BLUSH = function (y, c, o) { return '<ellipse cx="38" cy="' + y + '" rx="6" ry="3.6" fill="' + c + '" opacity="' + o + '"/><ellipse cx="82" cy="' + y + '" rx="6" ry="3.6" fill="' + c + '" opacity="' + o + '"/>'; };
+    var ZZZ = '<g class="pet-zzz" font-family="sans-serif" font-weight="700" fill="#7b8fb5"><text x="92" y="30" font-size="13">z</text><text x="98" y="20" font-size="10">z</text><text x="103" y="11" font-size="8">z</text></g>';
+    var PAWS = function (fill, stroke) { return '<ellipse cx="47" cy="108" rx="9" ry="6" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1.5"/><ellipse cx="73" cy="108" rx="9" ry="6" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1.5"/>'; };
+    var DOG_MOUTH = function (c) { return '<path d="M60 60 v4.5 M60 64.5 q-5 5 -10 1 M60 64.5 q5 5 10 1" fill="none" stroke="' + c + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'; };
+    var KINDS = {
+      dog: { name: '小狗', emoji: '🐶', say: ['汪！', '汪汪！'], build: function () { return {
+        tail: '<path d="M82 100 C98 100 104 84 98 74" fill="none" stroke="#e0a766" stroke-width="9" stroke-linecap="round"/>',
+        body: '<ellipse cx="60" cy="90" rx="27" ry="23" fill="#f1c58b"/><ellipse cx="60" cy="96" rx="15" ry="15" fill="#fff3df"/>' + PAWS('#fff3df', '#e0a766') +
+          '<path d="M43 108 v-2 M47 108.5 v-2.5 M51 108 v-2 M69 108 v-2 M73 108.5 v-2.5 M77 108 v-2" stroke="#e0a766" stroke-width="1.2" stroke-linecap="round"/>',
+        back: '',
+        head: '<ellipse cx="60" cy="52" rx="33" ry="29" fill="#f1c58b"/><ellipse cx="29" cy="58" rx="10" ry="19" fill="#c98e56" transform="rotate(14 29 58)"/><ellipse cx="91" cy="58" rx="10" ry="19" fill="#c98e56" transform="rotate(-14 91 58)"/>' +
+          '<path d="M60 25 C54 31 54 40 60 44 C66 40 66 31 60 25Z" fill="#fff3df"/><ellipse cx="60" cy="63" rx="17" ry="13" fill="#fff3df"/>' + BLUSH(60, '#ff9eaa', .5),
+        face: eyesG({ open: DARK_EYE, ink: '#3a2a22' }) + '<path class="pet-tongue" d="M54.5 66.5 q5.5 12 11 0 z" fill="#ff7f93"/><ellipse cx="60" cy="56.5" rx="5.2" ry="3.7" fill="#4a3328"/><ellipse cx="58.4" cy="55.3" rx="1.6" ry=".9" fill="#fff" opacity=".6"/>' + DOG_MOUTH('#4a3328')
+      }; } },
+      cat: { name: '小猫', emoji: '🐱', say: ['喵~', '喵呜~', '呼噜呼噜~'], build: function () { return {
+        tail: '<path d="M82 102 C106 104 110 80 98 64" fill="none" stroke="#f0a95a" stroke-width="9" stroke-linecap="round"/>',
+        body: '<ellipse cx="60" cy="90" rx="27" ry="23" fill="#f4b46b"/><ellipse cx="60" cy="96" rx="15" ry="15" fill="#fff0dc"/>' + PAWS('#fff0dc', '#d9893a') +
+          '<path d="M36 84 q6 2 8 8 M84 84 q-6 2 -8 8" fill="none" stroke="#d9893a" stroke-width="3" stroke-linecap="round"/>',
+        back: '<path d="M31 40 L35 11 L57 28 Z" fill="#f4b46b"/><path d="M37 34 L39 20 L50 29 Z" fill="#f6a9b6"/><path d="M89 40 L85 11 L63 28 Z" fill="#f4b46b"/><path d="M83 34 L81 20 L70 29 Z" fill="#f6a9b6"/>',
+        head: '<ellipse cx="60" cy="52" rx="34" ry="28" fill="#f4b46b"/><path d="M52 27 q2 6 0 11 M60 24 v13 M68 27 q-2 6 0 11" fill="none" stroke="#d9893a" stroke-width="3" stroke-linecap="round"/>' +
+          '<ellipse cx="60" cy="63" rx="13" ry="9.5" fill="#fff0dc"/>' + BLUSH(60, '#ff9eaa', .5),
+        face: eyesG({ open: DARK_EYE.replace(/r="4.4"/g, 'r="4.8"'), ink: '#3a2a22' }) + '<path class="pet-tongue" d="M56 64.5 q4 8 8 0 z" fill="#ff7f93"/><path d="M56.6 55.5 h6.8 l-3.4 4.2 z" fill="#f08a9c"/>' +
+          '<path d="M60 59.8 v2.4 M60 62.2 q-4 4 -8 1 M60 62.2 q4 4 8 1" fill="none" stroke="#7a4a2a" stroke-width="1.8" stroke-linecap="round"/>' +
+          '<path d="M44 61 L22 56 M44 65 L22 67 M76 61 L98 56 M76 65 L98 67" fill="none" stroke="#a47a52" stroke-width="1.4" stroke-linecap="round" opacity=".85"/>'
+      }; } },
+      rabbit: { name: '小兔', emoji: '🐰', say: ['噗噗~', '蹦蹦~'], build: function () { var st = '#e8d6c8'; return {
+        tail: '<circle cx="88" cy="102" r="7" fill="#fff" stroke="' + st + '" stroke-width="1.5"/>',
+        body: '<ellipse cx="60" cy="90" rx="27" ry="23" fill="#fffaf6" stroke="' + st + '" stroke-width="1.5"/><ellipse cx="60" cy="96" rx="15" ry="15" fill="#ffe9ee"/>' + PAWS('#fffaf6', st),
+        back: '<ellipse cx="42" cy="18" rx="9" ry="21" transform="rotate(-8 42 18)" fill="#fffaf6" stroke="' + st + '" stroke-width="1.5"/><ellipse cx="42.5" cy="20" rx="4.5" ry="14" transform="rotate(-8 42 18)" fill="#ffc6d2"/>' +
+          '<ellipse cx="78" cy="18" rx="9" ry="21" transform="rotate(8 78 18)" fill="#fffaf6" stroke="' + st + '" stroke-width="1.5"/><ellipse cx="77.5" cy="20" rx="4.5" ry="14" transform="rotate(8 78 18)" fill="#ffc6d2"/>',
+        head: '<ellipse cx="60" cy="52" rx="32" ry="28" fill="#fffaf6" stroke="' + st + '" stroke-width="1.5"/>' + BLUSH(60, '#ffa8b8', .55),
+        face: eyesG({ open: DARK_EYE, ink: '#3a2a22' }) + '<ellipse cx="60" cy="56" rx="3.6" ry="2.6" fill="#f2a0b2"/><path d="M60 58.6 v3 M60 61.6 q-4 4 -8 .6 M60 61.6 q4 4 8 .6" fill="none" stroke="#b88080" stroke-width="1.8" stroke-linecap="round"/>' +
+          '<path class="pet-tongue" d="M56 69 q4 7 8 0 z" fill="#ff7f93"/><rect x="57.4" y="62.6" width="5.2" height="5.6" rx="1.4" fill="#fff" stroke="#e3cfc4" stroke-width="1"/>'
+      }; } },
+      panda: { name: '熊猫', emoji: '🐼', say: ['嗷呜~', '啃竹子中…'], build: function () { var bk = '#2b2b33', st = '#d9dbe3'; return {
+        tail: '<circle cx="88" cy="102" r="6.5" fill="#fff" stroke="' + st + '" stroke-width="1.5"/>',
+        body: '<ellipse cx="60" cy="90" rx="27" ry="23" fill="#fff" stroke="' + st + '" stroke-width="1.5"/><ellipse cx="36" cy="88" rx="8" ry="14" transform="rotate(20 36 88)" fill="' + bk + '"/><ellipse cx="84" cy="88" rx="8" ry="14" transform="rotate(-20 84 88)" fill="' + bk + '"/>' +
+          '<ellipse cx="47" cy="108" rx="9" ry="6" fill="' + bk + '"/><ellipse cx="73" cy="108" rx="9" ry="6" fill="' + bk + '"/>',
+        back: '<circle cx="31" cy="30" r="11" fill="' + bk + '"/><circle cx="89" cy="30" r="11" fill="' + bk + '"/>',
+        head: '<ellipse cx="60" cy="52" rx="33" ry="29" fill="#fff" stroke="' + st + '" stroke-width="1.5"/><ellipse cx="46" cy="49" rx="8.5" ry="10.5" transform="rotate(20 46 49)" fill="' + bk + '"/><ellipse cx="74" cy="49" rx="8.5" ry="10.5" transform="rotate(-20 74 49)" fill="' + bk + '"/>' + BLUSH(63, '#ffb3c1', .6).replace('cx="38"', 'cx="33"').replace('cx="82"', 'cx="87"'),
+        face: eyesG({ open: '<circle cx="46" cy="47" r="4.2" fill="#fff"/><circle cx="74" cy="47" r="4.2" fill="#fff"/><circle cx="46.4" cy="47.4" r="2.6" fill="' + bk + '"/><circle cx="74.4" cy="47.4" r="2.6" fill="' + bk + '"/><circle cx="47.2" cy="46.4" r=".9" fill="#fff"/><circle cx="75.2" cy="46.4" r=".9" fill="#fff"/>', ink: '#fff' }) +
+          '<path class="pet-tongue" d="M55 66 q5 10 10 0 z" fill="#ff7f93"/><ellipse cx="60" cy="57" rx="5" ry="3.4" fill="' + bk + '"/><ellipse cx="58.6" cy="56" rx="1.5" ry=".8" fill="#fff" opacity=".5"/>' +
+          '<path d="M60 60.4 v3 M60 63.4 q-4 4 -8 1 M60 63.4 q4 4 8 1" fill="none" stroke="' + bk + '" stroke-width="2" stroke-linecap="round"/>'
+      }; } },
+      bear: { name: '小熊', emoji: '🐻', say: ['嗷~', '抱抱~'], build: function () { return {
+        tail: '<circle cx="88" cy="103" r="6" fill="#b87a45"/>',
+        body: '<ellipse cx="60" cy="90" rx="27" ry="23" fill="#c98e56"/><ellipse cx="60" cy="96" rx="15" ry="15" fill="#f3d9b8"/>' + PAWS('#f3d9b8', '#a8693a'),
+        back: '<circle cx="31" cy="30" r="10.5" fill="#b87a45"/><circle cx="31" cy="30" r="5.5" fill="#e8bd90"/><circle cx="89" cy="30" r="10.5" fill="#b87a45"/><circle cx="89" cy="30" r="5.5" fill="#e8bd90"/>',
+        head: '<ellipse cx="60" cy="52" rx="33" ry="29" fill="#c98e56"/><ellipse cx="60" cy="63" rx="15" ry="11.5" fill="#f3d9b8"/>' + BLUSH(60, '#ff9eaa', .45),
+        face: eyesG({ open: DARK_EYE, ink: '#3a2a22' }) + '<path class="pet-tongue" d="M55 66 q5 10 10 0 z" fill="#ff7f93"/><ellipse cx="60" cy="57" rx="5" ry="3.6" fill="#4a3328"/><ellipse cx="58.4" cy="55.9" rx="1.5" ry=".8" fill="#fff" opacity=".55"/>' + DOG_MOUTH('#4a3328').replace('M60 60 v4.5', 'M60 60.6 v3.9')
+      }; } }
+    };
+    function buildSvg(kind) {
+      var k = KINDS[kind] || KINDS.dog, o = k.build();
+      return '<ellipse cx="60" cy="113" rx="34" ry="5" fill="#000" opacity=".12"/><g class="pet-jump"><g class="pet-tail">' + o.tail + '</g><g class="pet-body">' + o.body + '</g><g class="pet-head">' + o.back + o.head + o.face + '</g>' + ZZZ + '</g>';
+    }
+
+    var st = { r: 16, b: 16, hidden: false, on: true, kind: 'dog' };
+    var svgEl = document.getElementById('petSvg');
+    try { var o = JSON.parse(localStorage.getItem(KEY) || '{}'); if (typeof o.r === 'number') st.r = o.r; if (typeof o.b === 'number') st.b = o.b; st.hidden = !!o.hidden; if (o.on === false) st.on = false; if (typeof o.kind === 'string' && KINDS[o.kind]) st.kind = o.kind; } catch (e) {}
+    function persist() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+
+    function size() { return box.offsetWidth || 88; }
+    function clamp() {
+      var s = size();
+      st.r = Math.min(Math.max(4, st.r), Math.max(4, window.innerWidth - s - 4));
+      st.b = Math.min(Math.max(4, st.b), Math.max(4, window.innerHeight - s - 4));
+    }
+    function place() { clamp(); box.style.right = st.r + 'px'; box.style.bottom = st.b + 'px'; back.style.right = '16px'; back.style.bottom = '16px'; }
+    var sel = document.getElementById('petSel');
+    var kindSel = document.getElementById('petKind');
+    function skin() { setLines(); svgEl.innerHTML = buildSvg(st.kind); back.textContent = KINDS[st.kind].emoji; if (kindSel) kindSel.value = st.kind; }
+    function show() { box.hidden = !st.on || st.hidden; back.hidden = !st.on || !st.hidden; if (sel) sel.value = st.on ? 'on' : 'off'; skin(); if (!box.hidden) place(); }
+    show();
+    if (sel) sel.addEventListener('change', function () { st.on = sel.value !== 'off'; if (st.on) st.hidden = false; persist(); show(); });
+    if (kindSel) kindSel.addEventListener('change', function () { if (KINDS[kindSel.value]) { st.kind = kindSel.value; persist(); skin(); if (st.on && !st.hidden) { box.classList.remove('sleep'); pet(); } } });
+
+    var COMMON = ['嘿嘿~', '再摸摸~', '好舒服…', '加油复习！', '我陪着你~', '摸摸头，考试顺利', '你好棒！', '蹭蹭~'];
+    var lines = COMMON.slice();
+    function setLines() { lines = KINDS[st.kind].say.concat(KINDS[st.kind].say, COMMON); }
+    setLines();
+    var hearts = ['♥', '♥', '♥', '♡', '✦'];
+    var sayT = 0, happyT = 0, sleepT = 0, lastLine = -1, xT = 0, hearting = 0;
+
+    function speak(txt) {
+      say.textContent = txt; say.classList.add('on');
+      clearTimeout(sayT); sayT = setTimeout(function () { say.classList.remove('on'); }, 1500);
+    }
+    function burst(n) {
+      for (var i = 0; i < n; i++) {
+        if (hearting > 10) return;
+        var h = document.createElement('span');
+        h.className = 'pet-heart'; h.textContent = hearts[(Math.random() * hearts.length) | 0];
+        h.style.setProperty('--dx', ((Math.random() - .5) * 50).toFixed(0) + 'px');
+        h.style.setProperty('--sc', (0.9 + Math.random() * 0.7).toFixed(2));
+        h.style.setProperty('--rot', ((Math.random() - .5) * 40).toFixed(0) + 'deg');
+        h.style.left = (38 + Math.random() * 24) + '%';
+        h.style.animationDelay = (i * 0.07) + 's';
+        hearting++;
+        box.appendChild(h);
+        (function (el) { var d = function () { if (el.parentNode) { el.remove(); hearting--; } }; el.addEventListener('animationend', d); setTimeout(d, 1800); })(h);
+      }
+    }
+    function restartAnim(cls) { box.classList.remove(cls); void box.offsetWidth; box.classList.add(cls); }
+
+    function sleepSoon() {
+      clearTimeout(sleepT);
+      sleepT = setTimeout(function () { if (!box.hidden && !document.hidden) { box.classList.remove('happy'); box.classList.add('sleep'); } }, 60000);
+    }
+    function wake() { if (box.classList.contains('sleep')) { box.classList.remove('sleep'); return true; } return false; }
+
+    function pet() {
+      var woke = wake();
+      if (woke) { restartAnim('wake'); speak('汪？！'); setTimeout(function () { box.classList.remove('wake'); }, 500); }
+      else {
+        box.classList.add('happy'); restartAnim('boing'); burst(2 + ((Math.random() * 2) | 0));
+        var i; do { i = (Math.random() * lines.length) | 0; } while (i === lastLine && lines.length > 1);
+        lastLine = i; speak(lines[i]);
+        clearTimeout(happyT); happyT = setTimeout(function () { box.classList.remove('happy', 'boing'); }, 1400);
+      }
+      sleepSoon();
+    }
+
+    /* 拖动 + 点击：移动不到 6px 算点击，否则算拖动 */
+    var drag = null;
+    dog.addEventListener('pointerdown', function (e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      drag = { x: e.clientX, y: e.clientY, r: st.r, b: st.b, moved: false, id: e.pointerId };
+      try { dog.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    dog.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 6) return;
+      drag.moved = true; st.r = drag.r - dx; st.b = drag.b - dy; place();
+    });
+    function end(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var d = drag; drag = null;
+      try { dog.releasePointerCapture(e.pointerId); } catch (x) {}
+      if (d.moved) persist();
+      else if (e.type === 'pointerup') { pet(); box.classList.add('showx'); clearTimeout(xT); xT = setTimeout(function () { box.classList.remove('showx'); }, 2500); }
+    }
+    dog.addEventListener('pointerup', end);
+    dog.addEventListener('pointercancel', end);
+    dog.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pet(); } });
+    dog.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+    hideBtn.addEventListener('click', function () { st.hidden = true; persist(); show(); });
+    back.addEventListener('click', function () { st.hidden = false; persist(); show(); box.classList.remove('sleep'); pet(); });
+
+    /* 窗口变化时别跑出屏幕；页面里有操作就重新计时睡觉（只是被动监听，不拦截任何事件） */
+    window.addEventListener('resize', function () { if (!box.hidden) place(); });
+    ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, function () { if (!box.classList.contains('sleep')) sleepSoon(); }, { passive: true, capture: true }); });
+    sleepSoon();
+  } catch (err) { /* 小狗出任何问题都不影响主系统 */ }
+})();
+</script>
+<script>
+const TOCTXT={"bio": "T4|1|Pengenalan kepada Biologi dan Peraturan Makmal|1.1 Bidang Biologi dan Kerjaya;1.2 Keselamatan dan Peraturan dalam Makmal Biologi;1.3 Berkomunikasi dalam Biologi;1.4 Penyiasatan Saintifik dalam Biologi\nT4|2|Biologi Sel dan Organisasi Sel|2.1 Struktur dan Fungsi Sel;2.2 Proses Hidup Organisma Unisel;2.3 Proses Hidup Organisma Multisel;2.4 Aras Organisasi\nT4|3|Pergerakan Bahan Merentasi Membran Plasma|3.1 Struktur Membran Plasma;3.2 Konsep Pergerakan Bahan Merentasi Membran Plasma;3.3 Pergerakan Bahan Merentasi Membran Plasma dalam Organisma Hidup;3.4 Pergerakan Bahan Merentasi Membran Plasma dalam Kehidupan Harian\nT4|4|Komposisi Kimia dalam Sel|4.1 Air;4.2 Karbohidrat;4.3 Protein;4.4 Lipid;4.5 Asid Nukleik\nT4|5|Metabolisme dan Enzim|5.1 Metabolisme;5.2 Enzim;5.3 Aplikasi Enzim dalam Kehidupan Harian\nT4|6|Pembahagian Sel|6.1 Pembahagian Sel;6.2 Kitar Sel dan Mitosis;6.3 Meiosis;6.4 Isu Pembahagian Sel terhadap Kesihatan Manusia\nT4|7|Respirasi Sel|7.1 Penghasilan Tenaga melalui Respirasi Sel;7.2 Respirasi Aerob;7.3 Fermentasi\nT4|8|Sistem Respirasi dalam Manusia dan Haiwan|8.1 Jenis Sistem Respirasi;8.2 Mekanisme Pernafasan;8.3 Pertukaran Gas dalam Manusia;8.4 Isu Kesihatan Berkaitan Sistem Respirasi Manusia\nT4|9|Nutrisi dan Sistem Pencernaan Manusia|9.1 Sistem Pencernaan;9.2 Pencernaan;9.3 Penyerapan;9.4 Asimilasi;9.5 Penyahtinjaan;9.6 Gizi Seimbang;9.7 Isu Kesihatan Berkaitan Sistem Pencernaan dan Tabiat Pemakanan\nT4|10|Pengangkutan dalam Manusia dan Haiwan|10.1 Jenis Sistem Peredaran;10.2 Sistem Peredaran Manusia;10.3 Mekanisme Denyutan Jantung;10.4 Mekanisme Pembekuan Darah;10.5 Kumpulan Darah Manusia;10.6 Isu Kesihatan Berkaitan Sistem Peredaran Manusia;10.7 Sistem Limfa Manusia;10.8 Isu Kesihatan Berkaitan Sistem Limfa Manusia\nT4|11|Keimunan Manusia|11.1 Pertahanan Badan;11.2 Tindakan Antibodi;11.3 Jenis Keimunan;11.4 Isu Kesihatan Berkaitan Keimunan Manusia\nT4|12|Koordinasi dan Gerak Balas dalam Manusia|12.1 Koordinasi dan Gerak Balas;12.2 Sistem Saraf;12.3 Neuron dan Sinaps;12.4 Tindakan Terkawal dan Tindakan Luar Kawal;12.5 Isu Kesihatan Berkaitan Sistem Saraf Manusia;12.6 Sistem Endokrin;12.7 Isu Kesihatan Berkaitan Sistem Endokrin Manusia\nT4|13|Homeostasis dan Sistem Urinari Manusia|13.1 Homeostasis;13.2 Sistem Urinari;13.3 Isu Kesihatan Berkaitan Sistem Urinari\nT4|14|Sokongan dan Pergerakan dalam Manusia dan Haiwan|14.1 Jenis Rangka;14.2 Sistem Otot Rangka Manusia;14.3 Mekanisme Pergerakan dan Gerak Alih;14.4 Isu Kesihatan Sistem Otot Rangka Manusia\nT4|15|Pembiakan Seks, Perkembangan dan Pertumbuhan dalam Manusia dan Haiwan|15.1 Sistem Pembiakan Manusia;15.2 Gametogenesis Manusia;15.3 Kitar Haid;15.4 Perkembangan Fetus Manusia;15.5 Pembentukan Kembar;15.6 Isu Kesihatan Berkaitan Sistem Pembiakan Manusia;15.7 Pertumbuhan dalam Manusia dan Haiwan\nT5|1|Organisasi Tisu Tumbuhan dan Pertumbuhan|1.1 Organisasi Tisu Tumbuhan;1.2 Tisu Meristem dan Pertumbuhan;1.3 Lengkung Pertumbuhan\nT5|2|Struktur dan Fungsi Daun|2.1 Struktur Daun;2.2 Organ Utama Pertukaran Gas;2.3 Organ Utama Transpirasi;2.4 Organ Utama Fotosintesis;2.5 Titik Pampasan\nT5|3|Nutrisi dalam Tumbuhan|3.1 Nutrien Tak Organik Utama;3.2 Organ Pengambilan Air dan Garam Mineral;3.3 Kepelbagaian dalam Nutrisi Tumbuhan\nT5|4|Pengangkutan dalam Tumbuhan|4.1 Tisu Vaskular;4.2 Pengangkutan Air dan Garam Mineral;4.3 Translokasi;4.4 Fitoremediasi\nT5|5|Gerak Balas dalam Tumbuhan|5.1 Jenis Gerak Balas;5.2 Fitohormon;5.3 Aplikasi Fitohormon dalam Pertanian\nT5|6|Pembiakan Seks dalam Tumbuhan Berbunga|6.1 Struktur Bunga;6.2 Pembentukan Debunga dan Pundi Embrio;6.3 Pendebungaan dan Persenyawaan;6.4 Perkembangan Biji Benih dan Buah;6.5 Kepentingan Biji Benih untuk Kemandirian\nT5|7|Penyesuaian Tumbuhan pada Habitat|7.1 Penyesuaian Tumbuhan Berdasarkan Habitat\nT5|8|Biodiversiti|8.1 Kepelbagaian Spesies;8.2 Kepentingan Biodiversiti;8.3 Pemeliharaan dan Pemuliharaan Biodiversiti\nT5|9|Ekosistem|9.1 Komponen Ekosistem;9.2 Interaksi dalam Ekosistem;9.3 Keseimbangan dalam Ekosistem\nT5|10|Kelestarian Alam Sekitar|10.1 Isu Alam Sekitar;10.2 Usaha Pemuliharaan dan Pemeliharaan Alam Sekitar;10.3 Peranan Individu dan Komuniti dalam Kelestarian Alam Sekitar\nT5|11|Pewarisan|11.1 Konsep Pewarisan;11.2 Hukum Mendel;11.3 Pewarisan Sifat dalam Manusia\nT5|12|Variasi|12.1 Jenis Variasi;12.2 Faktor yang Mempengaruhi Variasi;12.3 Kepentingan Variasi dalam Pemilihan Semula Jadi\nT5|13|Teknologi Genetik|13.1 Kejuruteraan Genetik;13.2 Aplikasi Teknologi Genetik dalam Kehidupan Seharian;13.3 Isu Etika dalam Teknologi Genetik", "sains": "T4|1|Langkah Keselamatan dalam Makmal (Safety Measures in the Laboratory)|\nT4|2|Bantuan Kecemasan (Emergency Help)|CPR;Heimlich Manoeuvre\nT4|3|Teknik Mengukur Parameter Kesihatan Badan (Techniques of Measuring the Parameters of Body Health)|\nT4|4|Teknologi Hijau untuk Kelestarian Alam Sekitar (Green Technology for Environmental Sustainability)|\nT4|5|Genetik (Genetics)|\nT4|6|Sokongan, Pergerakan dan Pertumbuhan (Support, Movement and Growth)|\nT4|7|Koordinasi Badan (Body Coordination)|\nT4|8|Unsur dan Bahan (Elements and Substances)|\nT4|9|Bahan Kimia dalam Industri (Chemicals in Industry)|\nT4|10|Bahan Kimia dalam Perubatan dan Kesihatan (Chemicals in Medicine and Health)|\nT4|11|Daya dan Gerakan (Force and Motion)|\nT4|12|Tenaga Nuklear (Nuclear Energy)|\nT5|1|Mikroorganisma (Microorganisms)|\nT5|2|Nutrisi dan Teknologi Makanan (Nutrition and Food Technology)|\nT5|3|Kelestarian Alam Sekitar (Sustainability of the Environment)|\nT5|4|Kadar Tindak Balas (Rate of Reaction)|\nT5|5|Sebatian Karbon (Carbon Compounds)|\nT5|6|Elektrokimia (Electrochemistry)|\nT5|7|Cahaya dan Optik (Light and Optics)|\nT5|8|Daya dan Tekanan (Force and Pressure)|\nT5|9|Teknologi Angkasa (Space Technology)|", "sej": "T4|1|Warisan Negara Bangsa|1.1 Latar Belakang Negara Bangsa Sebelum Kedatangan Barat;1.2 Ciri-ciri Negara Bangsa Kesultanan Melayu Melaka\nT4|2|Kebangkitan Nasionalisme|2.1 Maksud Nasionalisme;2.2 Perkembangan Idea Nasionalisme di Barat;2.3 Perkembangan Nasionalisme di Asia;2.4 Perkembangan Nasionalisme di Asia Tenggara;2.5 Kesedaran Nasionalisme di Negara Kita;2.6 Faktor Kemunculan Gerakan Nasionalisme;2.7 Perkembangan Nasionalisme;2.8 Kesan Perkembangan Nasionalisme\nT4|3|Konflik Dunia dan Pendudukan Jepun di Negara Kita|3.1 Nasionalisme di Negara Kita Sebelum Perang Dunia;3.2 Perang Dunia Pertama dan Faktor Perang Dunia Kedua;3.4 Perang Dunia Kedua di Asia Pasifik 1941-1945;3.5 Faktor Kedatangan Jepun ke Negara Kita;3.6 Dasar Pendudukan Jepun di Negara Kita;3.7 Perjuangan Rakyat Tempatan Menentang Pendudukan Jepun;3.8 Perkembangan Gerakan Nasionalisme Tempatan dan Pendudukan Jepun;3.9 Keadaan Negara Kita Selepas Kekalahan Jepun\nT4|4|Era Peralihan Kuasa British di Negara Kita|\nT4|5|Persekutuan Tanah Melayu 1948|\nT4|6|Ancaman Komunis dan Perisytiharan Darurat|6.1 Kemasukan Pengaruh Komunis di Negara Kita;6.2 Ancaman Komunis di Negara Kita\nT4|7|Usaha Ke Arah Kemerdekaan|\nT4|8|Pilihan Raya|\nT4|9|Perlembagaan Persekutuan Tanah Melayu 1957|\nT4|10|Pemasyhuran Kemerdekaan|10.1 Pengertian Kemerdekaan;10.2 Persediaan Menyambut Pemasyhuran Kemerdekaan Negara;10.3 Detik Menyambut Pemasyhuran Kemerdekaan Negara;10.4 Kesan Kemerdekaan terhadap Negara Kita;10.5 Prinsip Kedaulatan Persekutuan Tanah Melayu\nT5|1|Kedaulatan Negara|\nT5|2|Perlembagaan Persekutuan|2.1 Latar Belakang Sejarah Perlembagaan;2.2 Sejarah Penggubalan Perlembagaan Persekutuan\nT5|3|Raja Berperlembagaan dan Demokrasi Berparlimen|3.2 Sejarah dan Kedudukan Institusi Majlis Raja-Raja\nT5|4|Sistem Persekutuan|\nT5|5|Pembentukan Malaysia|\nT5|6|Cabaran Selepas Pembentukan Malaysia|\nT5|7|Membina Kesejahteraan Negara|\nT5|8|Membina Kemakmuran Negara|\nT5|9|Dasar Luar Malaysia|\nT5|10|Kecemerlangan Malaysia di Persada Dunia|", "fiz": "T4|1|Pengukuran|\nT4|2|Daya dan Gerakan I|\nT4|3|Kegravitian|\nT4|4|Haba|\nT4|5|Gelombang|\nT4|6|Cahaya dan Optik|\nT5|1|Daya dan Gerakan II|1.1 Daya Paduan;1.2 Leraian Daya;1.3 Keseimbangan Daya;1.4 Kekenyalan\nT5|2|Tekanan|2.1 Tekanan Cecair;2.2 Tekanan Atmosfera;2.3 Tekanan Gas;2.4 Prinsip Pascal;2.5 Prinsip Archimedes;2.6 Prinsip Bernoulli\nT5|3|Elektrik|3.1 Arus dan Beza Keupayaan;3.2 Rintangan\nT5|4|Keelektromagnetan|\nT5|5|Elektronik|\nT5|6|Fizik Nuklear|\nT5|7|Fizik Kuantum|"};
+
+/* ===== 数据：科目 / 章节 / 笔记 ===== */
+const EXAM = { writtenStart:"2026-11-23", writtenEnd:"2026-12-17" };
+const ET = (s,y)=>`https://edukaji.my/spm-trial-paper-download/${s}/${y}-all`;
+const SUBJECTS = [
+ {id:"bm",lang:"ms",name:"国语 BM",ms:"Bahasa Melayu",code:"1103",color:"#d33a2c",ep:"bahasa-melayu",core:true,
+  fmt:"Kertas 1 作文 + 摘要/Kertas 2 理解、语法、文学；另有口试(Ujian Bertutur)和听力(Ujian Mendengar)",
+  ch:[
+   ["Kertas 1：Karangan (Bahagian A 事件/Bahagian B 议论)",`<ul><li>先<b>圈出题目的文体</b>：Rencana(文章)、Ucapan(演讲)、Cerita(叙事)、Laporan、Surat。</li><li>开头：以谚语/问句/定义引入 → 主题句。结尾：总结 + 劝告/希望。</li><li>每段结构：<b>isi + huraian + contoh + kesimpulan 句</b>。</li><li>语法是失分大头：<code>di-</code> 前缀与介词 <code>di</code> 的分写、<code>kepada</code> 不写 <code>kepada nya</code>、<code>oleh itu / maka / lantaran</code> 的正确使用。</li></ul><div class="tip">每篇至少放 2 个谚语 (peribahasa) 和 2 个成语，必须用对语境，用错比不用更扣分。</div>`],
+   ["Kertas 1：Ringkasan (摘要)",`<ul><li>先划出<b>要点(isi penting)</b>，再用自己的话连成 1 段，不要抄原句。</li><li>字数遵守题目限制；一般先写草稿数字数。</li><li>不加个人意见，不加例子，只保留原文观点。</li></ul>`],
+   ["Kertas 2：Pemahaman (阅读理解)",`<ul><li>答案尽量回到原文找依据，但<b>不要整句照抄</b>，需要改写时用同义词。</li><li>「Apakah maksud ...」要解释在原文语境里的意思，不是词典义。</li><li>「Jelaskan」类题要有<b>因 + 果</b>两部分。</li></ul>`],
+   ["Tatabahasa (语法)",`<table><tr><th>类别</th><th>要点</th></tr><tr><td>Imbuhan</td><td>awalan (me-, ber-, pe-, ter-), akhiran (-kan, -i, -an), apitan (me-kan, pe-an, ke-an)</td></tr><tr><td>Kata ganda</td><td>penuh / separa / berentak 三种</td></tr><tr><td>Kata majmuk</td><td>kata majmuk 分写：<code>kerja sama</code>, <code>tanggungjawab</code> 例外要背</td></tr><tr><td>Ayat</td><td>ayat tunggal, majmuk (gabungan/pancangan/campuran)</td></tr></table>`],
+   ["Kesusasteraan (文学)",`<ul><li>Komsas：puisi、cerpen、novel、drama。每个文本背好<b>tema, persoalan, watak, plot, latar, nilai, pengajaran, gaya bahasa</b>。</li><li>答题格式：<b>Isi + Bukti (引用/事件) + Huraian</b>。</li><li>Sajak/pantun/syair/gurindam 的形式特征要会区分。</li></ul>`],
+   ["Ujian Bertutur & Mendengar (口试/听力)",`<ul><li>口试：用完整句子，开头<b>表明观点</b>，给 2 个理由，结尾总结；不要停顿太久，卡住时用「Pada pendapat saya ...」补位。</li><li>听力：先读题再听，抓<b>名词、数字、转折词</b>。</li></ul>`]
+  ]},
+ {id:"bi",lang:"en",name:"英文 BI",ms:"English",code:"1119",color:"#2c47d6",ep:"english",core:true,
+  fmt:"Paper 1 (Reading & Writing)、Paper 2 (Listening)、Speaking；以 CEFR 标准评分",
+  ch:[
+   ["Writing: Directed Writing (Part 1)",`<ul><li>格式：Email / Letter / Report / Proposal 等，<b>必须覆盖题目给的每个 content point</b>。</li><li>开头 purpose 句：<code>I am writing to ...</code>；结尾：<code>I look forward to hearing from you.</code></li><li>注意 register：给朋友非正式；给校长/公司正式，不用缩写。</li></ul>`],
+   ["Writing: Continuous Writing (Part 2)",`<ul><li>文体：Essay、Article、Short story、Review、Speech 等，先看 genre 再写。</li><li>结构：Introduction (hook) → 2-3 body paragraphs (P.E.E: Point, Evidence, Explain) → Conclusion。</li><li>高分要点：多样句型、linking words (however, moreover, consequently)、正确时态。</li></ul><div class="tip">写完检查三件事：主谓一致、时态一致、a/an/the。</div>`],
+   ["Reading: 题型与技巧",`<ul><li>Skimming 找主旨，Scanning 找细节；先看题再读文章。</li><li>Vocabulary in context：看前后句猜词义。</li><li>Inference 题：答案在文中有线索，不是凭空想象。</li></ul>`],
+   ["Grammar 常错点",`<table><tr><th>点</th><th>例</th></tr><tr><td>主谓一致</td><td>The number of students <b>is</b> / A number of students <b>are</b></td></tr><tr><td>时态</td><td>过去叙事用 past simple，背景用 past continuous</td></tr><tr><td>条件句</td><td>If I <b>were</b> you, I <b>would</b> ...</td></tr><tr><td>冠词</td><td>the + 唯一/已提及；泛指复数不加 the</td></tr></table>`],
+   ["Listening & Speaking",`<ul><li>Listening：先预读选项，圈关键词，听到答案立刻做记号。</li><li>Speaking：每个 task 说 3-4 句以上，给理由 + 例子，不要只答 yes/no。</li></ul>`]
+  ]},
+ {id:"sej",lang:"ms",name:"历史 Sejarah",ms:"Sejarah",code:"1249",color:"#8a5a00",ep:"sejarah",core:true,must:true,
+  fmt:"Kertas 1 (40 题选择)；Kertas 2 (结构 + 论述)。SPM 必须及格 (E 以上) 才能拿证书。",
+  ch:[
+   ["T4 Bab 1 Warisan Negara Bangsa",`<ul><li>满刺加 (Melaka) 作为<b>negara bangsa</b>：有政治体系、领土、人民、主权。</li><li>特点：Sultan 为最高统治者，Bendahara、Temenggung、Laksamana、Syahbandar 分工；<b>Undang-undang Kanun Melaka</b> 和 Undang-undang Laut Melaka。</li></ul>`],
+   ["T4 Bab 2 Kebangkitan Nasionalisme",`<ul><li>民族主义的意义；欧洲、亚洲、东南亚的发展；本国觉醒因素：教育、媒体、宗教改革(Kaum Muda)、外来思想。</li></ul>`],
+   ["T4 Bab 3 Konflik Dunia dan Pendudukan Jepun",`<ul><li>日本占领马来亚：1941-1945。政策：<b>Sook Ching</b> (肃清华人)、饥饿与物价上涨、泰缅铁路强迫劳动 (romusha)、一方面拉拢马来人。</li><li>抵抗：MPAJA (马来亚人民抗日军)、Force 136、Wataniah (沙巴) 等。</li></ul>`],
+   ["T4 Bab 4 Era Peralihan Kuasa British",`<ul><li>BMA (1945-46) → <b>Malayan Union 1946</b> (中央集权、公民权放宽、削弱苏丹权力) → 马来人反对，UMNO (1946) 成立 → 被 1948 年联合邦取代。</li><li>砂拉越 1946 割让给英国 (Rajah Vyner Brooke)，反割让运动 (Duncan Stewart 被刺)；沙巴 1946 成为皇家殖民地。</li></ul>`],
+   ["T4 Bab 5 Persekutuan Tanah Melayu 1948",`<ul><li>废除 Malayan Union 的原因：马来人强烈反对。特点：保留苏丹主权、中央政府 + 州政府、公民权条件较严。</li></ul>`],
+   ["T4 Bab 6 Ancaman Komunis dan Darurat",`<ul><li>1948 年 6 月 16 日宣布紧急状态 (<b>Darurat</b>)，起因之一是三名欧洲园丘经理在霹雳被杀。</li><li>应对：<b>Briggs Plan</b> (新村)、Templer 的「心理战」(hati dan minda)、Home Guard。1960 年 7 月 31 日紧急状态结束。</li></ul>`],
+   ["T4 Bab 7 Usaha Ke Arah Kemerdekaan",`<ul><li>Jawatankuasa Hubungan Antara Kaum (CLC)、Sistem Ahli (1951)、Sistem Pendidikan Kebangsaan (Penyata Razak 1956)、政党成立 (UMNO, MCA, MIC, Parti Perikatan)。</li></ul>`],
+   ["T4 Bab 8 Pilihan Raya",`<ul><li>1951 地方选举 (George Town)；<b>1955 年首次联邦大选</b>，Parti Perikatan 在 52 席中赢 51 席；Tunku Abdul Rahman 成为首席部长。</li></ul>`],
+   ["T4 Bab 9 Perlembagaan 1957",`<ul><li><b>Suruhanjaya Reid</b> (主席 Lord Reid) 起草宪法；1956 年 Tunku 率代表团到伦敦谈判；1957 年 2 月签署《独立协议》。</li></ul>`],
+   ["T4 Bab 10 Pemasyhuran Kemerdekaan",`<ul><li><b>1957 年 8 月 31 日</b>，在默迪卡体育场 (Stadium Merdeka) 宣布独立，Tunku 高呼「Merdeka」七次。</li><li>独立后：成为主权国家，宪法生效，第一任最高元首 Tuanku Abdul Rahman。</li></ul>`],
+   ["T5 主题：Perlembagaan & Institusi",`<ul><li>宪法的地位：最高法律 (Perkara 4)；联邦宪法特点：君主立宪、议会民主、联邦制。</li><li>Majlis Raja-Raja 的角色：选举最高元首/副元首，对 Islam 事务、马来特权提供意见。</li></ul><div class="tip">课本目录请以你手上的版本为准，上面是核心主题，不按章号。</div>`],
+   ["T5 主题：Pembentukan Malaysia (1963)",`<ul><li>1961 年 5 月 Tunku 在新加坡提出「马来西亚」构想 → Suruhanjaya Cobbold (1962) → 政府间委员会 (IGC) → <b>1963 年 9 月 16 日</b> 马来西亚成立 (马来亚 + 新加坡 + 沙巴 + 砂拉越)。</li><li>1965 年 8 月 9 日新加坡退出。</li></ul>`],
+   ["T5 主题：Dasar & Pembangunan Negara",`<ul><li>DEB (Dasar Ekonomi Baru) 1971-1990：消除贫穷 + 重组社会。</li><li>Wawasan 2020 (Mahathir, 1991)；Rancangan Malaysia。</li></ul>`],
+   ["答题技巧 (KBAT)",`<ul><li>Kertas 2 的「Huraikan」要有：<b>Isi (point) + Huraian (explain) + Contoh/Bukti</b>。</li><li>「Pada pendapat anda ...」类题一定要给立场 + 理由。</li><li>时间线：背<b>年份主线</b>：1511 → 1786 → 1824 → 1941-45 → 1946 → 1948 → 1955 → 1957 → 1963 → 1969 → 1971 → 1991。</li></ul>`]
+  ]},
+ {id:"mat",lang:"en",name:"数学 Matematik",ms:"Matematik",code:"1449",color:"#17795a",ep:"mathematics",core:true,
+  fmt:"Kertas 1 (40 题选择，1 小时 15 分) + Kertas 2 (Bahagian A/B/C，2 小时 30 分)",
+  ch:[
+   ["T4 Bab 1 Fungsi dan Persamaan Kuadratik",`<ul><li>标准形式 <code>ax² + bx + c = 0</code>；求根公式 <code>x = [-b ± √(b²-4ac)] / 2a</code>。</li><li>判别式：<code>b²-4ac &gt; 0</code> 两个不同实根；<code>= 0</code> 两个相等实根；<code>&lt; 0</code> 无实根。</li><li>两根之和 <code>-b/a</code>，积 <code>c/a</code>。</li></ul>`],
+   ["T4 Bab 2 Asas Nombor",`<ul><li>换算进制：先转十进制再转目标进制。</li><li>二进制加减法，逢二进一。</li></ul>`],
+   ["T4 Bab 3 Penaakulan Logik",`<ul><li>「且 (dan)」两真才真；「或 (atau)」一真即真。</li><li>否定 (~)；蕴涵「jika p maka q」的<b>逆命题、否命题、逆否命题</b>。</li><li>演绎 (deduction) vs 归纳 (induction) 的区别。</li></ul>`],
+   ["T4 Bab 4 Operasi Set",`<ul><li><code>n(A∪B) = n(A) + n(B) - n(A∩B)</code></li><li>Venn 图画图顺序：先填<b>交集</b>，再填各自独有部分，最后补外部 (ξ)。</li></ul>`],
+   ["T4 Bab 5 Rangkaian dalam Teori Graf",`<ul><li>点 (vertex)、边 (edge)、度 (degree)；简单图、有向图、加权图、树 (tree，无圈，n 点有 n-1 边)。</li></ul>`],
+   ["T4 Bab 6 Ketaksamaan Linear dalam Dua Pemboleh Ubah",`<ul><li>实线 = 含等号 (≤ ≥)；虚线 = 不含 (&lt; &gt;)。</li><li>取一个测试点 (如 (0,0)) 判断阴影区域。</li></ul>`],
+   ["T4 Bab 7 Graf Gerakan",`<ul><li>距离-时间图：斜率 = 速度；水平线 = 静止。</li><li>速度-时间图：斜率 = 加速度；<b>面积 = 距离</b>。</li><li>平均速度 = 总距离 ÷ 总时间。</li></ul>`],
+   ["T4 Bab 8 Sukatan Serakan Data Tak Terkumpul",`<ul><li>范围 (julat)；四分位数 Q1, Q2, Q3；四分位距 <code>IQR = Q3 - Q1</code>；箱形图 (plot kotak dan misai)；方差、标准差。</li></ul>`],
+   ["T4 Bab 9 Kebarangkalian Peristiwa Bergabung",`<ul><li>独立事件 <code>P(A∩B) = P(A)×P(B)</code>；互斥事件 <code>P(A∪B)= P(A)+P(B)</code>。</li><li>「至少一个」题：用 <code>1 - P(一个都没有)</code>。</li></ul>`],
+   ["T5 Bab 1 Ubahan",`<ul><li>正变：<code>y ∝ x → y = kx</code>；反变：<code>y ∝ 1/x</code>；联合变：<code>y ∝ xz/w</code>。</li><li>解题：先写比例式 → 求 k → 代回求答案。</li></ul>`],
+   ["T5 Bab 2 Matriks",`<ul><li>2×2 逆矩阵：若 <code>A = [a b; c d]</code>，则 <code>A⁻¹ = 1/(ad-bc) × [d -b; -c a]</code>。</li><li>用逆矩阵解联立方程：<code>AX = B → X = A⁻¹B</code>。</li></ul>`],
+   ["T5 Bab 3-4 Insurans & Cukai",`<ul><li>Insurans：premium、deductible、<b>co-insurance 条款</b> (保额不足 80% 要按比例赔)。</li><li>Cukai：<b>Pendapatan bercukai = Pendapatan agregat - pelepasan - pelepasan cukai</b>；Cukai pendapatan 看税率表分段计算。</li></ul>`],
+   ["T5 Bab 5 Kekongruenan, Pembesaran & Transformasi",`<ul><li>全等：SSS, SAS, ASA, AAS, RHS。</li><li>放大：比例因子 k；面积比 = k²。</li><li>三种等距变换：平移、反射、旋转 (面积不变)。</li></ul>`],
+   ["T5 Bab 6 Nisbah dan Graf Fungsi Trigonometri",`<ul><li>sin, cos, tan 在四个象限的符号：<b>ASTC</b>。</li><li>画 <code>y = a sin(bx) + c</code>：振幅 |a|，周期 360°/b。</li></ul>`],
+   ["T5 Bab 7 Sukatan Serakan Data Terkumpul",`<ul><li>累积频率 → 画 ogif → 读中位数、Q1, Q3。</li><li>用组中值计算均值。</li></ul>`],
+   ["T5 Bab 8 Pemodelan Matematik",`<ul><li>步骤：识别问题 → 设变量/假设 → 建立模型 → 求解 → 检验与改进 → 报告。</li></ul>`],
+   ["常用公式速记",`<table><tr><th>项目</th><th>公式</th></tr><tr><td>圆周 / 面积</td><td>2πr / πr²</td></tr><tr><td>圆柱体体积</td><td>πr²h</td></tr><tr><td>圆锥体体积</td><td>⅓πr²h</td></tr><tr><td>球体体积</td><td>4/3 πr³</td></tr><tr><td>勾股定理</td><td>a² + b² = c²</td></tr><tr><td>梯形面积</td><td>½(a+b)h</td></tr><tr><td>直线斜率</td><td>m = (y₂-y₁)/(x₂-x₁)</td></tr></table>`]
+  ]},
+ {id:"sains",lang:"en",name:"科学 Sains",ms:"Sains",code:"1511",color:"#00838f",ep:"science",core:true,
+  fmt:"Kertas 1：40 题选择 (40 分，1 小时 15 分钟)。Kertas 2：Bahagian A (4 题)、B (5 题)、C (选答 1 题)，共 80 分，2 小时 30 分钟；难度比例 低:中:高 = 5:3:2。另有 Ujian Amali。(据 Pandai 整理，以 LP 格式文件为准)",
+  ch:[
+   ["答题万能句式",`<ul><li>「Mengapa」：<b>因为 (sebab) + 现象 + 科学原理</b>。</li><li>实验设计三变量：<b>manipulated (操纵)、responding (响应)、fixed (固定)</b>。</li><li>结论：「Semakin ... semakin ...」。</li></ul>`],
+   ["生物基础",`<ul><li>细胞：动物 vs 植物 (植物有细胞壁、叶绿体、液泡)。</li><li>扩散 (diffusion)、渗透 (osmosis)；呼吸作用 <code>葡萄糖 + 氧 → 二氧化碳 + 水 + 能量</code>；光合作用 <code>二氧化碳 + 水 →(光,叶绿素) 葡萄糖 + 氧</code>。</li></ul>`],
+   ["化学基础",`<ul><li>元素、化合物、混合物；酸碱指示剂 (litmus：酸变红、碱变蓝)；中和反应：酸 + 碱 → 盐 + 水。</li><li>周期表同一族性质相似。</li></ul>`],
+   ["物理基础",`<ul><li>速度 = 距离/时间；力 F = ma；压强 P = F/A；功 W = Fd；功率 P = W/t。</li><li>电流 I，电压 V，电阻 R：<code>V = IR</code>。</li></ul>`]
+  ]},
+ {id:"moral",lang:"ms",name:"道德 / 伊斯兰教育",ms:"Pendidikan Moral / Islam",code:"1225 / 1223",color:"#7b4fb3",ep:null,core:true,
+  fmt:"Kertas 1 (选择) + Kertas 2 (结构 / 论述)。非穆斯林学生修读 Pendidikan Moral，穆斯林修读 Pendidikan Islam。",
+  ch:[
+   ["Pendidikan Moral 答题方法",`<ul><li>结构：<b>nilai murni + definisi + situasi + akibat</b>。</li><li>常考价值：kasih sayang, hormat-menghormati, bertanggungjawab, keadilan, rasional, baik hati, kerjasama, integriti, kejujuran。</li><li>案例题：先指出问题，再引用价值，再给建议。</li></ul>`],
+   ["Pendidikan Islam",`<ul><li>三大范畴：Akidah、Syariah、Akhlak；Al-Quran 与 Hadis 的引用要写准。</li><li>此部分请以你学校课本和老师的纲要为准。</li></ul>`]
+  ]},
+ {id:"am",lang:"en",name:"附加数学 Add Maths",ms:"Matematik Tambahan",code:"3472",color:"#c25e00",ep:"additional-mathematics",
+  fmt:"Kertas 1 + Kertas 2；公式表在考卷附页，但要熟悉用法",
+  ch:[
+   ["T4 Bab 1 Fungsi",`<ul><li>函数 f(x)、定义域/值域、复合函数 <code>fg(x) = f(g(x))</code>、反函数 <code>f⁻¹</code> (交换 x, y 后解 y)。</li></ul>`],
+   ["T4 Bab 2-3 Persamaan & Fungsi Kuadratik",`<ul><li>顶点式 <code>f(x) = a(x-p)² + q</code>：顶点 (p, q)；a&gt;0 开口向上有最小值。</li><li>二次不等式：画草图，看图取区间。</li></ul>`],
+   ["T4 Bab 4 Persamaan Serentak",`<ul><li>一线性一非线性：由线性式代入非线性式，化成二次方程。</li></ul>`],
+   ["T4 Bab 5 Indeks, Surd, Logaritma",`<table><tr><th>类别</th><th>公式</th></tr><tr><td>指数</td><td>aᵐ×aⁿ = aᵐ⁺ⁿ; aᵐ÷aⁿ = aᵐ⁻ⁿ; (aᵐ)ⁿ = aᵐⁿ</td></tr><tr><td>对数</td><td>log ab = log a + log b; log a/b = log a - log b; log aⁿ = n log a</td></tr><tr><td>换底</td><td>log_a b = log_c b / log_c a</td></tr></table>`],
+   ["T4 Bab 6 Janjang",`<table><tr><th>等差 (AP)</th><th>等比 (GP)</th></tr><tr><td>Tn = a + (n-1)d</td><td>Tn = arⁿ⁻¹</td></tr><tr><td>Sn = n/2 [2a + (n-1)d]</td><td>Sn = a(1-rⁿ)/(1-r)</td></tr><tr><td></td><td>S∞ = a/(1-r), |r|&lt;1</td></tr></table>`],
+   ["T4 Bab 7 Hukum Linear",`<ul><li>把非线性关系化成 <code>Y = mX + c</code> 形式，画直线图，从斜率和截距求常数。</li></ul>`],
+   ["T4 Bab 8 Geometri Koordinat",`<ul><li>距离 <code>√[(x₂-x₁)²+(y₂-y₁)²]</code>；分点公式；三角形面积：行列式法 (shoelace)。</li><li>垂直线斜率乘积 = -1；平行线斜率相等。</li></ul>`],
+   ["T4 Bab 9 Vektor",`<ul><li>模 |a| = √(x²+y²)；单位向量 = a/|a|；三点共线 → 向量平行。</li></ul>`],
+   ["T4 Bab 10 Penyelesaian Segi Tiga",`<ul><li>正弦定理 <code>a/sinA = b/sinB = c/sinC</code>；余弦定理 <code>a² = b²+c²-2bc cosA</code>；面积 <code>½ab sinC</code>。</li></ul>`],
+   ["T4 Bab 11 Nombor Indeks",`<ul><li>指数 <code>I = (Q₁/Q₀)×100</code>；综合指数 <code>Ī = ΣIw / Σw</code>。</li></ul>`],
+   ["T5 Sukatan Membulat, Pembezaan, Pengamiran",`<ul><li>弧长 s = rθ；扇形面积 A = ½r²θ (θ 为弧度)；1 弧度 = 180°/π。</li><li>微分 <code>d/dx (xⁿ) = nxⁿ⁻¹</code>；积分 <code>∫xⁿ dx = xⁿ⁺¹/(n+1) + c</code>。</li><li>驻点：dy/dx = 0；d²y/dx² &gt; 0 最小，&lt; 0 最大。</li></ul>`],
+   ["T5 Pilih Atur & Gabungan, Taburan Kebarangkalian",`<ul><li>排列 <code>ⁿPᵣ = n!/(n-r)!</code>；组合 <code>ⁿCᵣ = n!/[r!(n-r)!]</code>。</li><li>二项分布 <code>P(X=r) = ⁿCᵣ pʳ qⁿ⁻ʳ</code>，均值 np，标准差 √(npq)。</li><li>正态分布：Z = (X-μ)/σ，查表。</li></ul>`],
+   ["T5 Fungsi Trigonometri, Pengaturcaraan Linear, Kinematik",`<ul><li>sin²θ + cos²θ = 1；1 + tan²θ = sec²θ；sin2A = 2sinAcosA。</li><li>线性规划：画约束不等式 → 找可行区域 → 取顶点代入目标函数。</li><li>运动：v = ds/dt；a = dv/dt；距离 = ∫v dt。</li></ul>`]
+  ]},
+ {id:"fiz",lang:"en",name:"物理 Fizik",ms:"Fizik",code:"4531",color:"#1565c0",ep:"physics",
+  fmt:"Kertas 1 (40 选择)、Kertas 2 (结构 + 论述)、Kertas 3 (实验设计)；另有 Ujian Amali",
+  ch:[
+   ["T4 Asas Pengukuran",`<ul><li>基本量：长度 m、质量 kg、时间 s、电流 A、温度 K。</li><li>游标卡尺 0.01 cm，螺旋测微器 0.01 mm；<b>零误差</b>要先修正。</li></ul>`],
+   ["T4 Daya dan Gerakan I",`<ul><li>公式：<code>v = u + at</code>；<code>s = ut + ½at²</code>；<code>v² = u² + 2as</code>。</li><li><code>F = ma</code>；动量 <code>p = mv</code>；碰撞守恒；冲量 <code>Ft = mv - mu</code>。</li></ul>`],
+   ["T4 Graviti",`<ul><li>万有引力 <code>F = Gm₁m₂/r²</code>；<code>g = GM/r²</code>；<b>地球静止卫星</b> 周期 24 小时，轨道在赤道上空。</li></ul>`],
+   ["T4 Haba",`<ul><li><code>Q = mcΔθ</code>；潜热 <code>Q = mL</code>；气体定律：Boyle <code>PV = 常数</code>，Charles <code>V/T = 常数</code>，压强定律 <code>P/T = 常数</code> (T 用开尔文)。</li></ul>`],
+   ["T4 Gelombang",`<ul><li><code>v = fλ</code>；波动现象：反射、折射、衍射、干涉。杨氏双缝：<code>λ = ax/D</code>。</li><li>电磁波谱 (波长长→短)：无线电 → 微波 → 红外 → 可见光 → 紫外 → X 射线 → γ 射线。</li></ul>`],
+   ["T4 Cahaya dan Optik",`<ul><li>折射 Snell：<code>n = sin i / sin r</code>；全内反射需 <b>密到疏</b> 且入射角 &gt; 临界角：<code>sin c = 1/n</code>。</li><li>透镜：<code>1/f = 1/u + 1/v</code>；放大率 <code>m = v/u</code>。</li></ul>`],
+   ["T5 Daya dan Gerakan II",`<ul><li>圆周运动向心力 <code>F = mv²/r</code>；弹簧 <code>F = kx</code>；平衡：合力为零，力的三角形。</li></ul>`],
+   ["T5 Tekanan",`<ul><li><code>P = F/A</code>；液体压强 <code>P = hρg</code>；帕斯卡原理 (液压)；阿基米德原理：浮力 = 排开液体的重量；伯努利原理。</li></ul>`],
+   ["T5 Elektrik",`<ul><li><code>V = IR</code>；<code>P = IV</code>；<code>E = Pt</code>；串联 R = R₁+R₂；并联 1/R = 1/R₁+1/R₂；emf <code>ε = V + Ir</code>。</li></ul>`],
+   ["T5 Keelektromagnetan",`<ul><li>左手定则 (Fleming 左手) → 电动机；右手定则 → 发电机；<b>法拉第定律</b>：感应电动势与磁通量变化率成正比；变压器 <code>Vs/Vp = Ns/Np</code>。</li></ul>`],
+   ["T5 Elektronik",`<ul><li>二极管只允许单向导电 (整流)；晶体管作开关/放大器；半导体 n 型 / p 型。</li></ul>`],
+   ["T5 Fizik Nuklear & Kuantum",`<ul><li>半衰期：每过一个半衰期剩余量减半；<code>E = mc²</code>；光电效应：<code>E = hf = W + KE_max</code>，<code>h = 6.63×10⁻³⁴ Js</code>。</li></ul>`],
+   ["答题模板",`<ul><li>解释现象：<b>观察 + 原理 + 结论</b>。</li><li>Kertas 3 实验题：aim、variables (3 个)、apparatus、arrangement、procedure、table、analysis。</li></ul>`]
+  ]},
+ {id:"kim",lang:"en",name:"化学 Kimia",ms:"Kimia",code:"4541",color:"#ad1457",ep:"chemistry",
+  fmt:"Kertas 1 (40 选择)、Kertas 2、Kertas 3；另有 Ujian Amali",
+  ch:[
+   ["T4 Pengenalan kepada Kimia / Jirim & Atom",`<ul><li>原子结构：质子数 = 原子序 (proton number)；<b>nucleon number = 质子 + 中子</b>；同位素：质子数同、中子数不同。</li><li>物态变化：熔化、凝固、沸腾、升华。</li></ul>`],
+   ["T4 Konsep Mol",`<ul><li><code>n = m / M</code> (质量/摩尔质量)；<code>n = N / 6.02×10²³</code>；<code>n = V / 24 dm³</code> (室温室压) 或 <code>22.4 dm³</code> (STP)。</li><li>配平方程式后用<b>摩尔比</b>求量。</li></ul>`],
+   ["T4 Jadual Berkala",`<ul><li>第 1 族 (碱金属)：活泼性向下增加；第 17 族 (卤素)：活泼性向下减少；第 18 族惰性；第 3 周期性质变化；过渡元素特性 (有色化合物、催化剂、多价态)。</li></ul>`],
+   ["T4 Ikatan Kimia",`<ul><li>离子键：金属 → 非金属转移电子；共价键：共享电子。</li><li>离子化合物熔沸点高、熔融/水溶液导电；共价化合物熔沸点低、不导电。</li></ul>`],
+   ["T4 Asid, Bes dan Garam",`<ul><li><code>pH = -log[H⁺]</code>；强酸完全电离；中和反应；<code>M₁V₁ = M₂V₂</code> (滴定，摩尔比 1:1)。</li><li>制盐：可溶盐用<b>酸+金属/碱/碳酸盐</b>；不溶盐用<b>沉淀 (复分解)</b>。</li><li>阳离子/阴离子检验要背：例如 <code>Cl⁻ → AgNO₃ 白色沉淀</code>；<code>SO₄²⁻ → BaCl₂ 白色沉淀</code>；<code>CO₃²⁻ → 加酸，气体使石灰水变浑</code>。</li></ul>`],
+   ["T4 Kadar Tindak Balas",`<ul><li>影响因素：浓度、温度、表面积、催化剂、压强(气体)。<b>碰撞理论</b>：有效碰撞频率增加 → 速率增加。</li></ul>`],
+   ["T4 Bahan Buatan dalam Industri",`<ul><li>合金 (alloy)：原子大小不同阻碍层滑动 → 更硬；玻璃、陶瓷、复合材料。</li></ul>`],
+   ["T5 Keseimbangan Redoks",`<ul><li><b>OIL RIG</b>：氧化 (Oxidation Is Loss)，还原 (Reduction Is Gain)。氧化数升高 = 氧化。</li><li>电化学电池：负极氧化，正极还原；电解池：阳极氧化。</li></ul>`],
+   ["T5 Sebatian Karbon",`<ul><li>烷 (CₙH₂ₙ₊₂)、烯 (CₙH₂ₙ，含 C=C)、醇 (-OH)、羧酸 (-COOH)、酯 (-COO-)。</li><li>烯用溴水检验：<b>褐色褪去</b>；醇 + 酸 → 酯 + 水 (酯化)。</li></ul>`],
+   ["T5 Termokimia",`<ul><li>放热：ΔH 为负，温度上升；吸热：ΔH 为正，温度下降。</li><li><code>Q = mcθ</code>；<code>ΔH = -Q / n</code>。</li></ul>`],
+   ["T5 Polimer & Kimia Konsumer",`<ul><li>加聚 (addition) vs 缩聚 (condensation)；肥皂 vs 洗涤剂 (detergent 在硬水中也能用)；药物种类。</li></ul>`]
+  ]},
+ {id:"bio",lang:"en",name:"生物 Biologi",ms:"Biologi",code:"4551",color:"#2e7d32",ep:"biology",
+  fmt:"Kertas 1、Kertas 2、Kertas 3；另有 Ujian Amali",
+  ch:[
+   ["提示：章节以你的课本目录为准",`<div class="warnbox">KSSM 生物的章节顺序各版本说明不一，下面按「主题」整理，不按章号。你可以在设置里添加、改名或删除章节。</div>`],
+   ["细胞生物学 & 膜运输",`<ul><li>细胞器：线粒体 (呼吸)、叶绿体 (光合)、核糖体 (合成蛋白)、高尔基体 (修饰包装)、内质网。</li><li>扩散 / 渗透 / 主动运输 (需 ATP)。<b>等渗、高渗、低渗</b>溶液对细胞的影响。</li></ul>`],
+   ["细胞分裂 & 细胞呼吸",`<ul><li>有丝分裂：前 → 中 → 后 → 末 (PMAT)；减数分裂产生配子，染色体数减半。</li><li>有氧呼吸：葡萄糖 + O₂ → CO₂ + H₂O + <b>ATP</b>；无氧呼吸 (酵母：乙醇 + CO₂；肌肉：乳酸)。</li></ul>`],
+   ["植物：组织、叶、营养、运输、反应",`<ul><li>叶：栅栏组织 (光合)、海绵组织 (气体交换)、气孔 (保卫细胞)。</li><li>运输：木质部运水与矿物质 (蒸腾拉力)；韧皮部运有机物 (转运)。</li><li>植物激素：生长素 (auxin)，向光性。</li></ul>`],
+   ["遗传、变异、遗传技术",`<ul><li>孟德尔：<b>分离律、自由组合律</b>；单因子杂交 F2 表型比 <b>3:1</b>，基因型比 1:2:1；双因子 9:3:3:1。</li><li>变异：连续 vs 不连续；突变；自然选择。</li><li>遗传技术：基因工程、转基因 (GMO)、克隆；伦理问题。</li></ul>`],
+   ["生态系统 & 生物多样性 & 环境可持续",`<ul><li>食物链 → 食物网；能量流动逐级递减 (约 10%)；碳循环、氮循环；生物多样性的保护 (in situ / ex situ)。</li></ul>`]
+  ]},
+ {id:"bc",lang:"zh",name:"华文 Bahasa Cina",ms:"Bahasa Cina",code:"6351",color:"#b71c1c",ep:null,
+  fmt:"Kertas 1 (写作)、Kertas 2 (阅读理解、语文知识、文学)；另有听力和口试",
+  ch:[
+   ["写作：应用文 (书信、通告、启事等)",`<ul><li>书信格式：称呼 → 问候 → 正文 → 祝福语 → 署名 → 日期。</li><li>通告/启事：<b>标题 + 事由 + 时间 + 地点 + 联系 + 署名/日期</b>。</li></ul>`],
+   ["写作：记叙/议论/说明文",`<ul><li>记叙文：六要素 (人物、时间、地点、起因、经过、结果)；用细节描写 (动作、神态、环境) 增加分数。</li><li>议论文：<b>论点 → 论据 → 论证</b>；结尾呼应开头。</li></ul>`],
+   ["阅读理解 & 语文知识",`<ul><li>找关键句，回答用自己的话归纳；成语、修辞 (比喻、拟人、夸张、排比、设问、反问)。</li><li>标点符号与病句修改要多练。</li></ul>`]
+  ]}
+];
+
+/* ===== 闪卡 / 题库 / 资料库 ===== */
+const CARDS = [
+ // 历史
+ ["sej","马来亚独立日是哪一天？","1957 年 8 月 31 日 (Stadium Merdeka)"],
+ ["sej","马来西亚成立日？","1963 年 9 月 16 日 (马来亚 + 新加坡 + 沙巴 + 砂拉越)"],
+ ["sej","新加坡何时退出马来西亚？","1965 年 8 月 9 日"],
+ ["sej","Malayan Union 何时成立？为什么被反对？","1946 年 4 月 1 日。削弱苏丹主权、中央集权、公民权过宽松，引发马来人反对，UMNO 因此成立 (1946)。"],
+ ["sej","1955 年大选结果？","Parti Perikatan 在 52 个竞选席位中赢得 51 席，Tunku Abdul Rahman 成为首席部长。"],
+ ["sej","紧急状态 (Darurat) 起止时间？","1948 年 6 月 16 日宣布；1960 年 7 月 31 日结束。"],
+ ["sej","Briggs Plan 的核心措施？","设立新村 (Kampung Baru)，把乡村居民迁入管制区，切断共产党的粮食与情报来源。"],
+ ["sej","Suruhanjaya Reid 的任务？","起草独立的马来亚联合邦宪法 (主席 Lord William Reid)，1956 年成立。"],
+ ["sej","Perkara 153 (宪法) 是什么？","保障马来人及沙巴/砂拉越原住民的特殊地位，同时保护其他民族的合法权益。"],
+ ["sej","日本占领马来亚的时期？","1941 年底 ~ 1945 年 (英军 1945 年 9 月回归)。"],
+ ["sej","UMNO、MCA、MIC 成立年份？","UMNO 1946、MIC 1946、MCA 1949。"],
+ ["sej","DEB (新经济政策) 的两大目标和期限？","消除贫穷 + 重组社会；1971-1990。"],
+ ["sej","Kanun Melaka 是什么？","满刺加的成文法典，规范统治者、官员与人民的行为，是满刺加完善行政与法律体系的代表。"],
+ ["sej","Wawasan 2020 由谁提出？","Tun Dr Mahathir Mohamad，1991 年。"],
+ // 数学
+ ["mat","二次方程判别式与根的关系？","b²−4ac > 0 两不同实根；= 0 两相等实根；< 0 无实根。"],
+ ["mat","圆锥体积公式？","V = ⅓πr²h"],
+ ["mat","球体体积公式？","V = 4/3 πr³"],
+ ["mat","象限符号口诀 ASTC 怎么读？","第一象限全正 (All)；第二象限 Sin 正；第三象限 Tan 正；第四象限 Cos 正。"],
+ ["mat","四分位距怎么算？","IQR = Q3 − Q1"],
+ ["mat","集合公式 n(A∪B)？","n(A) + n(B) − n(A∩B)"],
+ ["mat","速度-时间图中面积和斜率各代表？","面积 = 距离；斜率 = 加速度。"],
+ ["mat","独立事件概率？","P(A∩B) = P(A) × P(B)"],
+ ["mat","2×2 逆矩阵公式？","A = [a b; c d]，A⁻¹ = 1/(ad−bc) × [d −b; −c a]，ad−bc ≠ 0。"],
+ ["mat","正变与反变的关系式？","正变 y = kx；反变 y = k/x。"],
+ ["mat","放大后面积与比例因子的关系？","面积比 = k² (k 为比例因子)。"],
+ // 英文
+ ["bi","The number of ... vs A number of ... 谁配单数动词？","The number of students is ... (单数)；A number of students are ... (复数)。"],
+ ["bi","Directed Writing 开头 purpose 句式？","I am writing to ... / I am writing with regard to ..."],
+ ["bi","P.E.E 段落结构？","Point (观点) → Evidence (证据/例子) → Explain (解释)。"],
+ ["bi","第二类条件句结构？","If + 过去式, would + 动词原形：If I were you, I would apologise."],
+ // 国语
+ ["bm","Peribahasa：Bagai aur dengan tebing","形容相互依存、互相帮助的关系。"],
+ ["bm","Peribahasa：Ada udang di sebalik batu","表面一套，暗藏不可告人的目的。"],
+ ["bm","Peribahasa：Hendak seribu daya, tak hendak seribu dalih","有心做事总有办法；不想做就总有借口。"],
+ ["bm","Peribahasa：Genggam bara api biar sampai jadi arang","做事坚持到底、不怕艰辛。"],
+ ["bm","Peribahasa：Seperti kera mendapat bunga","得到好东西却不懂珍惜。"],
+ ["bm","karangan 的段落结构？","isi + huraian + contoh + ayat penutup 段。开头引入 (谚语/问句)，结尾总结 + 建议。"],
+ // 科学
+ ["sains","实验的三个变量？","操纵变量 (manipulated)、响应变量 (responding)、固定变量 (fixed)。"],
+ ["sains","光合作用方程？","二氧化碳 + 水 →(光、叶绿素) 葡萄糖 + 氧气"],
+ ["sains","压强公式？","P = F / A"],
+ // 物理
+ ["fiz","匀加速运动三公式？","v = u + at；s = ut + ½at²；v² = u² + 2as"],
+ ["fiz","全内反射的两个条件？","光从光密介质射向光疏介质，且入射角 > 临界角。sin c = 1/n"],
+ ["fiz","变压器公式？","Vs/Vp = Ns/Np"],
+ ["fiz","Boyle / Charles / 压强定律各是什么？","Boyle：温度不变 PV=常数；Charles：压强不变 V/T=常数；压强定律：体积不变 P/T=常数 (T 用开尔文)。"],
+ ["fiz","emf 公式？","ε = V + Ir (r 是内阻)"],
+ ["fiz","杨氏双缝公式？","λ = ax / D"],
+ ["fiz","向心力公式？","F = mv² / r"],
+ // 化学
+ ["kim","OIL RIG 是什么？","氧化是失电子 (Oxidation Is Loss)，还原是得电子 (Reduction Is Gain)。"],
+ ["kim","摩尔的三个转换公式？","n = m/M；n = N/(6.02×10²³)；n = V/24 dm³ (室温室压)。"],
+ ["kim","如何检验烯烃？","加入溴水：褐色褪去 (或酸化高锰酸钾褪紫)。"],
+ ["kim","pH 的定义？","pH = −log[H⁺]"],
+ ["kim","合金为什么比纯金属硬？","合金中不同大小的原子阻碍原子层相互滑动。"],
+ ["kim","影响反应速率的因素和碰撞理论解释？","浓度、温度、表面积、催化剂、压强 (气体)；使有效碰撞频率增加。"],
+ ["kim","酯化反应？","醇 + 羧酸 → 酯 + 水 (需浓硫酸催化、加热)。"],
+ ["kim","放热反应 ΔH 符号？","ΔH 为负；温度上升。"],
+ // 生物
+ ["bio","有丝分裂四阶段？","前期 → 中期 → 后期 → 末期 (PMAT)。"],
+ ["bio","单因子杂交 F2 表型比和基因型比？","表型 3:1；基因型 1:2:1。"],
+ ["bio","木质部和韧皮部分别运输什么？","木质部：水和矿物质 (蒸腾拉力)；韧皮部：有机物 (转运)。"],
+ ["bio","有氧呼吸方程？","葡萄糖 + 氧 → 二氧化碳 + 水 + 能量 (ATP)"],
+ ["bio","等渗/高渗/低渗溶液中动物细胞的变化？","等渗：不变；高渗 (外面浓)：细胞失水皱缩；低渗：吸水膨胀甚至破裂。"],
+ // 附加数学
+ ["am","对数三大法则？","log ab = log a + log b；log a/b = log a − log b；log aⁿ = n log a"],
+ ["am","等差、等比数列的 Sn？","AP: Sn = n/2[2a+(n−1)d]；GP: Sn = a(1−rⁿ)/(1−r)；S∞ = a/(1−r)，|r|<1"],
+ ["am","微分与积分基本公式？","d/dx(xⁿ)=nxⁿ⁻¹；∫xⁿdx = xⁿ⁺¹/(n+1) + c"],
+ ["am","正弦/余弦定理？","a/sinA = b/sinB = c/sinC；a² = b²+c²−2bc cosA"],
+ ["am","弧长和扇形面积？","s = rθ；A = ½r²θ (θ 为弧度)"],
+ ["am","二项分布均值和标准差？","μ = np；σ = √(npq)"],
+ ["am","排列与组合公式？","ⁿPᵣ = n!/(n−r)!；ⁿCᵣ = n!/[r!(n−r)!]"],
+ // 道德
+ ["moral","Moral 答题结构？","nilai murni + 定义 + situasi (情境) + akibat (后果)。"]
+];
+const QUIZ = [
+ ["mat","方程 x² − 6x + 9 = 0 的根属于哪一类？",["两个不同实根","两个相等实根","无实根","两个虚根且不同"],1,"判别式 = 36 − 36 = 0，所以有两个相等实根 x = 3。"],
+ ["mat","若 y 与 x 成正变，且 x = 2 时 y = 10，则 x = 5 时 y = ？",["20","25","50","15"],1,"y = kx，k = 5，所以 y = 25。"],
+ ["mat","P(A) = 0.4, P(B) = 0.5，A 与 B 独立，P(A∩B) = ？",["0.9","0.2","0.1","0.45"],1,"独立事件相乘：0.4 × 0.5 = 0.2。"],
+ ["mat","半径 7 cm、高 10 cm 的圆柱体体积 (π = 22/7)？",["1540 cm³","770 cm³","440 cm³","1100 cm³"],0,"V = πr²h = (22/7)(49)(10) = 1540。"],
+ ["mat","集合中 n(A) = 12, n(B) = 9, n(A∩B) = 4，n(A∪B) = ？",["25","17","21","13"],1,"12 + 9 − 4 = 17。"],
+ ["mat","第二象限中哪一个三角函数为正？",["sin","cos","tan","全部"],0,"ASTC：第二象限只有 sin 为正。"],
+ ["mat","放大比例因子为 3，原面积 4 cm²，放大后面积？",["12 cm²","36 cm²","16 cm²","24 cm²"],1,"面积比 = 3² = 9，4 × 9 = 36。"],
+ ["bi","Choose the correct sentence.",["The number of students are rising.","A number of students are absent.","A number of students is absent.","The number of students were rising yesterday and is still."],1,"A number of + 复数名词 → 复数动词。The number of → 单数动词。"],
+ ["bi","If I ___ you, I would study harder.",["am","was","were","be"],2,"第二类条件句 (与现实相反) 用 were。"],
+ ["bi","Which is the best opening for a formal email?",["Hey! What's up?","I am writing to enquire about ...","Yo teacher!","Just wanted to say hi."],1,"正式邮件开头要清楚说明目的。"],
+ ["bm","Peribahasa 'Bagai aur dengan tebing' bermaksud ...",["Berkelahi sepanjang masa","Saling bergantung dan membantu","Hidup mewah","Tidak peduli"],1,"Aur 与 tebing 相互支撑，表示互相依存。"],
+ ["bm","Manakah penulisan yang betul?",["di bawa ke sekolah","dibawa ke sekolah","dibawa kesekolah","di bawa kesekolah"],1,"di- 作动词前缀要连写 (dibawa)，介词 ke 要分写 (ke sekolah)。"],
+ ["sej","Malayan Union diperkenalkan pada tahun ...",["1945","1946","1948","1951"],1,"Malayan Union 1946，1948 年被联合邦取代。"],
+ ["sej","Pilihan raya umum pertama Persekutuan Tanah Melayu diadakan pada ...",["1951","1955","1957","1959"],1,"1955 年，Perikatan 赢 51/52 席。"],
+ ["sej","Siapakah yang mengetuai Suruhanjaya Perlembagaan Persekutuan Tanah Melayu?",["Tunku Abdul Rahman","Lord Reid","Sir Gerald Templer","Sir Harold Briggs"],1,"Lord William Reid；Briggs 是 Briggs Plan，Templer 是紧急状态时的高级专员。"],
+ ["sej","Malaysia dibentuk pada ...",["31 Ogos 1957","16 September 1963","9 Ogos 1965","13 Mei 1969"],1,"1963 年 9 月 16 日。"],
+ ["sej","Tujuan utama Rancangan Briggs ialah ...",["Menubuhkan sekolah","Memutuskan bekalan makanan komunis dengan Kampung Baru","Membina lebuh raya","Menyatukan negeri"],1,"新村把村民集中，切断对共产党的补给。"],
+ ["sains","Dalam eksperimen, pemboleh ubah yang diubah oleh penyiasat dipanggil ...",["bergerak balas","dimanipulasi","dimalarkan","bebas gerak"],1,"Manipulated variable (被操纵变量)。"],
+ ["sains","Persamaan perkataan fotosintesis yang betul ialah ...",["Glukosa + oksigen → CO₂ + air","CO₂ + air → glukosa + oksigen","CO₂ + oksigen → air","Air → oksigen"],1,"光合：CO₂ + 水 → 葡萄糖 + 氧 (光、叶绿素)。"],
+ ["fiz","一物体 u = 0, a = 2 m/s², 经 5 s 后位移？",["10 m","25 m","50 m","5 m"],1,"s = ½at² = ½ × 2 × 25 = 25 m。"],
+ ["fiz","P = IV 中，4 A 流过 3 Ω 电阻，功率？",["12 W","48 W","7 W","24 W"],1,"V = IR = 12 V，P = IV = 48 W (或 I²R = 48)。"],
+ ["fiz","变压器初级 200 匝、次级 50 匝，初级电压 240 V，次级电压？",["60 V","960 V","120 V","30 V"],0,"Vs = 240 × 50/200 = 60 V (降压)。"],
+ ["fiz","全内反射发生需要 ...",["光从疏到密","入射角小于临界角","光从密到疏且入射角大于临界角","任意角度"],2,"必须密 → 疏，且入射角 > 临界角。"],
+ ["kim","在氧化还原反应中，氧化意味着 ...",["得到电子","失去电子","质子增加","中子增加"],1,"OIL RIG：氧化 = 失电子。"],
+ ["kim","0.2 mol 的 CO₂ 在室温室压下的体积？",["2.4 dm³","4.8 dm³","24 dm³","0.48 dm³"],1,"0.2 × 24 = 4.8 dm³。"],
+ ["kim","哪个试剂可用来区分烯烃和烷烃？",["石灰水","溴水","石蕊","氯化钡"],1,"烯烃使溴水褐色褪去，烷烃不会。"],
+ ["kim","pH = 2 的溶液中 [H⁺] 为？",["0.2 mol/dm³","0.01 mol/dm³","0.02 mol/dm³","2 mol/dm³"],1,"[H⁺] = 10⁻² = 0.01。"],
+ ["bio","杂合子 Tt × Tt 的后代中显性表型比例？",["25%","50%","75%","100%"],2,"表型 3:1，显性占 75%。"],
+ ["bio","哪个组织负责运输有机物？",["木质部","韧皮部","表皮","栅栏组织"],1,"韧皮部转运有机物 (translocation)。"],
+ ["bio","动物细胞置于低渗溶液中会？",["皱缩","不变","吸水膨胀甚至破裂","分裂"],2,"外界浓度低，水进入细胞。"],
+ ["am","log₂ 8 + log₂ 4 = ？",["5","6","7","12"],0,"3 + 2 = 5。"],
+ ["am","等差数列 a = 3, d = 4，第 10 项？",["39","43","40","36"],0,"T10 = 3 + 9×4 = 39。"],
+ ["am","若 y = 3x²，dy/dx = ？",["3x","6x","6x²","x³"],1,"d/dx (3x²) = 6x。"],
+ ["am","等比数列无穷和 a = 6, r = 1/3，S∞ = ？",["9","18","2","3"],0,"S∞ = 6/(1 − 1/3) = 9。"],
+ ["moral","在 Moral 的案例题中，高分答案通常包含？",["只写结论","价值 + 情境 + 后果/建议","只抄题目","只写一个词"],1,"结构化作答：nilai + situasi + akibat/cadangan。"]
+];
+const QUIZSET = QUIZ;
+
+const TB = {
+  mat:[["T4","buku-teks-matematik-tingkatan-4"],["T5","buku-teks-matematik-tingkatan-5"]],
+  fiz:[["T4","buku-teks-fizik-tingkatan-4"],["T5","buku-teks-fizik-tingkatan-5"]],
+  kim:[["T4","kimia-tingkatan-4"],["T5","buku-teks-kimia-tingkatan-5"]],
+  bio:[["T4","buku-teks-biologi-tingkatan-4"],["T5","buku-teks-biologi-tingkatan-5"]],
+  sej:[["T4","buku-teks-sejarah-tingkatan-4"],["T5","buku-teks-sejarah-tingkatan-5"]]
+};
+const GRADES = [["A+",0],["A",1],["A-",2],["B+",3],["B",4],["C+",5],["C",6],["D",7],["E",8],["G",9]];
+const TIPS = [
+ "先背「必须及格」的科目：国语 BM 和 Sejarah。它们拿不到 E，证书会有问题。(最新规定以 Lembaga Peperiksaan 为准)",
+ "先做 Trial 题再看答案：计时、手写，错题立刻进错题本，不要只看不做。",
+ "每科至少完整做 3 套近年卷 (2021 之后是 KSSM 新格式)，再回头补错的章节。",
+ "最后两周：每天一科「整卷限时」+ 一科「看错题本」，不再开新章节。",
+ "考试前一晚：整理证件、文具 (2B 铅笔、橡皮、黑色笔)、水，早睡；不要再刷新题。",
+ "选择题涂卡 (OMR) 要用 2B 铅笔涂满，改答案要擦干净。",
+ "论述题先列提纲 (3-5 个要点) 再写，避免漏点；结构化书写，每点独立成段。"
+];
+
+/* ===== 应用逻辑 v2 ===== */
+(function(){
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const KEY="spm-notes-v2";
+const MODELS=["gemini-3.6-flash","gemini-3.5-flash-lite"];
+const DEF={theme:"auto",exam:EXAM.writtenStart,since:null,my:["bm","bi","sej","mat","sains","moral"],sub:"bm",tab:"today",conf:{},done:{},box:{},wrong:[],cards:[],
+  tasks:{},ck:{},tt:{},goal:{},ai:{key:"",model:MODELS[0]},notes:{},req:{},subsAI:{},chat:{},exams:[],own:{},use:{},scope:{},strict:true,draft:null,lang:"auto"};
+let S;
+function ymd(d){const z=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())}
+function pd(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function dd(a,b){return Math.round((pd(b)-pd(a))/864e5)}
+const today=()=>ymd(new Date());
+function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+  S=Object.assign({},DEF,o);S.ai=Object.assign({key:"",model:MODELS[0]},S.ai);
+  if(!o.ai||!o.ai.key){try{const v1=JSON.parse(localStorage.getItem("spm-notes-v1")||"{}");if(v1.ai&&v1.ai.key)S.ai.key=v1.ai.key}catch(e){}}
+  if(!S.since)S.since=today();if(!S.my.length)S.my=["bm"];if(!S.my.includes(S.sub))S.sub=S.my[0]}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2200)}
+const subj=id=>SUBJECTS.find(s=>s.id===id);
+const mySubjects=()=>SUBJECTS.filter(s=>S.my.includes(s.id));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function plain(h){const d=document.createElement("div");d.innerHTML=h||"";return d.textContent.replace(/\s+/g," ").trim()}
+function md(t){try{if(window.marked&&window.DOMPurify)return DOMPurify.sanitize(marked.parse(t,{breaks:true}))}catch(e){}return esc(t).replace(/\n/g,"<br>")}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---- 章节 (含小章节) ---- */
+const TOC={};
+(function(){for(const [sid,txt] of Object.entries(TOCTXT)){TOC[sid]=txt.split("\n").map(l=>{const [T,no,title,subs]=l.split("|");return {T,no:+no,title,subs:(subs||"").split(";").filter(Boolean)}})}})();
+const chapCache={};
+function chapsOf(sid){
+  if(chapCache[sid]&&!chapCache[sid].dirty)return chapCache[sid].v;
+  const s=subj(sid),old=s.ch.map(c=>({t:c[0],n:c[1]})),toc=TOC[sid];let out=[];
+  if(toc&&["bio","sains","sej"].includes(sid)){
+    const used=new Set();
+    toc.forEach(e=>{const re=new RegExp("^"+e.T+"\\s*Bab\\s*"+e.no+"\\b","i");const i=old.findIndex((o,ix)=>!used.has(ix)&&re.test(o.t));let n="";if(i>=0){used.add(i);n=old[i].n}
+      out.push({k:sid+"|"+e.T+"-"+e.no,t:`${e.T} Bab ${e.no} ${e.title}`,subs:e.subs.slice(),n,core:true})});
+    old.forEach((o,ix)=>{if(!used.has(ix))out.push({k:sid+"|x"+ix,t:"📌 "+o.t,subs:[],n:o.n,quick:true})});
+  }else{
+    old.forEach((o,ix)=>{let subs=[];const m=o.t.match(/^T(\d)/);
+      if(toc){const key=o.t.replace(/^T\d\s*(Bab\s*\d+\s*)?/i,"").trim().toLowerCase();const e=toc.find(x=>(!m||x.T==="T"+m[1])&&x.title.toLowerCase()===key);if(e)subs=e.subs.slice()}
+      const quick=/(答题|公式速记|模板|格式)/.test(o.t)&&!/^T\d/.test(o.t);
+      out.push({k:sid+"|"+ix,t:o.t,subs,n:o.n,core:!quick,quick})});
+  }
+  (S.own[sid]||[]).forEach(c=>out.push({k:sid+"|own"+c.id,t:"✎ "+c.t,subs:[],n:"<p>"+esc(c.n).replace(/\n/g,"<br>")+"</p>",own:true,id:c.id}));
+  out.forEach(c=>{if(!c.subs.length&&S.subsAI[c.k])c.subs=S.subsAI[c.k]});
+  chapCache[sid]={v:out};return out}
+function bust(){for(const k in chapCache)delete chapCache[k]}
+function prog(sid){const cs=chapsOf(sid).filter(c=>c.core);const d=cs.filter(c=>S.done[c.k]).length;return{d,n:cs.length,p:cs.length?Math.round(d/cs.length*100):0}}
+function chapText(c,max){let t="";if(c.subs&&c.subs.length)t+="小章节："+c.subs.join("；")+"\n";if(S.req[c.k])t+="学生提供的章节要求："+S.req[c.k]+"\n";
+  if(c.n)t+="内置要点："+plain(c.n)+"\n";if(S.notes[c.k])t+="已生成的笔记：\n"+S.notes[c.k].md+"\n";return max?t.slice(0,max):t}
+
+/* ---- IndexedDB 资料文件 ---- */
+const DB={db:null,open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);if(!window.indexedDB)return rej(new Error("no idb"));const r=indexedDB.open("spm-files",1);r.onupgradeneeded=()=>r.result.createObjectStore("files",{keyPath:"id"});r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>rej(r.error)})},
+  async tx(mode,fn){const db=await this.open();return new Promise((res,rej)=>{const t=db.transaction("files",mode),st=t.objectStore("files");const r=fn(st);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)})},
+  all(){return this.tx("readonly",s=>s.getAll())},put(f){return this.tx("readwrite",s=>s.put(f))},del(id){return this.tx("readwrite",s=>s.delete(id))},get(id){return this.tx("readonly",s=>s.get(id))}};
+function blobB64(b){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(",")[1]);r.onerror=no;r.readAsDataURL(b)})}
+async function fileParts(sid){const out=[];let total=0,names=[];
+  let all=[];try{all=await DB.all()}catch(e){}
+  for(const f of all){if(f.sid!==sid||!S.use[f.id])continue;if(total+f.size>14*1024*1024){names.push("(超出体积，跳过) "+f.name);continue}
+    total+=f.size;let mime=f.type||"application/octet-stream";if(/\.md$|\.txt$|\.csv$/i.test(f.name))mime="text/plain";
+    out.push({text:"【学生上传的资料：《"+f.name+"》】"});out.push({inline_data:{mime_type:mime,data:await blobB64(f.blob)}});names.push(f.name)}
+  return{parts:out,names}}
+function prepImg(file){return new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(file);im.onload=()=>{const m=1400,k=Math.min(1,m/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.85).split(",")[1])};im.onerror=no;im.src=u})}
+
+/* ---- 语言规则：按科目的考试语言作答 + 华文翻译/解释 ---- */
+const LANGNAME={ms:"国语 (Bahasa Melayu)",en:"英文 (English)",zh:"华文"};
+function langOf(sid){const s=subj(sid);return(s&&s.lang)||"en"}
+function langLabel(sid){const l=langOf(sid),m=S.lang||"auto";if(l==="zh"||m==="zh")return "华文";if(m==="exam")return l==="ms"?"国语":"英文";return l==="ms"?"国语 + 华文翻译":"英文 + 华文翻译"}
+function wantZh(sid){return langOf(sid)!=="zh"&&(S.lang||"auto")==="auto"}
+function langRule(sid){
+  const l=langOf(sid),m=S.lang||"auto",name=LANGNAME[l];
+  if(l==="zh")return "【语言规则】本科是华文：全部用简体中文作答。";
+  if(m==="zh")return "【语言规则】学生要求全部用简体中文讲解；专有名词第一次出现时括注 国语 / 英文 原词。";
+  if(m==="exam")return `【语言规则】本科 SPM 考试用「${name}」：答案、笔记和题目全部只用「${name}」，句子要简短易懂，不要附华文翻译。`;
+  const other=l==="ms"?"English":"Bahasa Melayu";
+  return `【语言规则】学生用华文提问，但本科 SPM 考试用「${name}」作答，所以：
+(1) 答案、笔记、例句、题目正文先用「${name}」写，写成学生在考场上可以直接照着写的版本，句子短、词汇简单；
+(2) 每个段落或要点后面紧跟一行以「华文：」开头的内容：给出华文翻译，必要时再加一两句华文解释 (为什么这样答、易错点)；
+(3) 关键术语第一次出现时写成「${l==="ms"?"国语":"English"} (${other} / 华文)」三者对照，例如 ${l==="ms"?"kebarangkalian (probability / 概率)":"discriminant (pembeza / 判别式)"}；
+(4) 学生只问华文本身的问题，或明确要求只用华文时，可以直接用华文。`}
+/* ---- Gemini ---- */
+function aiOK(){return !!(S.ai.key&&S.ai.key.trim())}
+function aiErr(status,data){const raw=(data&&data.error&&data.error.message)||"",code=(data&&data.error&&data.error.status)||"";
+  if(status===400&&/API key|API_KEY/i.test(raw+" "+code))return "API key 无效。到「设置」重新粘贴 (前后不要有空格)，或到 aistudio.google.com/apikey 重新生成。";
+  if(status===400&&/location|not supported in your/i.test(raw))return "当前网络或地区不能调用 Gemini："+raw;
+  if(status===400&&/too large|size|token/i.test(raw))return "资料太大了，超过一次能处理的范围。取消勾选几份上传的资料，或拆小一点。";
+  if(status===401||status===403)return "key 没有权限或被限制 ("+status+")。"+raw;
+  if(status===404)return "找不到这个模型。到「设置」换成 gemini-3.5-flash-lite，或填新的模型名。";
+  if(status===429){const m=raw.match(/retry in ([\d.]+)s/i);return "请求太频繁，或今天的免费额度用完了。"+(m?"约 "+Math.ceil(+m[1])+" 秒后可重试。":"等 1 分钟再试。")+"也可以换成 gemini-3.5-flash-lite。"}
+  if(status>=500)return "Google 服务暂时繁忙 ("+status+")，稍后再试。";
+  return "出错了 ("+status+")："+(raw||"未知错误")}
+async function gem(contents,system,maxTokens){
+  if(!aiOK())throw new Error("请先到「设置」填入 Gemini API key。");
+  const model=(S.ai.model||"").trim()||MODELS[0];
+  const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent?key="+encodeURIComponent(S.ai.key.trim());
+  const body={contents,generationConfig:{maxOutputTokens:maxTokens||8192}};if(system)body.systemInstruction={parts:[{text:system}]};
+  for(let attempt=0;;attempt++){
+    let res;try{res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})}
+    catch(e){throw new Error("网络请求失败。如果是在 claude.ai 里打开的预览版，那里不允许连接 Google；请用 GitHub Pages 或本地打开 index.html。其他情况请检查网络。")}
+    let data=null;try{data=await res.json()}catch(e){}
+    if(!res.ok){if((res.status===503||res.status===500)&&attempt<2){await sleep(3000*(attempt+1));continue}throw new Error(aiErr(res.status,data))}
+    const cand=data&&data.candidates&&data.candidates[0];
+    if(!cand){const br=data&&data.promptFeedback&&data.promptFeedback.blockReason;throw new Error(br?"请求被拦截了 ("+br+")，换个问法再试。":"模型没有返回内容，请重试。")}
+    const text=((cand.content&&cand.content.parts)||[]).filter(p=>!p.thought&&typeof p.text==="string").map(p=>p.text).join("");
+    if(!text.trim())throw new Error("模型没有返回文字"+(cand.finishReason?" ("+cand.finishReason+")":"")+"，请重试。");
+    return text}}
+function parseJSON(t,open){t=t.replace(/```json|```/g,"").trim();const a=t.indexOf(open),b=t.lastIndexOf(open==="["?"]":"}");if(a<0||b<a)throw new Error("AI 返回的格式没解析成功，请再试一次。");
+  try{return JSON.parse(t.slice(a,b+1))}catch(e){throw new Error("AI 返回的格式没解析成功 (可能内容被截断)，请再试一次。")}}
+function sysPrompt(sid,extra){const s=subj(sid);
+  return ["你是马来西亚 SPM (KSSM Form 4 / Form 5) 的备考助教，学生是说华语的华裔学生。",
+   langRule(sid),
+   "答案要贴近 SPM 的评分习惯：写出得分点和步骤，先给结论再解释。计算题写出完整步骤和单位。",
+   "不确定的内容直接说不确定，不要编造考试年份、题号、页码或事实。",
+   "公式用普通文字和 Unicode 书写 (如 x²、√、×、÷、π)，不要使用 LaTeX。",
+   s?"当前科目："+s.name+" ("+s.ms+")。考试形式参考："+s.fmt:"",extra||""].filter(Boolean).join("\n")}
+const busy={};
+function setBusy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.l=btn.innerHTML;btn.innerHTML='<span class="spin"></span>'+(label||"处理中…")}else if(btn.dataset.l){btn.innerHTML=btn.dataset.l}}
+
+/* ---- 导航 ---- */
+const TABS=[["today","今日"],["notes","笔记"],["flash","闪卡"],["drill","刷题"],["exam","模拟卷"],["chat","问答"],["res","资料"]];
+let exTimer=null;
+function renderNav(){
+  $("#subjects").innerHTML=mySubjects().map(s=>`<button data-sub="${s.id}" aria-pressed="${s.id===S.sub&&S.tab!=="today"&&S.tab!=="set"}"><span class="sd" style="background:${s.color}"></span>${esc(s.name)}<span class="cnt">${prog(s.id).p}%</span></button>`).join("");
+  $("#tabs").innerHTML=TABS.map(t=>`<button class="tab ${S.tab===t[0]?"active":""}" role="tab" data-tab="${t[0]}" aria-selected="${S.tab===t[0]}">${t[1]}</button>`).join("");
+  const left=dd(today(),S.exam);$("#daysChip").innerHTML=left>0?`距笔试 <b>${left}</b> 天`:left===0?`<b>今天开考</b>`:`已开考 <b>${-left}</b> 天`;
+  $("#subjects").style.display=(S.tab==="today"||S.tab==="set")?"none":"";}
+function go(tab,sub){if(sub&&S.my.includes(sub))S.sub=sub;else if(sub&&!S.my.includes(sub)){S.my.push(sub);S.sub=sub}S.tab=tab;save();render();window.scrollTo(0,0);try{history.replaceState(null,"","#"+tab)}catch(e){}}
+function render(){if(exTimer&&S.tab!=="exam"){clearInterval(exTimer);exTimer=null}renderNav();
+  ({today:rToday,notes:rNotes,flash:rFlash,drill:rDrill,exam:rExam,chat:rChat,res:rRes,set:rSet})[S.tab]()}
+function needKey(){return aiOK()?"":`<div class="notice warn"><b>先设置 API key</b><p>AI 功能（生成笔记、出题、模拟卷、问答）要用你自己的 Gemini key，免费申请：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>。</p><button class="btn pri small" data-act="goset">去设置</button></div>`}
+
+/* ---- SPM 2026 官方时间表 (JWP 18 Ogos 2026，据 LP 公布整理) ---- */
+const JWP={
+ bm:{d:"2026-11-23",p:["听力 09:00-09:30 (1103/4)","K1 10:45-12:45 (1103/1)","K2 14:30-17:00 (1103/2)"],x:[["口试 Ujian Bertutur (1103/3)","2026-10-26","10月26-29日"]]},
+ bi:{d:"2026-11-24",p:["听力 09:00-09:40 (1119/4)","K1 11:00-12:30 (1119/1)","K2 14:30-16:00 (1119/2)"],x:[["口试 Ujian Bertutur (1119/3)","2026-11-02","11月2-5日"]]},
+ moral:{d:"2026-11-25",p:["Pendidikan Moral 08:15-10:45 (1225)","(Pendidikan Islam K1 同一时段)"],x:[]},
+ mat:{d:"2026-11-26",p:["K1 08:15-09:45 (1449/1)","K2 10:45-13:15 (1449/2)"],x:[]},
+ sej:{d:"2026-11-30",p:["K1 08:15-09:15 (1249/1)","K2 10:30-13:00 (1249/2)"],x:[]},
+ bio:{d:"2026-12-02",p:["K1 08:15-09:30 (4551/1)","K2 10:45-13:15 (4551/2)"],x:[["实验 Amali K3 (4551/3)","2026-11-18","11月18日"]]},
+ sains:{d:"2026-12-03",p:["K1 08:15-09:30 (1511/1)","K2 10:30-13:00 (1511/2)"],x:[]},
+ fiz:{d:"2026-12-03",p:["K1 08:15-09:30 (4531/1)","K2 10:30-13:00 (4531/2)"],x:[["实验 Amali K3 (4531/3)","2026-11-16","11月16日"]]},
+ bc:{d:"2026-12-08",p:["K1 08:15-10:00 (6351/1)","K2 14:30-16:45 (6351/2)"],x:[]},
+ kim:{d:"2026-12-15",p:["K1 08:15-09:30 (4541/1)","K2 10:45-13:15 (4541/2)"],x:[["实验 Amali K3 (4541/3)","2026-11-17","11月17日"]]},
+ am:{d:"2026-12-17",p:["K1 08:15-10:15 (3472/1)","K2 14:30-17:00 (3472/2)"],x:[]}
+};
+const JWP_URL="https://lp.moe.gov.my/index.php/jw-spm/1447-jadual-waktu-peperiksaan-sijil-pelajaran-malaysia-2026";
+function fmtD(d){const x=pd(d);return `${x.getMonth()+1}月${x.getDate()}日 周${"日一二三四五六"[x.getDay()]}`}
+function daysTag(n){return n>0?n+" 天":n===0?"就是今天":"已过"}
+function subjDate(sid){return S.tt[sid]||(JWP[sid]&&JWP[sid].d)||null}
+function examBonus(s){const d=subjDate(s.id);if(!d)return 0;const n=dd(today(),d);return n>=0&&n<=10?4:n>=11&&n<=21?2:0}
+function ttHTML(){
+  const t=today();
+  const rows=mySubjects().map(s=>({s,j:JWP[s.id],d:subjDate(s.id)})).sort((a,b)=>(a.d||"9").localeCompare(b.d||"9"));
+  return `<h2>各科考试日期</h2><p class="muted fine">已按 LP 公布的 SPM 2026 时间表自动设好 (JWP 18 Ogos 2026)。核对和下载官方版：<a href="${JWP_URL}" target="_blank" rel="noopener noreferrer">LP 官网</a>。第一次出现的科目 = 离你最近的考试。</p>
+  <div class="grid g3">${rows.map((r,i)=>{const s=r.s,j=r.j||{p:[],x:[]},n=r.d?dd(t,r.d):null,manual=!!S.tt[s.id];
+   return `<div class="card" style="border-left:5px solid ${s.color}"><div class="row"><b style="color:${s.color}">${esc(s.name)}</b><span class="spacer"></span>${n!==null?`<span class="tag ${n>=0&&n<=7?"red":n<0?"":"blue"}">${daysTag(n)}</span>`:""}</div>
+    <div style="font:700 18px var(--kai);margin:4px 0">${r.d?fmtD(r.d):"未设置"} ${manual?'<span class="tag warn">手动</span>':""}</div>
+    ${j.p.map(x=>`<div class="fine muted">${esc(x)}</div>`).join("")}
+    ${(j.x||[]).map(x=>{const m=dd(t,x[1]);return `<div class="fine" style="margin-top:4px"><span class="tag">${esc(x[0])}</span> ${esc(x[2])} <span class="muted">${m>=0?"· "+m+" 天后":"· 已过"}</span></div>`}).join("")}
+    <details style="margin-top:6px"><summary class="fine muted" style="cursor:pointer">日期不一样？手动改</summary><div class="row" style="margin-top:6px"><input type="date" data-tt="${s.id}" value="${manual?S.tt[s.id]:(r.d||"")}">${manual?`<button class="btn small" data-ttclr="${s.id}">还原</button>`:""}</div></details></div>`}).join("")}</div>
+  <p class="fine muted">${mySubjects().some(s=>s.id==="sains")&&mySubjects().some(s=>s.id==="fiz")?"提示：科学 (1511) 和物理 (4531) 在同一时段，请按你报考的科目为准。":""}12 月 11 日 (周五) 是雪兰莪苏丹华诞假期，不考试。</p>`}
+/* ---- 今日 ---- */
+function planFor(offset){
+  const ms=mySubjects();if(!ms.length)return[];
+  const wts=ms.map(s=>[s,Math.max(1,6-(S.conf[s.id]||3))+(s.must?2:0)+examBonus(s)]);const order=[];let r=0;
+  while(order.length<80){wts.forEach(([s,w])=>{if(r<w)order.push(s)});r++;if(r>8)r=0}
+  const d=((offset%order.length)+order.length)%order.length;const a=order[(d*2)%order.length];let b=order[(d*2+1)%order.length];
+  if(b.id===a.id)b=order.find(x=>x.id!==a.id)||a;return a===b?[a]:[a,b]}
+function nextChap(sid){return chapsOf(sid).find(c=>c.core&&!S.done[c.k])}
+function rToday(){
+  const t=today(),left=dd(t,S.exam);const total=Math.max(dd(S.since,S.exam),14);
+  let bub="";for(let i=0;i<=total;i++){const day=ymd(new Date(pd(S.since).getTime()+i*864e5));let c="";if(day<t)c="past";else if(day===t)c="today";if(day===S.exam)c="exam";bub+=`<b class="${c}" title="${day}"></b>`}
+  const stat=left>0?`<span class="num">${left}</span><span class="lbl">天后笔试开始 (${S.exam})</span>`:left===0?`<span class="num">今天</span><span class="lbl">笔试开始，加油。</span>`:`<span class="num">${-left}</span><span class="lbl">天前已开考</span>`;
+  const tasks=planFor(dd(S.since,t)),tk=S.tasks[t]||[];
+  const ex=S.exams.filter(e=>e.date===t).length;
+  $("#sheet").innerHTML=`${needKey()}
+  <div class="hero"><div class="big">${stat}</div><div class="muted fine">每过一天涂掉一个圈，红色是今天，蓝色粗边是笔试第一天。</div>
+   <div class="omr" aria-hidden="true">${bub}</div><div class="omr-legend"><span class="l-past">已过</span><span class="l-today">今天</span><span class="l-exam">笔试开始</span></div></div>
+  <div class="grid g2" style="margin-top:14px">
+   <div class="card"><div class="row"><h3 style="margin:0">今天的重点</h3><span class="spacer"></span><span class="tag blue">按你的信心自动排</span></div>
+    ${tasks.length?tasks.map(s=>{const c=nextChap(s.id);return `<div style="margin:10px 0;padding:10px 12px;border-left:5px solid ${s.color};background:var(--sheet2);border-radius:0 10px 10px 0"><b>${esc(s.name)}</b>${s.must?` <span class="tag red">必须及格</span>`:""}<br>
+      <span class="fine">${c?`下一章：<a href="#" data-act="opennote" data-sub="${s.id}" data-k="${esc(c.k)}">${esc(c.t)}</a>`:"所有章节都复习过了，改做模拟卷"}</span><br><span class="fine muted">读完笔记，做 1 组题；错的进错题本。</span></div>`}).join(""):`<div class="empty">先到「设置」选择你考的科目。</div>`}
+    <div class="fine muted">想换重点？在「设置」调整每科信心 (1-5)，越没把握排得越多。</div></div>
+   <div class="card"><h3 style="margin:0 0 8px">今日清单</h3>
+    <div>${tk.map((x,i)=>`<label class="chk" style="display:flex;margin:6px 0;font-size:15px;color:var(--ink)"><input type="checkbox" data-tk="${i}" ${x.d?"checked":""}> <span style="${x.d?"text-decoration:line-through;color:var(--muted)":""}">${esc(x.t)}</span><span class="spacer"></span><button class="btn small" data-tkdel="${i}">删</button></label>`).join("")||`<div class="fine muted">还没有清单。</div>`}</div>
+    <div class="row" style="margin-top:8px"><input type="text" id="tkIn" placeholder="加一件今天要做的事" style="flex:1;min-width:150px"><button class="btn" id="tkAdd">添加</button></div>
+    ${ex?`<div class="fine muted" style="margin-top:8px">今天已完成 ${ex} 套模拟卷。</div>`:""}</div></div>
+  <h2>各科进度</h2><div class="grid g3">${mySubjects().map(s=>{const p=prog(s.id);return `<button class="card" style="text-align:left;cursor:pointer" data-act="gosub" data-sub="${s.id}" data-tab="notes"><b style="color:${s.color}">${esc(s.name)}</b> <span class="muted fine">${p.d}/${p.n} 章</span><div class="bar" style="margin-top:8px"><i style="width:${p.p}%;background:${s.color}"></i></div></button>`}).join("")}</div>
+  ${ttHTML()}
+  ${infoHTML()}`;
+  const add=()=>{const v=$("#tkIn").value.trim();if(!v)return;(S.tasks[t]=S.tasks[t]||[]).push({t:v,d:false});save();rToday()};
+  $("#tkAdd").onclick=add;$("#tkIn").onkeydown=e=>{if(e.key==="Enter")add()};
+  $$("[data-tk]").forEach(c=>c.onchange=()=>{S.tasks[t][+c.dataset.tk].d=c.checked;save();rToday()});
+  $$("[data-tkdel]").forEach(c=>c.onclick=e=>{e.preventDefault();S.tasks[t].splice(+c.dataset.tkdel,1);save();rToday()});
+  $$("[data-tt]").forEach(i=>i.onchange=()=>{S.tt[i.dataset.tt]=i.value||undefined;save();rToday()});
+  $$("[data-ttclr]").forEach(b=>b.onclick=()=>{delete S.tt[b.dataset.ttclr];save();rToday()});
+  $$("[data-ck]").forEach(c=>c.onchange=()=>{S.ck[c.dataset.ck]=c.checked||undefined;save()});
+  $$("[data-g]").forEach(x=>x.onchange=()=>{S.goal[x.dataset.g]=x.value;save();gps()});gps();
+}
+function gps(){const sel=$$("[data-g]"),o=$("#gpsOut");if(!o)return;if(!sel.length){o.textContent="-";return}const pts=sel.map(x=>GRADES.find(g=>g[0]===x.value)[1]);o.textContent=(pts.reduce((a,b)=>a+b,0)/pts.length).toFixed(2)}
+function infoHTML(){
+  const ck=["身份证 / 护照","Pernyataan Pendaftaran Peperiksaan (从 SPPAT 打印)","2B 铅笔 ×3、橡皮、黑色笔","直尺、圆规、量角器 (数学/理科用)","科学计算器 (按规定型号，非可编程)","水 + 小点心","提前到考场认路，确认座位","前一晚整理好书包，早睡"];
+  return `<h2>考试资讯</h2>
+  <details class="chap"><summary><span class="t">SPM 2026 时间线</span></summary><div class="body"><p class="fine muted">依据 LP 的 JWP (2026 年 8 月 18 日版)。各科具体日期和时间在上面「各科考试日期」。官方文件：<a href="${JWP_URL}" target="_blank" rel="noopener noreferrer">LP</a>。</p>
+   <table class="t"><tbody><tr><td>国语口试 (Ujian Bertutur BM)</td><td>10 月 26-29 日</td></tr><tr><td>英语口试 (Ujian Bertutur BI)</td><td>11 月 2-5 日</td></tr><tr><td>科学实验 (Amali)：物理 / 化学 / 生物 + 附加科学</td><td>11 月 16 / 17 / 18 日</td></tr><tr><td><b>笔试</b></td><td><b>11 月 23 日 - 12 月 17 日</b></td></tr><tr><td>听力 (Ujian Mendengar) BM / BI</td><td>11 月 23 日 / 24 日</td></tr><tr><td>特别假期，不考试</td><td>12 月 11 日 (周五)</td></tr></tbody></table>
+   <div class="tip">考试须知：提前 20 分钟到考场；身份证放在桌角；迟到超过 30 分钟入场由主考官决定，且没有补时。手机、电子设备和笔记不能带入考场。</div></div></details>
+  <details class="chap"><summary><span class="t">成绩点数与目标 (估算 GPS)</span></summary><div class="body"><p class="fine muted">点数越低越好。真实成绩以 LP 公布为准。</p>
+   ${mySubjects().map(s=>`<div class="row" style="justify-content:space-between;margin:5px 0"><span>${esc(s.name)}</span><select data-g="${s.id}">${GRADES.map(g=>`<option value="${g[0]}" ${(S.goal[s.id]||"A")===g[0]?"selected":""}>${g[0]} (${g[1]})</option>`).join("")}</select></div>`).join("")}
+   <div class="row" style="justify-content:space-between;margin-top:10px;border-top:1px solid var(--line);padding-top:10px"><b>目标平均点数</b><b id="gpsOut" style="font:700 28px var(--kai)"></b></div>
+   <p class="fine muted">国语和历史要及格才能拿证书 (细则以 LP 为准)。</p></div></details>
+  <details class="chap"><summary><span class="t">考试日清单</span></summary><div class="body">${ck.map((x,i)=>`<label class="chk" style="display:flex;margin:7px 0;color:var(--ink);font-size:15px"><input type="checkbox" data-ck="${i}" ${S.ck[i]?"checked":""}> ${esc(x)}</label>`).join("")}</div></details>
+  <details class="chap"><summary><span class="t">备考原则</span></summary><div class="body"><ul style="margin:0;padding-left:1.2em">${TIPS.map(t=>`<li style="margin:6px 0">${esc(t)}</li>`).join("")}</ul></div></details>`}
+
+/* ---- 笔记 ---- */
+let nQ="",bulk={on:false,stop:false};
+function rNotes(){
+  const sid=S.sub,s=subj(sid),p=prog(sid);let cs=chapsOf(sid);
+  const q=nQ.toLowerCase();if(q)cs=SUBJECTS.flatMap(x=>chapsOf(x.id).map(c=>({...c,sid:x.id}))).filter(c=>(c.t+" "+c.subs.join(" ")+" "+plain(c.n)+" "+(S.notes[c.k]?S.notes[c.k].md:"")).toLowerCase().includes(q));
+  const gen=chapsOf(sid).filter(c=>S.notes[c.k]).length;
+  $("#sheet").innerHTML=`${needKey()}
+  <div class="row" style="margin-bottom:10px"><h2 style="margin:0">${esc(s.name)} 笔记</h2><span class="tag">${esc(s.ms)} · ${esc(s.code)}</span>${s.must?'<span class="tag red">必须及格</span>':""}<span class="spacer"></span>
+   <input type="text" id="nq" placeholder="搜索所有科目的笔记…" value="${esc(nQ)}" style="max-width:240px"></div>
+  ${q?`<p class="muted fine">搜索结果：${cs.length} 条</p>`:`<div class="card" style="margin-bottom:12px"><div class="row"><span class="fine muted">${p.d}/${p.n} 章已复习 · ${gen} 章有 AI 笔记</span><span class="tag blue" title="可在设置里改">AI 语言：${langLabel(sid)}</span><span class="spacer"></span>
+   <button class="btn small pri" id="bulkBtn" ${aiOK()?"":"disabled"}>${bulk.on?"停止批量生成":"✨ 批量生成本科笔记"}</button></div><div class="bar" style="margin:8px 0"><i style="width:${p.p}%;background:${s.color}"></i></div>
+   <div class="fine muted">考试形式：${esc(s.fmt)}</div><div id="bulkMsg" class="fine" style="margin-top:6px"></div></div>`}
+  <div>${cs.map(c=>chapHTML(c,c.sid||sid,!!q)).join("")}</div>
+  ${q?"":`<details class="chap" style="margin-top:14px"><summary><span class="t">＋ 添加我自己的笔记 / 章节</span></summary><div class="body"><input type="text" id="ncT" placeholder="标题，例如：T5 Bab 3 要点" style="margin-bottom:8px"><textarea id="ncN" placeholder="内容 (换行会保留)"></textarea><button class="btn pri small" id="ncAdd" style="margin-top:8px">保存到 ${esc(s.name)}</button></div></details>`}`;
+  $("#nq").oninput=e=>{nQ=e.target.value.trim();const pos=e.target.selectionStart;rNotes();const i=$("#nq");i.focus();i.setSelectionRange(pos,pos)};
+  bindChaps();
+  const a=$("#ncAdd");if(a)a.onclick=()=>{const t=$("#ncT").value.trim(),n=$("#ncN").value.trim();if(!t){toast("先写标题");return}(S.own[sid]=S.own[sid]||[]).push({id:Date.now(),t,n});bust();save();rNotes()};
+  const bb=$("#bulkBtn");if(bb)bb.onclick=()=>{if(bulk.on){bulk.stop=true;return}bulkGen(sid)};
+}
+function chapHTML(c,sid,open){
+  const has=!!S.notes[c.k],subs=c.subs||[];
+  return `<details class="chap" data-k="${esc(c.k)}" ${open||S.openChap===c.k?"open":""}><summary><span class="t">${open?`<span class="tag">${esc(subj(sid).name)}</span> `:""}${esc(c.t)} ${has?'<span class="tag ok">AI 笔记</span>':""}</span>
+   ${c.core?`<label class="chk" onclick="event.stopPropagation()"><input type="checkbox" data-done="${esc(c.k)}" ${S.done[c.k]?"checked":""}>已复习</label>`:""}</summary>
+   <div class="body">
+    <div class="subs" data-subs="${esc(c.k)}">${subs.length?subs.map(x=>`<span class="tag">${esc(x)}</span>`).join(""):`<span class="fine muted">还没有小章节目录。</span> ${c.core?`<button class="btn small" data-act="gensubs" data-k="${esc(c.k)}" data-sub="${sid}">AI 补小章节</button>`:""}`}</div>
+    ${c.core?`<label class="fine muted" style="display:block;margin:6px 0 4px">章节要求 / 老师划的范围 (AI 生成笔记、出题、回答时都会参考)</label><textarea data-req="${esc(c.k)}" placeholder="例如：1.2 只考定义和公式；1.4 不考…" style="min-height:60px">${esc(S.req[c.k]||"")}</textarea>`:""}
+    ${c.n?`<div class="note"><div class="fine muted" style="margin-top:8px">内置要点</div>${c.n}</div>`:""}
+    <div id="ai-${esc(c.k)}" class="md" style="margin-top:10px">${has?md(S.notes[c.k].md):""}</div>
+    <div class="row" style="margin-top:10px">
+      ${c.core||c.quick?`<button class="btn small pri" data-act="gennote" data-k="${esc(c.k)}" data-sub="${sid}" ${aiOK()?"":"disabled"}>${has?"重新生成笔记":"✨ AI 生成这一章的笔记"}</button>`:""}
+      ${has?`<button class="btn small" data-act="copynote" data-k="${esc(c.k)}">复制</button><button class="btn small" data-act="delnote" data-k="${esc(c.k)}">删除 AI 笔记</button>`:""}
+      ${c.core?`<button class="btn small" data-act="askchap" data-k="${esc(c.k)}" data-sub="${sid}">问 AI</button><button class="btn small" data-act="cardchap" data-k="${esc(c.k)}" data-sub="${sid}" ${aiOK()?"":"disabled"}>出闪卡</button><button class="btn small" data-act="quizchap" data-k="${esc(c.k)}" data-sub="${sid}">出题</button>`:""}
+      ${c.own?`<button class="btn small badb" data-act="delown" data-id="${c.id}" data-sub="${sid}">删除这条</button>`:""}
+    </div></div></details>`}
+function bindChaps(){
+  $$("[data-done]").forEach(c=>c.onchange=()=>{S.done[c.dataset.done]=c.checked||undefined;save();const p=prog(c.dataset.done.split("|")[0]);toast(c.checked?`已复习 ✓ (${p.d}/${p.n})`:"取消标记");renderNav()});
+  $$("[data-req]").forEach(t=>t.onchange=()=>{S.req[t.dataset.req]=t.value.trim()||undefined;save();toast("章节要求已保存")});
+  $$("details.chap[data-k]").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)S.openChap=d.dataset.k}));}
+function findChap(sid,k){return chapsOf(sid).find(c=>c.k===k)}
+function noteSystem(sid){return sysPrompt(sid,"你现在是 SPM 笔记整理老师：只整理考试用得上的内容，条理清晰，宁可短也不要编造。")}
+async function genNote(sid,k,btn){
+  const c=findChap(sid,k),s=subj(sid);if(!c)return;setBusy(btn,true,"生成中…");
+  try{const fp=await fileParts(sid);
+    const prompt=`请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：\n1. 按小章节逐个整理 (${c.subs.length?"依据上面给出的小章节":"如果你不能确定课本的小章节名称，先按 DSKP 常见划分列出，并注明『按 DSKP 推测』"})。\n2. 每个小章节包含：核心概念 / 公式或关键定义 / 易错点 / SPM 常考题型与答题要点。\n3. 最后给：一张 5 行以内的速记表，和 3 道自测题 (答案放在最后)。\n4. 若学生提供了章节要求或上传了资料，以它们为准，资料里没有的不要编。\n5. 语言按系统提示里的【语言规则】(考试语言 + 每个要点后的「华文：」翻译与解释)，同一小节几个要点的华文可以合并成一段，控制篇幅；用 Markdown 小标题和短列表。`;
+    const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),8192);
+    S.notes[k]={md:out,at:Date.now()};save();toast("笔记已生成");if(S.tab==="notes"){S.openChap=k;rNotes()}}
+  catch(e){toast(e.message.slice(0,80));setBusy(btn,false);const m=$("#bulkMsg");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}
+async function bulkGen(sid){
+  const todo=chapsOf(sid).filter(c=>c.core&&!S.notes[c.k]);if(!todo.length){toast("这一科的章节都有笔记了");return}
+  if(!confirm(`会连续请求 ${todo.length} 次 Gemini，每章一次，可能用掉不少免费额度。继续吗？(随时可停止)`))return;
+  bulk={on:true,stop:false};rNotes();
+  for(let i=0;i<todo.length&&!bulk.stop;i++){const c=todo[i];const m=$("#bulkMsg");if(m)m.innerHTML=`<span class="spin"></span>正在生成 ${i+1}/${todo.length}：${esc(c.t)}`;
+    try{const fp=await fileParts(sid);const s=subj(sid);
+      const prompt=`请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：按小章节逐个整理 (${c.subs.length?"依据给出的小章节":"不确定课本小章节名称时按 DSKP 常见划分并注明『按 DSKP 推测』"})；每个小章节写：核心概念 / 公式或关键定义 / 易错点 / SPM 常考题型与答题要点；最后给 5 行以内速记表和 3 道自测题 (答案放最后)。资料里没有的不要编。语言按系统提示里的【语言规则】(考试语言 + 「华文：」翻译与解释，同一小节的华文可合并)，用 Markdown。`;
+      const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),8192);S.notes[c.k]={md:out,at:Date.now()};save();await sleep(1200)}
+    catch(e){const m2=$("#bulkMsg");if(m2)m2.innerHTML=`<span style="color:var(--bad)">在「${esc(c.t)}」停下了：${esc(e.message)}</span>`;bulk.stop=true;bulk.err=true}}
+  const err=bulk.err;bulk={on:false,stop:false};const keep=$("#bulkMsg")&&err?$("#bulkMsg").innerHTML:"";rNotes();if(keep&&$("#bulkMsg"))$("#bulkMsg").innerHTML=keep;if(!err)toast("批量生成完成")}
+async function genSubs(sid,k,btn){const c=findChap(sid,k),s=subj(sid);setBusy(btn,true,"生成中…");
+  try{const out=await gem([{role:"user",parts:[{text:`列出 KSSM「${s.name}」的章节「${c.t}」按 DSKP / 课本通常的小章节标题 (如 1.1 …、1.2 …)。只输出 JSON 字符串数组，例如 ["1.1 …","1.2 …"]，不要其他文字。不确定的小章节名称，在末尾加『(推测)』。`}]}],sysPrompt(sid),2048);
+    const arr=parseJSON(out,"[").filter(x=>typeof x==="string").slice(0,20);if(!arr.length)throw new Error("没有得到小章节");S.subsAI[k]=arr;bust();save();rNotes()}
+  catch(e){toast(e.message.slice(0,80));setBusy(btn,false)}}
+
+/* ---- 闪卡 ---- */
+let fq=[],fi=0,fShow=false;
+const allCards=()=>CARDS.map((c,i)=>({id:"b"+i,s:c[0],q:c[1],a:c[2]})).concat(S.cards.map(c=>({...c,own:true})));
+function rFlash(){
+  const sid=S.sub;
+  if(!fq.length||fq.some(c=>c.s!==sid)){fq=shuffle(allCards().filter(c=>c.s===sid&&(S.box[c.id]||0)<3));fi=0;fShow=false}
+  const total=allCards().filter(c=>c.s===sid).length,mast=total-fq.length,c=fq[fi];
+  $("#sheet").innerHTML=`${needKey()}<div class="row" style="margin-bottom:8px"><h2 style="margin:0">${esc(subj(sid).name)} 闪卡</h2><span class="spacer"></span><span class="fine muted">已掌握 ${mast} / ${total}（连续答对 3 次算掌握）</span></div>
+  ${c?`<div class="flash"><div class="face" id="face" tabindex="0" role="button" aria-label="翻面">${fShow?`<div class="a">${esc(c.a)}</div>${c.az?`<div class="fine muted" style="margin-top:10px">华文：${esc(c.az)}</div>`:""}`:`<div class="q">${esc(c.q)}</div>${c.qz?`<div class="fine muted" style="margin-top:8px">${esc(c.qz)}</div>`:""}<div class="fine muted" style="margin-top:14px">点击翻面</div>`}</div>
+   <div class="row" style="margin-top:16px;justify-content:center">${fShow?`<button class="btn badb" id="fNo">不记得</button><button class="btn good" id="fYes">记得</button>`:`<button class="btn" id="fFlip">显示答案</button>`}</div>
+   <div class="fine muted" style="text-align:center;margin-top:8px">本轮第 ${fi+1} / ${fq.length}</div></div>`:`<div class="empty">${total?"这一科的闪卡都掌握了 🎉":"这一科还没有闪卡"}<br><button class="btn" id="fReset" style="margin-top:10px">${total?"重置进度再来一遍":"—"}</button></div>`}
+  <h3>用 AI 生成闪卡</h3><div class="controls"><label class="grow">章节<select id="fgC">${chapsOf(sid).filter(c=>c.core).map(c=>`<option value="${esc(c.k)}">${esc(c.t)}</option>`).join("")}</select></label>
+   <label>张数<select id="fgN"><option>6</option><option selected>10</option><option>15</option></select></label><button class="btn pri" id="fgGo" ${aiOK()?"":"disabled"}>生成</button></div>
+  <details class="chap"><summary><span class="t">＋ 添加自己的闪卡</span></summary><div class="body"><input type="text" id="acQ" placeholder="问题" style="margin-bottom:8px"><textarea id="acA" placeholder="答案"></textarea><button class="btn pri small" id="acAdd" style="margin-top:8px">保存</button></div></details>`;
+  const flip=()=>{fShow=!fShow;rFlash()};const f=$("#face");if(f){f.onclick=flip;f.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}}}
+  const nxt=ok=>{const id=c.id;S.box[id]=ok?(S.box[id]||0)+1:0;if(!ok&&!S.wrong.some(w=>w.id===id))S.wrong.push({id,type:"card",s:c.s,q:c.q,a:c.a});
+    if(ok)S.wrong=S.wrong.filter(w=>!(w.id===id&&w.type==="card"));save();
+    if(ok&&S.box[id]>=3)fq.splice(fi,1);else fi++;if(fi>=fq.length){fi=0;fq=shuffle(fq.filter(x=>(S.box[x.id]||0)<3))}fShow=false;rFlash()};
+  if($("#fYes")){$("#fYes").onclick=()=>nxt(true);$("#fNo").onclick=()=>nxt(false)}if($("#fFlip"))$("#fFlip").onclick=flip;
+  if($("#fReset"))$("#fReset").onclick=()=>{allCards().forEach(c=>{if(c.s===sid)delete S.box[c.id]});save();fq=[];rFlash()};
+  $("#acAdd").onclick=()=>{const q=$("#acQ").value.trim(),a=$("#acA").value.trim();if(!q||!a){toast("问题和答案都要填");return}S.cards.push({id:"u"+Date.now(),s:sid,q,a});save();fq=[];toast("已添加");rFlash()};
+  $("#fgGo").onclick=()=>genCards(sid,$("#fgC").value,+$("#fgN").value,$("#fgGo"));
+}
+async function genCards(sid,k,n,btn){const c=findChap(sid,k);setBusy(btn,true,"生成中…");
+  try{const fp=await fileParts(sid);const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」的章节「${c.t}」做 ${n} 张复习闪卡。\n${chapText(c,3500)}\n只输出 JSON 数组：[{"q":"问题","a":"简短答案","qz":"问题的华文翻译","az":"答案的华文翻译，加一句华文解释"}]。q 和 a 用考试语言 (见【语言规则】)，答案不超过 60 字；qz、az 用华文${wantZh(sid)?"":"，这次不需要，留空字符串"}。问题要考核心概念、公式、定义或易错点。不要编造资料里没有的内容。`}]}],sysPrompt(sid),4096);
+    const arr=parseJSON(out,"[").filter(x=>x&&x.q&&x.a);if(!arr.length)throw new Error("没有得到闪卡");arr.forEach((x,i)=>S.cards.push({id:"g"+Date.now()+i,s:sid,q:String(x.q),a:String(x.a),qz:x.qz?String(x.qz):"",az:x.az?String(x.az):""}));save();fq=[];toast(`已添加 ${arr.length} 张闪卡`);if(S.tab==="flash")rFlash();else setBusy(btn,false)}
+  catch(e){toast(e.message.slice(0,80));setBusy(btn,false)}}
+
+/* ---- 刷题 (选择题 + 错题本) ---- */
+let dMode="quiz",qz=null;
+function rDrill(){
+  $("#sheet").innerHTML=`${needKey()}<div class="row" style="margin-bottom:10px"><h2 style="margin:0">${esc(subj(S.sub).name)} 刷题</h2><span class="spacer"></span>
+   <div class="seg"><button data-dm="quiz" aria-pressed="${dMode==="quiz"}">选择题</button><button data-dm="wrong" aria-pressed="${dMode==="wrong"}">错题本 (${S.wrong.filter(w=>w.s===S.sub).length})</button></div></div><div id="dBody"></div>`;
+  $$("[data-dm]").forEach(b=>b.onclick=()=>{dMode=b.dataset.dm;qz=null;rDrill()});(dMode==="quiz"?rQuiz:rWrong)()}
+function rQuiz(){
+  const sid=S.sub,box=$("#dBody");
+  if(qz&&qz.sid!==sid)qz=null;
+  if(!qz){const nb=QUIZ.filter(q=>q[0]===sid).length;
+    box.innerHTML=`<div class="card" style="max-width:640px"><div class="controls"><label class="grow">题源<select id="qSrc"><option value="ai">AI 按章节出题</option><option value="bank" ${nb?"":"disabled"}>内置题库 (${nb} 题)</option></select></label>
+     <label class="grow" id="qCw">章节<select id="qC"><option value="">整科综合</option>${chapsOf(sid).filter(c=>c.core).map(c=>`<option value="${esc(c.k)}" ${S.pickChap===c.k?"selected":""}>${esc(c.t)}</option>`).join("")}</select></label></div>
+     <div class="controls"><label>题数<select id="qN"><option>5</option><option selected>8</option><option>10</option><option>15</option></select></label><label>难度<select id="qD"><option>基础</option><option selected>SPM 中等</option><option>KBAT 偏难</option></select></label><button class="btn pri" id="qGo">开始</button></div>
+     <div id="qMsg" class="fine muted"></div><p class="fine muted">AI 题目可能有错，答案和解析都会显示，可疑的请对照课本。答错的会进入错题本。</p></div>`;
+    const sync=()=>{const ai=$("#qSrc").value==="ai";$("#qCw").style.display=ai?"":"none";$("#qD").disabled=!ai;if(!aiOK()&&ai)$("#qGo").disabled=true;else $("#qGo").disabled=false};
+    if(!aiOK()&&nb)$("#qSrc").value="bank";$("#qSrc").onchange=sync;sync();
+    $("#qGo").onclick=async()=>{const src=$("#qSrc").value,n=+$("#qN").value;
+      if(src==="bank"){const pool=shuffle(QUIZ.filter(q=>q[0]===sid)).slice(0,n).map(q=>({q:q[1],o:q[2],a:q[3],e:q[4]}));qz={sid,qs:pool,i:0,score:0,picked:null,fin:false,ai:false};rQuiz();return}
+      const k=$("#qC").value,c=k?findChap(sid,k):null;S.pickChap=k;setBusy($("#qGo"),true,"生成中…");
+      try{const fp=await fileParts(sid);const ctx=c?`章节：${c.t}\n${chapText(c,3500)}`:"范围：这一科整个 KSSM 纲要 (Form 4 + Form 5)";
+        const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」出 ${n} 道单选题 (4 个选项)。难度：${$("#qD").value}。\n${ctx}\n要求：贴近 KSSM 与 SPM Kertas 1 风格；有且仅有一个正确答案；解析写出关键步骤；不要编造资料里没有的内容。\n只输出 JSON 数组：[{"q":"题目","o":["A内容","B内容","C内容","D内容"],"a":0,"e":"解析","qz":"题目和 4 个选项的华文翻译 (写成一段)","ez":"解析的华文翻译，加一句华文解释"}]。a 是正确选项序号 (0-3)。q、o、e 用考试语言 (见【语言规则】)；qz、ez 用华文${wantZh(sid)?"":"，这次不需要，留空字符串"}。`}]}],sysPrompt(sid),8192);
+        const arr=parseJSON(out,"[").filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!arr.length)throw new Error("AI 返回的题目格式不对，请再试一次。");
+        qz={sid,qs:arr,i:0,score:0,picked:null,fin:false,ai:true};rQuiz()}
+      catch(e){setBusy($("#qGo"),false);$("#qMsg").innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}};return}
+  if(qz.fin){box.innerHTML=`<div class="card qbox"><h3 style="margin-top:0">完成</h3><div class="score" style="margin:10px 0">${qz.score}/${qz.qs.length}</div><p class="muted">答错的题已放进错题本。</p><div class="row"><button class="btn pri" id="qAgain">再来一组</button><button class="btn" id="qWr">看错题本</button></div></div>`;
+    $("#qAgain").onclick=()=>{qz=null;rQuiz()};$("#qWr").onclick=()=>{dMode="wrong";qz=null;rDrill()};return}
+  const q=qz.qs[qz.i],L="ABCD";
+  box.innerHTML=`<div class="qbox"><div class="fine muted">第 ${qz.i+1} / ${qz.qs.length} 题 ${qz.ai?'<span class="tag warn">AI 生成</span>':""}</div>
+   <h3 style="margin:10px 0 6px;font-family:var(--sans);font-size:18px">${esc(q.q)}</h3>
+   ${q.qz?`<details style="margin:2px 0 6px"><summary class="fine muted" style="cursor:pointer">华文翻译</summary><div class="fine" style="margin-top:4px">${esc(q.qz)}</div></details>`:""}
+   ${q.o.map((o,i)=>`<button class="opt ${qz.picked===null?"":i===q.a?"right":i===qz.picked?"wrong":""}" data-o="${i}" ${qz.picked!==null?"disabled":""}><span class="bub">${L[i]}</span><span>${esc(o)}</span></button>`).join("")}
+   ${qz.picked!==null?`<div class="tip"><b>${qz.picked===q.a?"答对了":"答错了"}</b>：${esc(q.e||"")}${q.ez?`<div class="fine" style="margin-top:4px">华文：${esc(q.ez)}</div>`:""}</div><button class="btn pri" id="qNext">${qz.i+1>=qz.qs.length?"看结果":"下一题"}</button>`:""}</div>`;
+  $$("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;qz.picked=i;if(i===q.a)qz.score++;else{S.wrong.push({id:"q"+Date.now()+qz.i,type:"quiz",s:qz.sid,q:q.q+"  ("+q.o.map((o,k)=>L[k]+". "+o).join(" / ")+")",a:"正确答案："+L[q.a]+". "+q.o[q.a]+"。"+(q.e||"")+(q.ez?"\n华文："+q.ez:"")});save()}rQuiz()});
+  if($("#qNext"))$("#qNext").onclick=()=>{qz.i++;qz.picked=null;if(qz.i>=qz.qs.length)qz.fin=true;rQuiz()}}
+function rWrong(){
+  const sid=S.sub,ws=S.wrong.filter(w=>w.s===sid);
+  $("#dBody").innerHTML=`<p class="muted fine">答错的闪卡、选择题和模拟卷失分点会在这里，也可以手动记录做真题时的错题。</p>
+  ${ws.length?ws.map(w=>`<div class="card" style="margin-bottom:8px"><div class="row"><span class="tag">${w.type==="exam"?"模拟卷":w.type==="manual"?"手动":w.type==="card"?"闪卡":"选择题"}</span><span class="spacer"></span><button class="btn small" data-wai="${esc(w.id)}">AI 讲解</button><button class="btn small" data-wdel="${esc(w.id)}">已搞懂，移除</button></div><b style="display:block;margin-top:6px;white-space:pre-wrap">${esc(w.q)}</b><div class="fine muted" style="margin-top:4px;white-space:pre-wrap">${esc(w.a||"")}</div></div>`).join(""):`<div class="empty">这一科的错题本是空的。</div>`}
+  <details class="chap" style="margin-top:14px"><summary><span class="t">＋ 手动记一道错题 (例如做真题错的)</span></summary><div class="body"><input type="text" id="mwQ" placeholder="题目或出处 (如 2024 Selangor Trial P2 Q5)" style="margin-bottom:8px"><textarea id="mwA" placeholder="正确做法 / 我错在哪里"></textarea><button class="btn pri small" id="mwAdd" style="margin-top:8px">保存</button></div></details>`;
+  $("#mwAdd").onclick=()=>{const q=$("#mwQ").value.trim(),a=$("#mwA").value.trim();if(!q){toast("先写题目或出处");return}S.wrong.push({id:"m"+Date.now(),type:"manual",s:sid,q,a});save();rDrill()}}
+
+const ANYFLIP={
+ mat:[["T4 (BM)","https://anyflip.com/nmbvq/pxsn/basic","KPM 2019 KSSM 课本，国语版。"],["T4 (English)","https://anyflip.com/scujt/joeq/basic","KPM 2019 KSSM 课本，英文版 (DLP)。"]],
+ am:[["T4","https://anyflip.com/ojleo/gjlw/basic","附加数学 T4 KSSM，322 页。"]],
+ sains:[["T4","https://anyflip.com/heynn/pvbg/basic","科学 T4 KSSM，291 页。"]]
+};
+/* ---- 模拟卷 ---- */
+function paperTypes(sid){
+  const wr=(id,label,n,hint)=>({id,kind:"writing",label,n,hint}),op=(id,label,n,hint)=>({id,kind:"open",label,n,hint}),mc=(id,label,n)=>({id,kind:"mcq",label,n});
+  const sci=[op("k2","Kertas 2 结构 + 论述",5,"Bahagian A/B 为结构题 (每小问 1-3 分)，最后 1 题为论述/开放题 (约 10-12 分)，含实验设计、图表分析、KBAT 情境。"),mc("k1","Kertas 1 选择题",20)];
+  return({
+   bm:[wr("w","Kertas 1 作文 (Karangan)",3,"出 3 道不同文体的作文题 (如 Rencana / Ucapan / Cerita)，学生选 1 题作答，每题满分 40。评分点按 内容与观点、语言、结构、词汇 四项。"),op("p","Kertas 2 阅读理解 + 语法",4,"含 1 篇短文的理解题、摘要/语法题和 1 道文学 (Komsas) 概念题。")],
+   bi:[wr("w","Paper 1 Writing (Directed + Continuous)",2,"出 1 道 Directed Writing (给出要点，如邮件/报告，满分 20) 和 1 道 Continuous Writing (给 3 个题目选 1 个，满分 30)。评分按 内容、语言、结构、词汇。"),op("r","Reading + Grammar",4,"含 1 篇短文的理解题、词汇语境题、语法改错、完成句子。")],
+   bc:[wr("w","作文 / 应用文",2,"出 1 道应用文 (书信/通告等) 和 1 道作文 (记叙/议论)，评分按 内容、语言、结构、书写规范。"),op("r","阅读理解 + 语文知识",4,"含 1 篇短文理解、成语/修辞、病句修改。")],
+   sej:[op("k2","Kertas 2 结构 + 论述",5,"含史料/情境结构题 (a)(b)(c)，以及需要给立场并论证的 KBAT 论述题，评分按「观点 + 解释 + 例子/证据」。"),mc("k1","Kertas 1 选择题",20)],
+   mat:[op("k2","Kertas 2 (计算与应用)",6,"Bahagian A 短题、B 中等题、C 综合应用题。每小问写明分值，答案需要完整步骤；评分点包含方法分 (M) 和答案分 (A)。"),mc("k1","Kertas 1 选择题",20)],
+   am:[op("k2","Kertas 2 (计算与应用)",6,"Bahagian A/B/C，涵盖 Form 4 与 Form 5，评分点包含方法分和答案分。"),op("k1","Kertas 1 (短题)",8,"短题，每题 2-4 分，考公式与基本计算。")],
+   sains:sci,fiz:[op("k2","Kertas 2 结构 + 论述",5,"含计算、图表分析、实验设计 (操纵/响应/固定变量) 与 KBAT 论述。"),mc("k1","Kertas 1 选择题",20)],
+   kim:[op("k2","Kertas 2 结构 + 论述",5,"含方程式、计算 (摩尔)、实验设计与 KBAT 论述。"),mc("k1","Kertas 1 选择题",20)],
+   bio:[op("k2","Kertas 2 结构 + 论述",5,"含图表 (可用文字描述图)、实验设计与 KBAT 论述。"),mc("k1","Kertas 1 选择题",20)],
+   moral:[op("k2","Kertas 2 结构 + 论述",4,"含情境结构题与价值观论述 (价值 + 情境 + 后果/建议)。"),mc("k1","Kertas 1 选择题",20)]
+  })[sid]||sci}
+let EX=null,exPick={},exSel=null;
+function exSave(){if(!EX)return;const{imgs,...rest}=EX;try{S.draft=rest;save()}catch(e){}}
+function rExam(){
+  if(!EX&&S.draft&&S.draft.sid===S.sub&&!S.draft.result){EX=Object.assign({imgs:{}},S.draft)}
+  if(EX&&EX.sid!==S.sub){EX=null}
+  if(EX&&EX.result)return showResult();
+  if(EX)return showPaper();
+  const sid=S.sub,pts=paperTypes(sid),cs=chapsOf(sid).filter(c=>c.core);exSel=exSel&&exSel.sid===sid?exSel:{sid,set:new Set()};
+  const hist=S.exams.filter(e=>e.sid===sid).sort((a,b)=>b.at-a.at);
+  const avg=SUBJECTS.filter(s=>S.my.includes(s.id)).map(s=>{const a=S.exams.filter(e=>e.sid===s.id);return a.length?{s,avg:Math.round(a.reduce((x,e)=>x+e.pct,0)/a.length),n:a.length}:null}).filter(Boolean);
+  $("#sheet").innerHTML=`${needKey()}<h2>${esc(subj(sid).name)} 模拟卷</h2>
+  <div class="notice"><p>AI 会按 KSSM / SPM 的风格出一份模拟卷，你在页面里作答，交卷后 AI 按评分要点批改并写评语。这是<b>仿真练习</b>，不是某一年的真题；真题和 Trial 卷请到「资料」页下载，做完可以在下面手动记一笔成绩。</p></div>
+  <div class="controls"><label class="grow">卷别<select id="exT">${pts.map(t=>`<option value="${t.id}">${esc(t.label)}</option>`).join("")}</select></label>
+   <label>题数<input type="number" id="exN" min="1" max="40" value="${pts[0].n}" style="width:80px"></label>
+   <label>难度<select id="exD"><option>基础</option><option selected>SPM 中等</option><option>KBAT 偏难</option><option>Trial 水平</option></select></label>
+   ${wantZh(sid)?`<label class="chk" style="color:var(--ink);font-size:14px;align-self:center"><input type="checkbox" id="exZ"> 附华文翻译</label>`:""}<label>限时<select id="exL"><option value="0">不限时</option><option>30</option><option>45</option><option>60</option><option>90</option><option>150</option></select></label></div>
+  <details class="chap"><summary><span class="t">范围：${exSel.set.size?`已选 ${exSel.set.size} 章`:"整科综合 (点这里可选章节)"}</span></summary><div class="body">
+   <div class="row" style="margin-bottom:6px"><button class="btn small" id="exAll">全选</button><button class="btn small" id="exNone">清空</button><span class="fine muted">不选 = 整科综合</span></div>
+   ${cs.map(c=>`<label class="chk" style="display:flex;margin:5px 0;color:var(--ink);font-size:15px"><input type="checkbox" data-exc="${esc(c.k)}" ${exSel.set.has(c.k)?"checked":""}> ${esc(c.t)}</label>`).join("")}</div></details>
+  <div class="row" style="margin-top:12px"><button class="btn pri" id="exGo" ${aiOK()?"":"disabled"}>生成模拟卷</button><span class="fine muted" id="exMsg"></span></div>
+  <p class="fine muted">${esc(subj(sid).fmt)}</p>
+  <h2>成绩记录</h2>
+  ${avg.length?`<div class="grid g3">${avg.map(a=>`<div class="card"><b style="color:${a.s.color}">${esc(a.s.name)}</b> <span class="fine muted">平均 ${a.avg}% · ${a.n} 套</span><div class="bar" style="margin-top:6px"><i style="width:${a.avg}%;background:${a.s.color}"></i></div></div>`).join("")}</div>`:`<div class="empty">还没有记录。做完一套模拟卷，或在下面手动记一套真题成绩。</div>`}
+  ${hist.length?`<div class="scroll-x" style="margin-top:10px"><table class="t"><thead><tr><th>日期</th><th>名称</th><th>得分</th><th>%</th><th></th></tr></thead><tbody>${hist.map(e=>`<tr><td>${e.date}</td><td>${esc(e.title)}${e.manual?' <span class="tag">手动</span>':""}</td><td>${e.score}/${e.max}</td><td><b>${e.pct}%</b></td><td><button class="btn small" data-exdel="${e.id}">删</button></td></tr>`).join("")}</tbody></table></div>`:""}
+  <details class="chap" style="margin-top:12px"><summary><span class="t">＋ 手动记一套外部真题 / Trial 成绩</span></summary><div class="body"><div class="controls"><label class="grow">名称<input type="text" id="mxT" placeholder="如 2025 Perak Trial K2"></label><label>得分<input type="number" id="mxS" style="width:90px" min="0"></label><label>满分<input type="number" id="mxF" value="100" style="width:90px" min="1"></label><button class="btn pri" id="mxAdd">保存</button></div></div></details>`;
+  $("#exT").onchange=()=>{const t=pts.find(x=>x.id===$("#exT").value);$("#exN").value=t.n};
+  $$("[data-exc]").forEach(c=>c.onchange=()=>{c.checked?exSel.set.add(c.dataset.exc):exSel.set.delete(c.dataset.exc);c.closest("details").querySelector(".t").textContent=exSel.set.size?`范围：已选 ${exSel.set.size} 章`:"范围：整科综合 (点这里可选章节)"});
+  $("#exAll").onclick=()=>{cs.forEach(c=>exSel.set.add(c.k));rExam();$("details.chap").open=true};$("#exNone").onclick=()=>{exSel.set.clear();rExam()};
+  $$("[data-exdel]").forEach(b=>b.onclick=()=>{S.exams=S.exams.filter(e=>String(e.id)!==b.dataset.exdel);save();rExam()});
+  $("#mxAdd").onclick=()=>{const sc=parseFloat($("#mxS").value),fm=parseFloat($("#mxF").value),t=$("#mxT").value.trim()||"外部真题";if(isNaN(sc)||isNaN(fm)||fm<=0||sc<0||sc>fm){toast("检查一下得分和满分");return}
+    S.exams.push({id:Date.now(),sid,title:t,date:today(),at:Date.now(),score:sc,max:fm,pct:Math.round(sc/fm*100),manual:true});save();rExam()};
+  $("#exGo").onclick=()=>genExam(pts.find(x=>x.id===$("#exT").value),Math.max(1,Math.min(40,+$("#exN").value||5)),$("#exD").value,+$("#exL").value,!!($("#exZ")&&$("#exZ").checked));
+}
+async function genExam(type,n,diff,limit,zh){
+  const sid=S.sub,s=subj(sid),btn=$("#exGo"),msg=$("#exMsg");setBusy(btn,true,"出卷中，约 20-60 秒…");
+  try{const fp=await fileParts(sid);const cs=chapsOf(sid).filter(c=>c.core);const picked=cs.filter(c=>exSel&&exSel.set.has(c.k));
+    const scope=picked.length?"范围 (只能考这些章节)：\n"+picked.map(c=>"- "+c.t+(c.subs.length?"（"+c.subs.join("；")+"）":"")).join("\n")+"\n\n参考资料：\n"+picked.map(c=>chapText(c,1800)).join("\n---\n").slice(0,9000):"范围：这一科整个 KSSM 纲要 (Form 4 + Form 5)，按 SPM 常见比例分布。";
+    const common=`请为 SPM「${s.name}」出一份仿真模拟卷。\n卷别：${type.label}\n难度：${diff}\n${scope}\n\n硬性要求：仿 KSSM / SPM 风格；不要声称这是某年真题；资料里没有的内容不要编；题目与评分要点用考试语言 (见【语言规则】)；公式用 Unicode，不用 LaTeX；无法在纯文字里呈现的图形题，用文字描述图或换成表格数据。\n`;
+    let prompt,max=16384;
+    if(type.kind==="mcq"){prompt=common+`出 ${n} 道单选题 (4 个选项，每题 1 分)。只输出 JSON：{"title":"卷名","instructions":"说明","mcq":[{"q":"题目","o":["A","B","C","D"],"a":0,"e":"解析","qz":"${zh?"题目和选项的华文翻译":""}","ez":"${zh?"解析的华文翻译":""}"}]}${zh?"\nqz、ez 用华文，其余用考试语言。":""}`}
+    else{prompt=common+`共 ${n} 道大题。${type.hint}\n${type.kind==="writing"?"每道题只有 1 个 part，m 为满分 (见上面说明)，scheme 写评分标准 (内容/语言/结构/词汇各档的要求和常见扣分点)。学生只需选 1 题作答。":"每道大题含 1-4 个小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme (逐点列出得分点，说明可接受的答案；计算题标明方法分 M 与答案分 A)。"}\n只输出 JSON：{"title":"卷名","instructions":"考生须知","questions":[{"no":1,"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}","parts":[{"p":"(a)","q":"小问","qz":"${zh?"小问的华文翻译":""}","m":2,"scheme":"评分要点","cz":"${zh?"评分要点的华文翻译":""}"}]}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}
+    const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],sysPrompt(sid,"你现在是 SPM 出卷老师，也是严谨的评卷员，答案和评分要点必须正确。"),max);
+    const o=parseJSON(out,"{");let qs;
+    if(type.kind==="mcq"){const m=(o.mcq||[]).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!m.length)throw new Error("AI 返回的题目格式不对，请再试一次。");qs=m.map((x,i)=>({no:i+1,mcq:true,stem:x.q,o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||"",m:1}))}
+    else{qs=(o.questions||[]).filter(q=>q&&Array.isArray(q.parts)&&q.parts.length).map((q,i)=>({no:q.no||i+1,stem:q.stem||"",sz:q.sz||"",parts:q.parts.map(p=>({p:p.p||"",q:String(p.q||""),qz:p.qz||"",m:Number(p.m)||1,scheme:String(p.scheme||""),cz:p.cz||""}))}));if(!qs.length)throw new Error("AI 返回的试卷格式不对，请再试一次。")}
+    EX={sid,type:type.id,kind:type.kind,label:type.label,title:o.title||s.name+" 模拟卷",instr:o.instructions||"",qs,ans:{},pick:{},started:Date.now(),limit,imgs:{},result:null};exSave();rExam()}
+  catch(e){setBusy(btn,false);if(msg)msg.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}
+function exMax(){let t=0;EX.qs.forEach(q=>{if(q.mcq)t+=q.m;else q.parts.forEach(p=>t+=p.m)});return t}
+function showPaper(){
+  const e=EX;let body="";
+  e.qs.forEach((q,qi)=>{
+    if(q.mcq){body+=`<div class="qcard"><div class="qh"><span class="qno">${q.no}.</span><span class="tag">1 分</span></div><div class="stem">${esc(q.stem)}</div>${zhBox(q.qz)}${q.o.map((o,i)=>`<button class="opt ${e.pick[qi]===i?"sel":""}" data-mc="${qi}" data-i="${i}"><span class="bub">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("")}</div>`}
+    else{body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span><span class="tag">${q.parts.reduce((a,p)=>a+p.m,0)} 分</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>${zhBox(q.sz)}`:""}
+     ${q.parts.map((p,pi)=>{const id=qi+"-"+pi;return `<div class="part"><span class="tag pm">${p.m} 分</span><div class="stem"><b>${esc(p.p)}</b> ${esc(p.q)}</div>${zhBox(p.qz)}
+       <textarea data-an="${id}" placeholder="在这里作答${e.kind==="writing"?" (整篇写在这里)":""}" style="min-height:${e.kind==="writing"?260:80}px;margin-top:6px">${esc(e.ans[id]||"")}</textarea>
+       <div class="row" style="margin-top:4px"><label class="btn small">📷 附手写答案照片<input type="file" accept="image/*" data-img="${id}" hidden></label>${e.imgs[id]?`<span class="tag ok">已附图</span> <button class="btn small" data-imgx="${id}">移除</button>`:""}</div></div>`}).join("")}</div>`}});
+  $("#sheet").innerHTML=`<div class="timerbar no-print"><div><b>${esc(e.title)}</b> <span class="tag">${esc(e.label)}</span> <span class="tag">共 ${exMax()} 分</span></div><div class="row"><b id="exClock"></b></div></div>
+   ${e.instr?`<div class="notice"><p>${esc(e.instr)}</p>${e.kind==="writing"?"<p><b>选 1 题作答，其余留空，不会扣分。</b></p>":""}</div>`:""}
+   ${body}
+   <div class="row" style="margin-top:14px"><button class="btn pri" id="exSub">交卷并批改</button><button class="btn" id="exQuit">放弃这份卷</button><span class="fine muted" id="exMsg2">作答会自动保存在这个浏览器里 (照片除外)。</span></div>`;
+  $$("[data-mc]").forEach(b=>b.onclick=()=>{e.pick[+b.dataset.mc]=+b.dataset.i;exSave();$$(`[data-mc="${b.dataset.mc}"]`).forEach(x=>x.classList.toggle("sel",x===b))});
+  $$("[data-an]").forEach(t=>t.oninput=()=>{e.ans[t.dataset.an]=t.value;clearTimeout(exSave.t);exSave.t=setTimeout(exSave,500)});
+  $$("[data-img]").forEach(i=>i.onchange=async ev=>{const f=ev.target.files[0];if(!f)return;try{e.imgs[i.dataset.img]=await prepImg(f);showPaper()}catch(x){toast("图片读取失败")}});
+  $$("[data-imgx]").forEach(b=>b.onclick=()=>{delete e.imgs[b.dataset.imgx];showPaper()});
+  $("#exQuit").onclick=()=>{if(confirm("放弃这份卷？作答内容会丢失。")){EX=null;S.draft=null;save();clearInterval(exTimer);rExam()}};
+  $("#exSub").onclick=()=>submitExam();
+  clearInterval(exTimer);const clk=()=>{const el=$("#exClock");if(!el)return;const sec=Math.floor((Date.now()-e.started)/1000);
+    if(e.limit){const left=e.limit*60-sec;el.textContent=(left<0?"超时 ":"剩余 ")+fmtT(Math.abs(left));el.style.color=left<0?"var(--bad)":""}else el.textContent="已用 "+fmtT(sec)};
+  clk();exTimer=setInterval(clk,1000)}
+function zhBox(t){return t?`<details style="margin:2px 0 4px"><summary class="fine muted" style="cursor:pointer">华文翻译</summary><div class="fine" style="margin-top:4px;white-space:pre-wrap">${esc(t)}</div></details>`:""}
+function fmtT(s){const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(h?h+":":"")+String(m).padStart(2,"0")+":"+String(x).padStart(2,"0")}
+async function submitExam(){
+  const e=EX,btn=$("#exSub");const s=subj(e.sid);
+  const open=[];e.qs.forEach((q,qi)=>{if(!q.mcq)q.parts.forEach((p,pi)=>{const id=qi+"-"+pi;open.push({id,qi,pi,q,p,ans:(e.ans[id]||"").trim(),img:e.imgs[id]})})});
+  const answered=open.filter(x=>x.ans||x.img);
+  if(!answered.length&&!Object.keys(e.pick).length){toast("还没有作答");return}
+  if(open.length&&!aiOK()){toast("批改需要 API key");return}
+  setBusy(btn,true,"批改中，约 20-60 秒…");clearInterval(exTimer);
+  try{const res={};
+    e.qs.forEach((q,qi)=>{if(q.mcq){const ok=e.pick[qi]===q.a;res["m"+qi]={score:ok?1:0,max:1,comment:e.pick[qi]===undefined?"未作答":(ok?"正确":"正确答案是 "+"ABCD"[q.a]+"。"+q.e)}}});
+    if(answered.length){const parts=[];let txt=`请按评分要点批改这份 SPM「${s.name}」模拟卷的作答。\n卷别：${e.label}\n规则：\n- 每个小问按 scheme 给分，分数 ≤ 该题满分，可给 0.5 分；\n- 只依据学生写的内容给分，不要替学生补全；\n- comment 用华文 2-4 句 (学生需要看懂)：指出得分点、失分原因，以及怎样答才能拿满分；关键词、标准答案和值得背的句子用考试语言写出来 (华文科目全部用华文)${["writing"].includes(e.kind)?"；作文要指出最主要的 3 个语言/结构问题":""}；\n- 学生的手写照片会随题目附在后面，先读出内容再批改；字迹无法辨认的地方要在评语中说明。\n只输出 JSON 数组：[{"id":"题号","score":数字,"comment":"评语"}]。\n\n`;
+      answered.forEach(x=>{txt+=`### id=${x.id}\n题目：${x.q.stem?x.q.stem+"\n":""}${x.p.p} ${x.p.q}\n满分：${x.p.m}\n评分要点：${x.p.scheme}\n学生作答：${x.ans||"(见照片)"}\n\n`;parts.push(x)});
+      const content=[{text:txt}];parts.forEach(x=>{if(x.img){content.push({text:`id=${x.id} 的手写答案照片：`});content.push({inline_data:{mime_type:"image/jpeg",data:x.img}})}});
+      const out=await gem([{role:"user",parts:content}],sysPrompt(e.sid,"你现在是严格公正的 SPM 评卷员。"),8192);const arr=parseJSON(out,"[");
+      arr.forEach(r=>{const x=answered.find(a=>a.id===String(r.id));if(x)res[x.id]={score:Math.max(0,Math.min(x.p.m,Number(r.score)||0)),max:x.p.m,comment:String(r.comment||"")}})}
+    let total=0,max=0,added=0;
+    open.forEach(x=>{if(!res[x.id]){if(e.kind==="writing"){return}res[x.id]={score:0,max:x.p.m,comment:"未作答。"}}});
+    Object.values(res).forEach(r=>{total+=r.score;max+=r.max});
+    open.forEach(x=>{const r=res[x.id];if(r&&r.score<r.max*.6&&(x.ans||x.img)){S.wrong.push({id:"e"+Date.now()+x.id,type:"exam",s:e.sid,q:`[${e.title}] 第 ${x.q.no} 题 ${x.p.p} ${x.p.q}`,a:`得分 ${r.score}/${r.max}\n评分要点：${x.p.scheme}\n我的作答：${x.ans||"(照片)"}\n评语：${r.comment}`});added++}});
+    e.qs.forEach((q,qi)=>{if(q.mcq&&res["m"+qi].score===0&&e.pick[qi]!==undefined){S.wrong.push({id:"e"+Date.now()+"m"+qi,type:"exam",s:e.sid,q:q.stem+"  ("+q.o.map((o,k)=>"ABCD"[k]+". "+o).join(" / ")+")",a:"正确答案："+"ABCD"[q.a]+"。"+q.e});added++}});
+    const pct=max?Math.round(total/max*100):0;e.result={res,total,max,pct,added};
+    S.exams.push({id:Date.now(),sid:e.sid,title:e.title,date:today(),at:Date.now(),score:Math.round(total*10)/10,max,pct});S.draft=null;save();rExam()}
+  catch(err){setBusy(btn,false);toast(err.message.slice(0,80));const m=$("#exMsg2");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(err.message)}</span>`;exTimerResume()}}
+function exTimerResume(){const e=EX;clearInterval(exTimer);exTimer=setInterval(()=>{const el=$("#exClock");if(!el)return;const sec=Math.floor((Date.now()-e.started)/1000);el.textContent=(e.limit?(e.limit*60-sec<0?"超时 ":"剩余 ")+fmtT(Math.abs(e.limit*60-sec)):"已用 "+fmtT(sec))},1000)}
+function showResult(){
+  const e=EX,r=e.result;let body="";
+  e.qs.forEach((q,qi)=>{
+    if(q.mcq){const x=r.res["m"+qi];body+=`<div class="qcard"><div class="qh"><span class="qno">${q.no}.</span><span class="tag ${x.score?"ok":"red"}">${x.score}/1</span></div><div class="stem">${esc(q.stem)}</div><div class="fine" style="margin-top:6px">你的答案：${e.pick[qi]===undefined?"未作答":"ABCD"[e.pick[qi]]} · 正确：${"ABCD"[q.a]}</div><div class="fb ${x.score?"full":"zero"}">${esc(x.comment)}${q.ez?`<div style="margin-top:4px">华文：${esc(q.ez)}</div>`:""}</div></div>`}
+    else{const ps=q.parts.map((p,pi)=>{const id=qi+"-"+pi,x=r.res[id];if(!x)return "";return `<div class="part"><span class="tag pm ${x.score>=x.max?"ok":x.score===0?"red":"warn"}">${x.score}/${x.max}</span><div class="stem"><b>${esc(p.p)}</b> ${esc(p.q)}</div>
+        <div class="fine muted" style="margin-top:4px;white-space:pre-wrap">我的作答：${esc(e.ans[id]||(e.imgs[id]?"(照片)":"(未作答)"))}</div>
+        <div class="fb ${x.score>=x.max?"full":x.score===0?"zero":""}">${esc(x.comment)}</div>
+        <details style="margin-top:4px"><summary class="fine muted" style="cursor:pointer">参考评分要点</summary><div class="fine" style="white-space:pre-wrap;margin-top:4px">${esc(p.scheme)}</div>${p.cz?`<div class="fine muted" style="white-space:pre-wrap;margin-top:4px">华文：${esc(p.cz)}</div>`:""}</details></div>`}).join("");
+      if(ps.trim())body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>`:""}${ps}</div>`}});
+  $("#sheet").innerHTML=`<div class="row"><h2 style="margin:0">${esc(e.title)}</h2><span class="tag">${esc(e.label)}</span></div>
+   <div class="card" style="margin:12px 0"><div class="row"><div class="score">${Math.round(r.total*10)/10}<span class="muted" style="font-size:22px"> / ${r.max}</span></div><span class="tag blue" style="font-size:15px">${r.pct}%</span><span class="spacer"></span>
+   <button class="btn pri" id="exNew">再出一份</button></div>${r.added?`<p class="fine muted" style="margin:8px 0 0">已把 ${r.added} 个失分点放进「刷题 → 错题本」。</p>`:""}
+   <p class="fine muted" style="margin:6px 0 0">这是 AI 评分，仅供练习参考；作文和开放题的分数可能偏松或偏严，建议再请老师看一遍。</p></div>${body}`;
+  $("#exNew").onclick=()=>{EX=null;S.draft=null;save();rExam()}}
+
+/* ---- 问答 ---- */
+let chatBusy=false,chatImg=null,chatPending=null,chatErr="";
+function kwScore(c,q){const hay=(c.t+" "+c.subs.join(" ")+" "+plain(c.n)+" "+(S.notes[c.k]?S.notes[c.k].md:"")+" "+(S.req[c.k]||"")).toLowerCase();let sc=0;
+  (q.toLowerCase().match(/[a-z]{3,}/g)||[]).forEach(w=>{if(hay.includes(w))sc+=2});const zh=q.replace(/[^\u4e00-\u9fff]/g,"");for(let i=0;i<zh.length-1;i++){if(hay.includes(zh.slice(i,i+2)))sc+=1}return sc}
+async function buildCtx(sid,query){
+  const cs=chapsOf(sid).filter(c=>c.core),key=S.scope[sid],blocks=[];let used=[];
+  if(key){const c=cs.find(x=>x.k===key);if(c){blocks.push("【当前章节】"+c.t+"\n"+chapText(c,7000));used.push(c.t)}}
+  else{cs.map(c=>({c,sc:kwScore(c,query)})).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc).slice(0,3).forEach(x=>{blocks.push("【相关章节】"+x.c.t+"\n"+chapText(x.c,3000));used.push(x.c.t)})}
+  const reqs=cs.filter(c=>S.req[c.k]&&!used.includes(c.t)).slice(0,6).map(c=>c.t+"：要求 "+S.req[c.k]);if(reqs.length)blocks.push("【其他章节的学生要求】\n"+reqs.join("\n"));
+  const catalog="【本科章节目录】\n"+cs.map(c=>c.t+(c.subs.length?"（"+c.subs.join("；")+"）":"")).join("\n");
+  const fp=await fileParts(sid);
+  const rule=S.strict?"回答规则：只依据下面【资料】和学生上传的文件作答。资料没有覆盖的点，先明确说「资料里没有这一点」，再用 SPM 通用知识补充，并在该段前标注 [通用知识]。不要把通用知识说成是课本原文。":"回答规则：优先依据下面【资料】和学生上传的文件；资料没写到的，可用 SPM 通用知识补充，并标注 [通用知识]。";
+  return{system:sysPrompt(sid,rule+"\n\n"+catalog+"\n\n"+blocks.join("\n\n")),parts:fp.parts,used,files:fp.names}}
+function rChat(){
+  const sid=S.sub,h=S.chat[sid]||[],cs=chapsOf(sid).filter(c=>c.core);let nFiles=0;
+  $("#sheet").innerHTML=`${needKey()}<div class="row" style="margin-bottom:8px"><h2 style="margin:0">${esc(subj(sid).name)} 问答</h2><span class="spacer"></span><button class="btn small" id="chClr">清空对话</button></div>
+  <div class="controls"><label class="grow">范围<select id="chScope"><option value="">整科 (自动找相关章节)</option>${cs.map(c=>`<option value="${esc(c.k)}" ${S.scope[sid]===c.k?"selected":""}>${esc(c.t)}</option>`).join("")}</select></label>
+   <label class="chk" style="color:var(--ink);font-size:14px"><input type="checkbox" id="chStrict" ${S.strict?"checked":""}> 只依据我的资料回答</label></div>
+  <div class="fine muted" id="chInfo" style="margin-bottom:8px"><span class="tag blue">回答语言：${langLabel(sid)}</span> 回答会参考：章节要求、内置要点、AI 笔记，以及你在「资料」页勾选的上传文件。</div>
+  <div id="msgs">${h.length?h.map(m=>`<div class="msg ${m.r}">${m.r==="user"?esc(m.t).replace(/\n/g,"<br>")+(m.img?'<div class="fine muted">(附了一张图片)</div>':""):`<div class="md">${md(m.t)}</div>${m.src&&m.src.length?`<div class="fine muted" style="margin-top:6px">参考：${esc(m.src.join("、"))}</div>`:""}`}</div>`).join(""):`<div class="empty">例如：「讲一下判别式，再出 3 道练习」<br>「Kadar tindak balas 为什么升温变快？」<br>拍下不会的题，点下面的 📷 上传。</div>`}${chatBusy?`<div class="msg model muted"><span class="spin"></span>思考中…</div>`:""}${chatErr?`<div class="notice error">${esc(chatErr)}</div>`:""}</div>
+  <div class="card" style="margin-top:10px">${chatImg?`<div class="fine" style="margin-bottom:6px">已附图片 <button class="btn small" id="chImgX">移除</button></div>`:""}
+   <textarea id="chIn" placeholder="输入问题，Ctrl/⌘+Enter 发送" ${chatBusy?"disabled":""}></textarea>
+   <div class="row" style="margin-top:8px"><label class="btn small">📷 上传题目图片<input type="file" id="chFile" accept="image/*" hidden></label><span class="spacer"></span><button class="btn pri" id="chSend" ${chatBusy?"disabled":""}>发送</button></div></div>`;
+  const last=$("#msgs").lastElementChild;if(last&&h.length)last.scrollIntoView({block:"nearest"});
+  $("#chClr").onclick=()=>{S.chat[sid]=[];chatErr="";save();rChat()};
+  $("#chScope").onchange=e=>{S.scope[sid]=e.target.value||undefined;save()};$("#chStrict").onchange=e=>{S.strict=e.target.checked;save()};
+  $("#chFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{chatImg=await prepImg(f);rChat()}catch(x){toast("图片读取失败")}};
+  if($("#chImgX"))$("#chImgX").onclick=()=>{chatImg=null;rChat()};
+  const send=()=>{const v=$("#chIn").value.trim();if(v||chatImg)ask(v||"请讲解这张图片里的题目。")};
+  $("#chSend").onclick=send;$("#chIn").onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))send()};
+  if(chatPending){const q=chatPending;chatPending=null;ask(q)}}
+async function ask(text){
+  if(chatBusy)return;const sid=S.sub,h=S.chat[sid]=S.chat[sid]||[];const img=chatImg;chatImg=null;chatErr="";
+  h.push({r:"user",t:text,img:!!img});chatBusy=true;if(S.tab==="chat")rChat();
+  try{const ctx=await buildCtx(sid,text);
+    const hist=h.slice(-14).map((m,i,a)=>({role:m.r==="user"?"user":"model",parts:[{text:m.t}]}));
+    const lastParts=hist[hist.length-1].parts;if(img)lastParts.unshift({inline_data:{mime_type:"image/jpeg",data:img}});ctx.parts.forEach((p,i)=>lastParts.splice(i,0,p));
+    const out=await gem(hist,ctx.system+(img?"\n学生附了题目图片：先准确读出题目，字迹看不清的地方要说明，再解答。":""),8192);
+    h.push({r:"model",t:out,src:ctx.used.concat(ctx.files)})}
+  catch(e){h.pop();chatErr=e.message}
+  chatBusy=false;if(h.length>40)S.chat[sid]=h.slice(-40);save();if(S.tab==="chat"&&S.sub===sid)rChat()}
+
+/* ---- 资料 ---- */
+function link(href,title,desc,tag){return `<a class="res" href="${href}" target="_blank" rel="noopener noreferrer"><b>${esc(title)}${tag?` <span class="tag ${tag[1]||""}">${esc(tag[0])}</span>`:""}</b><span class="fine muted">${desc}</span></a>`}
+async function rRes(){
+  const sid=S.sub,s=subj(sid),yrs=[2026,2025,2024,2023,2022,2021];
+  $("#sheet").innerHTML=`<h2>${esc(s.name)} 资料</h2><div id="upBox"><div class="empty">读取中…</div></div>${resLinks(sid,s,yrs)}`;
+  renderUploads(sid)}
+async function renderUploads(sid){
+  const box=$("#upBox");if(!box)return;let files=[],err="";try{files=(await DB.all()).filter(f=>f.sid===sid)}catch(e){err="这个浏览器不支持保存文件 (可能是无痕模式)。"}
+  box.innerHTML=`<h3>我上传的资料</h3><p class="muted fine">把课本 PDF、老师的笔记、Trial 卷或照片放进来，勾选后，生成笔记、出题、模拟卷和问答都会参考它们。文件只保存在这个浏览器里，只在你使用 AI 时发给 Google Gemini。单个文件建议 ≤ 14 MB，一次最多带 14 MB。</p>
+   ${err?`<div class="notice error">${esc(err)}</div>`:`<div class="drop" id="drop"><div><b>点这里选择文件，或拖进来</b></div><div class="fine muted">PDF、图片 (png/jpg/webp)、txt / md / csv</div><input type="file" id="upIn" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,.csv,image/*,application/pdf" hidden></div>`}
+   <div style="margin-top:10px">${files.length?files.map(f=>`<div class="card" style="margin-bottom:8px"><div class="row"><label class="chk" style="color:var(--ink);font-size:15px"><input type="checkbox" data-use="${f.id}" ${S.use[f.id]?"checked":""}> ${esc(f.name)}</label><span class="tag">${(f.size/1048576).toFixed(1)} MB</span>${f.size>14*1048576?'<span class="tag red">太大，AI 会跳过</span>':""}<span class="spacer"></span><button class="btn small" data-updel="${f.id}">删除</button></div></div>`).join(""):`<div class="fine muted">这一科还没有上传资料。</div>`}</div>`;
+  const drop=$("#drop"),inp=$("#upIn");
+  if(drop){drop.onclick=()=>inp.click();drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};drop.ondragleave=()=>drop.classList.remove("over");
+    drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");addFiles(sid,e.dataTransfer.files)};inp.onchange=()=>addFiles(sid,inp.files)}
+  $$("[data-use]").forEach(c=>c.onchange=()=>{S.use[c.dataset.use]=c.checked||undefined;save()});
+  $$("[data-updel]").forEach(b=>b.onclick=async()=>{await DB.del(b.dataset.updel);delete S.use[b.dataset.updel];save();renderUploads(sid)})}
+async function addFiles(sid,list){let n=0;for(const f of list){const ok=/\.(pdf|png|jpe?g|webp|txt|md|csv)$/i.test(f.name)||/^image\//.test(f.type)||f.type==="application/pdf";if(!ok){toast("不支持："+f.name+"（PPT/Word 请先另存为 PDF）");continue}
+    try{const id="f"+Date.now()+Math.random().toString(36).slice(2,6);await DB.put({id,sid,name:f.name,type:f.type,size:f.size,blob:f});S.use[id]=true;n++}catch(e){toast("保存失败："+f.name)}}
+  save();if(n)toast("已添加 "+n+" 个文件，并勾选为 AI 参考");renderUploads(sid)}
+function resLinks(sid,s,yrs){
+  const tb=TB[sid]||[];
+  return `<h3>官方入口</h3><div class="grid g3">${link("https://lp.moe.gov.my","Lembaga Peperiksaan (LP)","官方 SPM 时间表、考试通告、格式文件，每年更新。",["官方","ok"])}
+   ${link("https://sppat.moe.gov.my","SPPAT","查看/打印「Pernyataan Pendaftaran Peperiksaan」，考试当天要带。",["官方","ok"])}
+   ${link(JWP_URL,"LP：Jadual Waktu SPM 2026","官方 JWP 文件页 (2026 年 8 月 18 日版)。本站的各科日期已按它自动设好。",["官方","ok"])}</div>
+  <h3>${esc(s.name)} 课本 · AnyFlip 在线翻页</h3>
+  <p class="fine muted">AnyFlip 上的课本是网友上传的，不是官方发布，可能下架或版本不同。打开后先看封面是不是 KPM 的 KSSM 版本 (2019 起)。书如果开放下载，可以存成 PDF，再上传到上面的「我上传的资料」，让 AI 照着课本出题和回答。</p>
+  <div class="grid g3">${(ANYFLIP[sid]||[]).map(([t,u,d])=>link(u,`${s.name} ${t}`,d,["AnyFlip","blue"])).join("")}
+   ${["Tingkatan 4","Tingkatan 5"].map(f=>link("https://www.google.com/search?q="+encodeURIComponent("site:anyflip.com Buku Teks "+(sid==="moral"?"Pendidikan Moral":s.ms)+" "+f+" KSSM"),`搜索：${s.name} ${f.replace("Tingkatan ","T")}`,"在 AnyFlip 里找这一科的课本 (用 Google 站内搜索)。",["搜索"])).join("")}</div>
+  <h3>${esc(s.name)} 课本 PDF</h3><div class="grid g3">
+   ${sid==="bio"?link("https://ecentral.my/wp-content/uploads/2025/05/Biologi-Tingkatan-4.pdf","生物 T4 课本 (PDF 直链)","15 章，含小章节。",["T4","blue"])+link("https://ecentral.my/wp-content/uploads/2025/05/Biologi-Tingkatan-5.pdf","生物 T5 课本 (PDF 直链)","13 章，含小章节。",["T5","blue"]):""}
+   ${tb.map(([t,slug])=>link("https://ecentral.my/"+slug+"/",`${s.name} ${t}`,"eCentral 课本下载页 (目录 + PDF)。",[t,"blue"])).join("")}
+   ${link("https://ecentral.my/buku-teks/","所有科目课本总目录","eCentral，可搜索你的科目 (BM、BI、Add Maths、Moral…)。",["目录"])}</div>
+  ${s.ep?`<h3>${esc(s.name)} Trial / 模拟卷 (含答案)</h3><div class="row">${yrs.map(y=>`<a class="btn small" href="${ET(s.ep,y)}" target="_blank" rel="noopener noreferrer">${y}</a>`).join("")}</div>
+   <p class="fine muted">EduKaji 按年份整理，页面里可以按州属筛选。Trial 通常比正式考试难，用来练速度和抗压。做完后可以在「模拟卷 → 成绩记录」手动记一笔分数。</p>`:`<h3>Trial / 模拟卷</h3><p class="fine muted">这一科没有找到 Trial 汇总页，可到 EduKaji 总入口自己搜。</p>`}
+  <div class="grid g3" style="margin-top:8px">${link("https://edukaji.my/spm-trial-paper-download","EduKaji：全部科目 Trial","各科各年份入口，有答案。",["Trial","blue"])}
+   ${sid==="sains"?link("https://app.pandai.org/app/learn/kssm-f4/kssm-sc/kssm-f4-sc-02/videos","Pandai：Sains Form 4","每章有速记、视频、实验、练习 (部分需免费注册)。",["学习站"])+link("https://app.pandai.org/app/learn/kssm-f5/kssm-sc/exam-overview/spm-preparation1763220753","Pandai：Sains Form 5 + SPM 备考","含 SPM 格式说明和历年各州 Trial 列表。",["学习站"]):""}
+   ${sid==="sej"?link("https://get.pandai.org/app/learn/kssm-f4/kssm-sj/kssm-f4-sj-03/videos","Pandai：Sejarah Form 4","章节视频 (部分需免费注册)。",["学习站"]):""}</div>
+  <h3>格式与往年题</h3><div class="grid g3">
+   ${link("https://www.komunitasbelajar.id/2020/12/buku-format-pentaksiran-spm-mulai-2021.html","Format Pentaksiran SPM 2021 起","各科格式书汇总下载入口 (第三方整理)。官方最新版请到 LP 确认。",["第三方","warn"])}
+   ${link("https://afterschool.my/articles/actual-collection-of-spm-past-year-questions-for-2014-2015-2016-2017-2018-2019-spm-repeat-bahasa-melayu-mathematics-history","SPM 真题合集 2014-2019","旧格式 (KBSM)，适合练内容，不适合当格式参考。",["旧格式","warn"])}
+   ${link("https://store.pelangibooks.com/collections/ebooks/products/ebooks-ranger-spm-2026","Ranger SPM 2026 (Pelangi eBook)","按 DSKP 与最新格式写的快速复习，需通过 ePelangi 阅读 (付费)。",["付费"])}</div>
+  <div class="warnbox" style="margin-top:14px">社交媒体上的「预测题 / 漏题」大多只是预测，KPM 已多次说明。把真题和模拟卷练熟更划算。</div>`}
+
+/* ---- 设置 ---- */
+function applyTheme(){document.body.dataset.theme=S.theme||"auto"}
+function rSet(){
+  const themes=[["auto","跟随系统"],["light","浅色"],["night","夜间"],["sakura","樱花"],["mint","薄荷"],["paper","纸张"]];
+  $("#sheet").innerHTML=`<h2>设置</h2>
+  <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p>
+    <input type="password" id="sKey" placeholder="粘贴 API key" value="${esc(S.ai.key)}" autocomplete="off">
+    <div class="controls" style="margin-top:8px"><label class="grow">模型<select id="sMd">${MODELS.map(m=>`<option ${S.ai.model===m?"selected":""}>${m}</option>`).join("")}${MODELS.includes(S.ai.model)?"":`<option selected>${esc(S.ai.model)}</option>`}</select></label><button class="btn pri" id="sKeyOk">保存并测试</button></div><div id="sKeyMsg" class="fine"></div></div>
+   <div class="card"><h3 style="margin-top:0">笔试开始日</h3><input type="date" id="sEx" value="${S.exam}"><p class="fine muted">默认是 SPM 2026 笔试第一天 (2026-11-23)。考的是别的日期就改这里。</p>
+    <h3>AI 回答语言</h3><div class="seg"><button data-lang="auto" aria-pressed="${(S.lang||"auto")==="auto"}">考试语言 + 华文翻译</button><button data-lang="exam" aria-pressed="${S.lang==="exam"}">只用考试语言</button><button data-lang="zh" aria-pressed="${S.lang==="zh"}">全部华文</button></div><p class="fine muted">国语、历史、道德用国语；英文和数学、理科、附加数学用英文；华文科目用华文。默认会在每段后面附「华文：」翻译和解释。</p><h3>外观</h3><div class="seg">${themes.map(t=>`<button data-th="${t[0]}" aria-pressed="${S.theme===t[0]}">${t[1]}</button>`).join("")}</div></div></div>
+  <h3>我考的科目 & 信心</h3><p class="fine muted">信心 1 = 没把握，5 = 很稳。越没把握，越常排进每日重点。</p>
+  <div class="grid g3">${SUBJECTS.map(s=>`<div class="card"><label class="chk" style="color:var(--ink);font-size:15px"><input type="checkbox" data-my="${s.id}" ${S.my.includes(s.id)?"checked":""}> <b>${esc(s.name)}</b></label><div class="row" style="margin-top:6px"><span class="fine muted">信心</span><select data-cf="${s.id}">${[1,2,3,4,5].map(n=>`<option ${(S.conf[s.id]||3)===n?"selected":""}>${n}</option>`).join("")}</select></div></div>`).join("")}</div>
+  <h3>备份</h3><p class="fine muted">进度、AI 笔记和错题都只在这个浏览器里。换设备或清缓存前先导出 (导出文件不含 API key，也不含上传的文件)。</p>
+  <div class="row"><button class="btn" id="bkOut">导出 JSON</button><label class="btn">导入 JSON<input type="file" id="bkIn" accept=".json" hidden></label><button class="btn badb" id="bkRs">清空全部进度</button></div>`;
+  $("#sKeyOk").onclick=async()=>{S.ai.key=$("#sKey").value.trim();S.ai.model=$("#sMd").value;save();const m=$("#sKeyMsg");if(!S.ai.key){m.textContent="已清除 key";return}m.innerHTML='<span class="spin"></span>测试中…';
+    try{await gem([{role:"user",parts:[{text:"只回复两个字母：OK"}]}],"",64);m.innerHTML='<span style="color:var(--ok)">连接成功 ✓</span>'}catch(e){m.innerHTML='<span style="color:var(--bad)">'+esc(e.message)+'</span>'}};
+  $("#sEx").onchange=e=>{if(e.target.value){S.exam=e.target.value;save();renderNav();toast("已更新")}};
+  $$("[data-lang]").forEach(b=>b.onclick=()=>{S.lang=b.dataset.lang;save();rSet()});
+  $$("[data-th]").forEach(b=>b.onclick=()=>{S.theme=b.dataset.th;save();applyTheme();rSet()});
+  $$("[data-my]").forEach(c=>c.onchange=()=>{S.my=SUBJECTS.filter(s=>$(`[data-my="${s.id}"]`).checked).map(s=>s.id);if(!S.my.length){c.checked=true;S.my=[c.dataset.my]}if(!S.my.includes(S.sub))S.sub=S.my[0];save();renderNav()});
+  $$("[data-cf]").forEach(c=>c.onchange=()=>{S.conf[c.dataset.cf]=+c.value;save()});
+  $("#bkOut").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(Object.assign({},S,{ai:Object.assign({},S.ai,{key:""}),draft:null}),null,1)],{type:"application/json"}));a.download="spm-notes-backup.json";a.click()};
+  $("#bkIn").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const k=S.ai.key,m=S.ai.model;S=Object.assign({},DEF,JSON.parse(t));S.ai={key:k,model:m};bust();save();toast("已导入");render()}catch(x){toast("文件格式不对")}})};
+  $("#bkRs").onclick=()=>{if(confirm("确定清空所有进度、AI 笔记和错题？这个操作不能撤销。(API key 会保留)")){const k=S.ai;S=Object.assign({},DEF,{since:today(),ai:k});bust();save();go("today")}}}
+
+/* ---- 事件 ---- */
+document.addEventListener("click",e=>{
+  const sb=e.target.closest("#subjects [data-sub]");if(sb){S.sub=sb.dataset.sub;save();render();return}
+  const tb=e.target.closest("#tabs [data-tab]");if(tb){S.tab=tb.dataset.tab;save();render();try{history.replaceState(null,"","#"+S.tab)}catch(x){}return}
+  const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,k=a.dataset.k,sid=a.dataset.sub;
+  if(act!=="copynote")e.preventDefault();
+  if(act==="goset"){S.tab="set";save();render()}
+  else if(act==="opennote"){S.openChap=k;go("notes",sid);setTimeout(()=>{const d=document.querySelector(`details[data-k="${CSS.escape(k)}"]`);if(d){d.open=true;d.scrollIntoView({block:"center"})}},50)}
+  else if(act==="gosub"){go(a.dataset.tab||"notes",sid)}
+  else if(act==="gennote"){genNote(sid,k,a)}
+  else if(act==="gensubs"){genSubs(sid,k,a)}
+  else if(act==="cardchap"){genCards(sid,k,10,a)}
+  else if(act==="askchap"){S.scope[sid]=k;go("chat",sid)}
+  else if(act==="quizchap"){S.pickChap=k;dMode="quiz";qz=null;go("drill",sid)}
+  else if(act==="copynote"){const n=S.notes[k];if(n&&navigator.clipboard)navigator.clipboard.writeText(n.md).then(()=>toast("已复制"),()=>toast("复制失败"))}
+  else if(act==="delnote"){if(confirm("删除这一章的 AI 笔记？")){delete S.notes[k];save();S.openChap=k;rNotes()}}
+  else if(act==="delown"){S.own[sid]=(S.own[sid]||[]).filter(x=>String(x.id)!==a.dataset.id);bust();save();rNotes()}
+});
+document.addEventListener("click",e=>{const w=e.target.closest("[data-wai]");if(w){const x=S.wrong.find(y=>y.id===w.dataset.wai);if(!x)return;chatPending=`我做错了这道 SPM ${subj(x.s)?subj(x.s).name:""} 的题，请讲清楚：为什么错、正确思路、这个知识点怎么避免再错。\n题目：${x.q}\n${x.a?"参考答案/笔记："+x.a:""}`;go("chat",x.s)}
+  const d=e.target.closest("[data-wdel]");if(d){S.wrong=S.wrong.filter(y=>y.id!==d.dataset.wdel);save();rWrong()}});
+$("#btnSet").onclick=()=>{S.tab="set";save();render()};
+
+/* ---- 启动 ---- */
+load();applyTheme();
+const h0=(location.hash||"").slice(1);if(TABS.some(t=>t[0]===h0))S.tab=h0;else if(!TABS.some(t=>t[0]===S.tab)&&S.tab!=="set")S.tab="today";
+render();
+window.__spm={S:()=>S,go};
+})();
+
+</script>
+</body>
+</html>
