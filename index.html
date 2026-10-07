@@ -760,7 +760,7 @@ function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY)||"{}")}catch
   S=Object.assign({},DEF,o);S.ai=Object.assign({key:"",model:MODELS[0]},S.ai);
   if(!o.ai||!o.ai.key){try{const v1=JSON.parse(localStorage.getItem("spm-notes-v1")||"{}");if(v1.ai&&v1.ai.key)S.ai.key=v1.ai.key}catch(e){}}
   if(!S.since)S.since=today();if(!S.my.length)S.my=["bm"];if(!S.my.includes(S.sub))S.sub=S.my[0]}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){if(!save.w){save.w=1;setTimeout(()=>toast("浏览器存储空间满了，新内容可能没保存。请先导出备份，再删掉一些旧笔记或旧试卷。"),0)}}}
 function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2200)}
 const subj=id=>SUBJECTS.find(s=>s.id===id);
 const mySubjects=()=>SUBJECTS.filter(s=>S.my.includes(s.id));
@@ -792,6 +792,8 @@ function chapsOf(sid){
   chapCache[sid]={v:out};return out}
 function bust(){for(const k in chapCache)delete chapCache[k]}
 function prog(sid){const cs=chapsOf(sid).filter(c=>c.core);const d=cs.filter(c=>S.done[c.k]).length;return{d,n:cs.length,p:cs.length?Math.round(d/cs.length*100):0}}
+function fmtAt(t){return new Date(t).toLocaleString("zh-CN",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}
+function putNote(k,md,at,restoreIdx){const old=S.notes[k];const hist=old&&old.hist?old.hist.slice():[];if(old)hist.unshift({md:old.md,at:old.at});if(restoreIdx!==undefined)hist.splice(restoreIdx+1,1);S.notes[k]={md,at:at||Date.now(),hist:hist.slice(0,10)}}
 function chapText(c,max){let t="";if(c.subs&&c.subs.length)t+="小章节："+c.subs.join("；")+"\n";if(S.req[c.k])t+="学生提供的章节要求："+S.req[c.k]+"\n";
   if(c.n)t+="内置要点："+plain(c.n)+"\n";if(S.notes[c.k])t+="已生成的笔记：\n"+S.notes[c.k].md+"\n";return max?t.slice(0,max):t}
 
@@ -985,6 +987,8 @@ function chapHTML(c,sid,open){
     ${c.core?`<label class="fine muted" style="display:block;margin:6px 0 4px">章节要求 / 老师划的范围 (AI 生成笔记、出题、回答时都会参考)</label><textarea data-req="${esc(c.k)}" placeholder="例如：1.2 只考定义和公式；1.4 不考…" style="min-height:60px">${esc(S.req[c.k]||"")}</textarea>`:""}
     ${c.n?`<div class="note"><div class="fine muted" style="margin-top:8px">内置要点</div>${c.n}</div>`:""}
     <div id="ai-${esc(c.k)}" class="md" style="margin-top:10px">${has?md(S.notes[c.k].md):""}</div>
+    ${has&&S.notes[c.k].at?`<div class="fine muted" style="margin-top:4px">生成于 ${fmtAt(S.notes[c.k].at)}</div>`:""}
+    ${has&&(S.notes[c.k].hist||[]).length?`<details class="chap" style="margin-top:8px"><summary><span class="t">历史版本 (${S.notes[c.k].hist.length})</span></summary><div class="body">${S.notes[c.k].hist.map((h,i)=>`<details style="margin:6px 0"><summary class="fine" style="cursor:pointer">${fmtAt(h.at)} 的版本 <button class="btn small" data-act="histrestore" data-k="${esc(c.k)}" data-i="${i}">恢复这个版本</button></summary><div class="md" style="margin-top:6px">${md(h.md)}</div></details>`).join("")}</div></details>`:""}
     <div class="row" style="margin-top:10px">
       ${c.core||c.quick?`<button class="btn small pri" data-act="gennote" data-k="${esc(c.k)}" data-sub="${sid}" ${aiOK()?"":"disabled"}>${has?"重新生成笔记":"✨ AI 生成这一章的笔记"}</button>`:""}
       ${has?`<button class="btn small" data-act="copynote" data-k="${esc(c.k)}">复制</button><button class="btn small" data-act="delnote" data-k="${esc(c.k)}">删除 AI 笔记</button>`:""}
@@ -1002,7 +1006,7 @@ async function genNote(sid,k,btn){
   try{const fp=await fileParts(sid);
     const prompt=`请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：\n1. 按小章节逐个整理 (${c.subs.length?"依据上面给出的小章节":"如果你不能确定课本的小章节名称，先按 DSKP 常见划分列出，并注明『按 DSKP 推测』"})。\n2. 每个小章节包含：核心概念 / 公式或关键定义 / 易错点 / SPM 常考题型与答题要点。\n3. 最后给：一张 5 行以内的速记表，和 3 道自测题 (答案放在最后)。\n4. 若学生提供了章节要求或上传了资料，以它们为准，资料里没有的不要编。\n5. 语言按系统提示里的【语言规则】(考试语言 + 每个要点后的「华文：」翻译与解释)，同一小节几个要点的华文可以合并成一段，控制篇幅；用 Markdown 小标题和短列表。`;
     const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),8192);
-    S.notes[k]={md:out,at:Date.now()};save();toast("笔记已生成");if(S.tab==="notes"){S.openChap=k;rNotes()}}
+    putNote(k,out);save();toast(S.notes[k].hist.length?"已生成新版本，旧版本在「历史版本」里":"笔记已生成");if(S.tab==="notes"){S.openChap=k;rNotes()}}
   catch(e){toast(e.message.slice(0,80));setBusy(btn,false);const m=$("#bulkMsg");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}
 async function bulkGen(sid){
   const todo=chapsOf(sid).filter(c=>c.core&&!S.notes[c.k]);if(!todo.length){toast("这一科的章节都有笔记了");return}
@@ -1011,7 +1015,7 @@ async function bulkGen(sid){
   for(let i=0;i<todo.length&&!bulk.stop;i++){const c=todo[i];const m=$("#bulkMsg");if(m)m.innerHTML=`<span class="spin"></span>正在生成 ${i+1}/${todo.length}：${esc(c.t)}`;
     try{const fp=await fileParts(sid);const s=subj(sid);
       const prompt=`请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：按小章节逐个整理 (${c.subs.length?"依据给出的小章节":"不确定课本小章节名称时按 DSKP 常见划分并注明『按 DSKP 推测』"})；每个小章节写：核心概念 / 公式或关键定义 / 易错点 / SPM 常考题型与答题要点；最后给 5 行以内速记表和 3 道自测题 (答案放最后)。资料里没有的不要编。语言按系统提示里的【语言规则】(考试语言 + 「华文：」翻译与解释，同一小节的华文可合并)，用 Markdown。`;
-      const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),8192);S.notes[c.k]={md:out,at:Date.now()};save();await sleep(1200)}
+      const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),8192);putNote(c.k,out);save();await sleep(1200)}
     catch(e){const m2=$("#bulkMsg");if(m2)m2.innerHTML=`<span style="color:var(--bad)">在「${esc(c.t)}」停下了：${esc(e.message)}</span>`;bulk.stop=true;bulk.err=true}}
   const err=bulk.err;bulk={on:false,stop:false};const keep=$("#bulkMsg")&&err?$("#bulkMsg").innerHTML:"";rNotes();if(keep&&$("#bulkMsg"))$("#bulkMsg").innerHTML=keep;if(!err)toast("批量生成完成")}
 async function genSubs(sid,k,btn){const c=findChap(sid,k),s=subj(sid);setBusy(btn,true,"生成中…");
@@ -1132,11 +1136,12 @@ function rExam(){
   <p class="fine muted">${esc(subj(sid).fmt)}</p>
   <h2>成绩记录</h2>
   ${avg.length?`<div class="grid g3">${avg.map(a=>`<div class="card"><b style="color:${a.s.color}">${esc(a.s.name)}</b> <span class="fine muted">平均 ${a.avg}% · ${a.n} 套</span><div class="bar" style="margin-top:6px"><i style="width:${a.avg}%;background:${a.s.color}"></i></div></div>`).join("")}</div>`:`<div class="empty">还没有记录。做完一套模拟卷，或在下面手动记一套真题成绩。</div>`}
-  ${hist.length?`<div class="scroll-x" style="margin-top:10px"><table class="t"><thead><tr><th>日期</th><th>名称</th><th>得分</th><th>%</th><th></th></tr></thead><tbody>${hist.map(e=>`<tr><td>${e.date}</td><td>${esc(e.title)}${e.manual?' <span class="tag">手动</span>':""}</td><td>${e.score}/${e.max}</td><td><b>${e.pct}%</b></td><td><button class="btn small" data-exdel="${e.id}">删</button></td></tr>`).join("")}</tbody></table></div>`:""}
+  ${hist.length?`<div class="scroll-x" style="margin-top:10px"><table class="t"><thead><tr><th>日期</th><th>名称</th><th>得分</th><th>%</th><th></th></tr></thead><tbody>${hist.map(e=>`<tr><td>${e.date}</td><td>${esc(e.title)}${e.manual?' <span class="tag">手动</span>':""}</td><td>${e.score}/${e.max}</td><td><b>${e.pct}%</b></td><td style="white-space:nowrap">${e.snap?`<button class="btn small" data-exview="${e.id}">查看</button> `:""}<button class="btn small" data-exdel="${e.id}">删</button></td></tr>`).join("")}</tbody></table></div>`:""}
   <details class="chap" style="margin-top:12px"><summary><span class="t">＋ 手动记一套外部真题 / Trial 成绩</span></summary><div class="body"><div class="controls"><label class="grow">名称<input type="text" id="mxT" placeholder="如 2025 Perak Trial K2"></label><label>得分<input type="number" id="mxS" style="width:90px" min="0"></label><label>满分<input type="number" id="mxF" value="100" style="width:90px" min="1"></label><button class="btn pri" id="mxAdd">保存</button></div></div></details>`;
   $("#exT").onchange=()=>{const t=pts.find(x=>x.id===$("#exT").value);$("#exN").value=t.n};
   $$("[data-exc]").forEach(c=>c.onchange=()=>{c.checked?exSel.set.add(c.dataset.exc):exSel.set.delete(c.dataset.exc);c.closest("details").querySelector(".t").textContent=exSel.set.size?`范围：已选 ${exSel.set.size} 章`:"范围：整科综合 (点这里可选章节)"});
   $("#exAll").onclick=()=>{cs.forEach(c=>exSel.set.add(c.k));rExam();$("details.chap").open=true};$("#exNone").onclick=()=>{exSel.set.clear();rExam()};
+  $$("[data-exview]").forEach(b=>b.onclick=()=>{const x=S.exams.find(y=>String(y.id)===b.dataset.exview);if(!x||!x.snap)return;EX=Object.assign(JSON.parse(JSON.stringify(x.snap)),{imgs:{},review:true,limit:0});rExam()});
   $$("[data-exdel]").forEach(b=>b.onclick=()=>{S.exams=S.exams.filter(e=>String(e.id)!==b.dataset.exdel);save();rExam()});
   $("#mxAdd").onclick=()=>{const sc=parseFloat($("#mxS").value),fm=parseFloat($("#mxF").value),t=$("#mxT").value.trim()||"外部真题";if(isNaN(sc)||isNaN(fm)||fm<=0||sc<0||sc>fm){toast("检查一下得分和满分");return}
     S.exams.push({id:Date.now(),sid,title:t,date:today(),at:Date.now(),score:sc,max:fm,pct:Math.round(sc/fm*100),manual:true});save();rExam()};
@@ -1200,7 +1205,7 @@ async function submitExam(){
     open.forEach(x=>{const r=res[x.id];if(r&&r.score<r.max*.6&&(x.ans||x.img)){S.wrong.push({id:"e"+Date.now()+x.id,type:"exam",s:e.sid,q:`[${e.title}] 第 ${x.q.no} 题 ${x.p.p} ${x.p.q}`,a:`得分 ${r.score}/${r.max}\n评分要点：${x.p.scheme}\n我的作答：${x.ans||"(照片)"}\n评语：${r.comment}`});added++}});
     e.qs.forEach((q,qi)=>{if(q.mcq&&res["m"+qi].score===0&&e.pick[qi]!==undefined){S.wrong.push({id:"e"+Date.now()+"m"+qi,type:"exam",s:e.sid,q:q.stem+"  ("+q.o.map((o,k)=>"ABCD"[k]+". "+o).join(" / ")+")",a:"正确答案："+"ABCD"[q.a]+"。"+q.e});added++}});
     const pct=max?Math.round(total/max*100):0;e.result={res,total,max,pct,added};
-    S.exams.push({id:Date.now(),sid:e.sid,title:e.title,date:today(),at:Date.now(),score:Math.round(total*10)/10,max,pct});S.draft=null;save();rExam()}
+    S.exams.push({id:Date.now(),sid:e.sid,title:e.title,date:today(),at:Date.now(),score:Math.round(total*10)/10,max,pct,snap:{sid:e.sid,type:e.type,kind:e.kind,label:e.label,title:e.title,instr:e.instr,qs:e.qs,ans:e.ans,pick:e.pick,started:e.started,result:e.result}});S.exams.filter(x=>x.snap).sort((x,y)=>y.at-x.at).slice(12).forEach(x=>{delete x.snap});S.draft=null;save();rExam()}
   catch(err){setBusy(btn,false);toast(err.message.slice(0,80));const m=$("#exMsg2");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(err.message)}</span>`;exTimerResume()}}
 function exTimerResume(){const e=EX;clearInterval(exTimer);exTimer=setInterval(()=>{const el=$("#exClock");if(!el)return;const sec=Math.floor((Date.now()-e.started)/1000);el.textContent=(e.limit?(e.limit*60-sec<0?"超时 ":"剩余 ")+fmtT(Math.abs(e.limit*60-sec)):"已用 "+fmtT(sec))},1000)}
 function showResult(){
@@ -1214,9 +1219,10 @@ function showResult(){
       if(ps.trim())body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>`:""}${ps}</div>`}});
   $("#sheet").innerHTML=`<div class="row"><h2 style="margin:0">${esc(e.title)}</h2><span class="tag">${esc(e.label)}</span></div>
    <div class="card" style="margin:12px 0"><div class="row"><div class="score">${Math.round(r.total*10)/10}<span class="muted" style="font-size:22px"> / ${r.max}</span></div><span class="tag blue" style="font-size:15px">${r.pct}%</span><span class="spacer"></span>
-   <button class="btn pri" id="exNew">再出一份</button></div>${r.added?`<p class="fine muted" style="margin:8px 0 0">已把 ${r.added} 个失分点放进「刷题 → 错题本」。</p>`:""}
-   <p class="fine muted" style="margin:6px 0 0">这是 AI 评分，仅供练习参考；作文和开放题的分数可能偏松或偏严，建议再请老师看一遍。</p></div>${body}`;
-  $("#exNew").onclick=()=>{EX=null;S.draft=null;save();rExam()}}
+   <button class="btn pri" id="exNew">${e.review?"返回成绩记录":"再出一份"}</button><button class="btn" id="exRedo">重做这份卷</button></div>${r.added?`<p class="fine muted" style="margin:8px 0 0">已把 ${r.added} 个失分点放进「刷题 → 错题本」。</p>`:""}
+   <p class="fine muted" style="margin:6px 0 0">${e.review?"这是保存下来的旧试卷 (只保留最近 12 份的题目和作答，更早的只留成绩)。":""}这是 AI 评分，仅供练习参考；作文和开放题的分数可能偏松或偏严，建议再请老师看一遍。</p></div>${body}`;
+  $("#exNew").onclick=()=>{EX=null;S.draft=null;save();rExam()};
+  $("#exRedo").onclick=()=>{EX={sid:e.sid,type:e.type,kind:e.kind,label:e.label,title:e.title,instr:e.instr,qs:JSON.parse(JSON.stringify(e.qs)),ans:{},pick:{},started:Date.now(),limit:0,imgs:{},result:null};exSave();rExam()}}
 
 /* ---- 问答 ---- */
 let chatBusy=false,chatImg=null,chatPending=null,chatErr="";
@@ -1310,15 +1316,14 @@ function rSet(){
   $("#sheet").innerHTML=`<h2>设置</h2>
   <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p>
     <input type="password" id="sKey" placeholder="粘贴 API key" value="${esc(S.ai.key)}" autocomplete="off">
-    <div class="controls" style="margin-top:8px"><label class="grow">模型<select id="sMd">${MODELS.map(m=>`<option ${S.ai.model===m?"selected":""}>${m}</option>`).join("")}${MODELS.includes(S.ai.model)?"":`<option selected>${esc(S.ai.model)}</option>`}</select></label><button class="btn pri" id="sKeyOk">保存并测试</button></div><div id="sKeyMsg" class="fine"></div></div>
+    <div class="controls" style="margin-top:8px"><label class="grow">模型<select id="sMd">${MODELS.map(m=>`<option ${S.ai.model===m?"selected":""}>${m}</option>`).join("")}${MODELS.includes(S.ai.model)?"":`<option selected>${esc(S.ai.model)}</option>`}</select></label><button class="btn pri" id="sKeyOk">保存</button></div><div id="sKeyMsg" class="fine"></div></div>
    <div class="card"><h3 style="margin-top:0">笔试开始日</h3><input type="date" id="sEx" value="${S.exam}"><p class="fine muted">默认是 SPM 2026 笔试第一天 (2026-11-23)。考的是别的日期就改这里。</p>
     <h3>AI 回答语言</h3><div class="seg"><button data-lang="auto" aria-pressed="${(S.lang||"auto")==="auto"}">考试语言 + 华文翻译</button><button data-lang="exam" aria-pressed="${S.lang==="exam"}">只用考试语言</button><button data-lang="zh" aria-pressed="${S.lang==="zh"}">全部华文</button></div><p class="fine muted">国语、历史、道德用国语；英文和数学、理科、附加数学用英文；华文科目用华文。默认会在每段后面附「华文：」翻译和解释。</p><h3>外观</h3><div class="seg">${themes.map(t=>`<button data-th="${t[0]}" aria-pressed="${S.theme===t[0]}">${t[1]}</button>`).join("")}</div></div></div>
   <h3>我考的科目 & 信心</h3><p class="fine muted">信心 1 = 没把握，5 = 很稳。越没把握，越常排进每日重点。</p>
   <div class="grid g3">${SUBJECTS.map(s=>`<div class="card"><label class="chk" style="color:var(--ink);font-size:15px"><input type="checkbox" data-my="${s.id}" ${S.my.includes(s.id)?"checked":""}> <b>${esc(s.name)}</b></label><div class="row" style="margin-top:6px"><span class="fine muted">信心</span><select data-cf="${s.id}">${[1,2,3,4,5].map(n=>`<option ${(S.conf[s.id]||3)===n?"selected":""}>${n}</option>`).join("")}</select></div></div>`).join("")}</div>
   <h3>备份</h3><p class="fine muted">进度、AI 笔记和错题都只在这个浏览器里。换设备或清缓存前先导出 (导出文件不含 API key，也不含上传的文件)。</p>
   <div class="row"><button class="btn" id="bkOut">导出 JSON</button><label class="btn">导入 JSON<input type="file" id="bkIn" accept=".json" hidden></label><button class="btn badb" id="bkRs">清空全部进度</button></div>`;
-  $("#sKeyOk").onclick=async()=>{S.ai.key=$("#sKey").value.trim();S.ai.model=$("#sMd").value;save();const m=$("#sKeyMsg");if(!S.ai.key){m.textContent="已清除 key";return}m.innerHTML='<span class="spin"></span>测试中…';
-    try{await gem([{role:"user",parts:[{text:"只回复两个字母：OK"}]}],"",64);m.innerHTML='<span style="color:var(--ok)">连接成功 ✓</span>'}catch(e){m.innerHTML='<span style="color:var(--bad)">'+esc(e.message)+'</span>'}};
+  $("#sKeyOk").onclick=()=>{S.ai.key=$("#sKey").value.trim();S.ai.model=$("#sMd").value;save();$("#sKeyMsg").innerHTML=S.ai.key?'<span style="color:var(--ok)">已保存 ✓</span>':"已清除 key";toast(S.ai.key?"已保存":"已清除 key")};
   $("#sEx").onchange=e=>{if(e.target.value){S.exam=e.target.value;save();renderNav();toast("已更新")}};
   $$("[data-lang]").forEach(b=>b.onclick=()=>{S.lang=b.dataset.lang;save();rSet()});
   $$("[data-th]").forEach(b=>b.onclick=()=>{S.theme=b.dataset.th;save();applyTheme();rSet()});
@@ -1343,7 +1348,8 @@ document.addEventListener("click",e=>{
   else if(act==="askchap"){S.scope[sid]=k;go("chat",sid)}
   else if(act==="quizchap"){S.pickChap=k;dMode="quiz";qz=null;go("drill",sid)}
   else if(act==="copynote"){const n=S.notes[k];if(n&&navigator.clipboard)navigator.clipboard.writeText(n.md).then(()=>toast("已复制"),()=>toast("复制失败"))}
-  else if(act==="delnote"){if(confirm("删除这一章的 AI 笔记？")){delete S.notes[k];save();S.openChap=k;rNotes()}}
+  else if(act==="histrestore"){const n=S.notes[k],h=n&&n.hist&&n.hist[+a.dataset.i];if(h&&confirm("恢复到这个版本？当前版本会放进历史版本里。")){putNote(k,h.md,h.at,+a.dataset.i);save();S.openChap=k;rNotes()}}
+  else if(act==="delnote"){if(confirm("删除这一章的 AI 笔记 (连同历史版本)？")){delete S.notes[k];save();S.openChap=k;rNotes()}}
   else if(act==="delown"){S.own[sid]=(S.own[sid]||[]).filter(x=>String(x.id)!==a.dataset.id);bust();save();rNotes()}
 });
 document.addEventListener("click",e=>{const w=e.target.closest("[data-wai]");if(w){const x=S.wrong.find(y=>y.id===w.dataset.wai);if(!x)return;chatPending=`我做错了这道 SPM ${subj(x.s)?subj(x.s).name:""} 的题，请讲清楚：为什么错、正确思路、这个知识点怎么避免再错。\n题目：${x.q}\n${x.a?"参考答案/笔记："+x.a:""}`;go("chat",x.s)}
