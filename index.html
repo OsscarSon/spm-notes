@@ -104,7 +104,7 @@ p{margin:.45em 0}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:0 0 14px}
 .controls label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
-.controls .grow{flex:1 1 200px}
+.controls .grow{flex:1 1 200px}.controls label{min-width:0;max-width:100%}.controls .grow select{width:100%}
 select,input[type=text],input[type=password],input[type=number],input[type=date],textarea{border:1.5px solid var(--line);background:var(--sheet);border-radius:10px;padding:8px 10px;min-height:40px;max-width:100%}
 input[type=text],input[type=password],textarea{width:100%}
 textarea{min-height:90px;resize:vertical;line-height:1.6}
@@ -1052,43 +1052,87 @@ async function genCards(sid,k,n,btn){const c=findChap(sid,k);setBusy(btn,true,"�
   catch(e){toast(e.message.slice(0,80));setBusy(btn,false)}}
 
 /* ---- 刷题 (选择题 + 错题本) ---- */
-let dMode="quiz",qz=null;
+let dMode="mcq",qz=null;
 function rDrill(){
-  $("#sheet").innerHTML=`${needKey()}<div class="row" style="margin-bottom:10px"><h2 style="margin:0">${esc(subj(S.sub).name)} 刷题</h2><span class="spacer"></span>
-   <div class="seg"><button data-dm="quiz" aria-pressed="${dMode==="quiz"}">选择题</button><button data-dm="wrong" aria-pressed="${dMode==="wrong"}">错题本 (${S.wrong.filter(w=>w.s===S.sub).length})</button></div></div><div id="dBody"></div>`;
-  $$("[data-dm]").forEach(b=>b.onclick=()=>{dMode=b.dataset.dm;qz=null;rDrill()});(dMode==="quiz"?rQuiz:rWrong)()}
+  $("#sheet").innerHTML=`${needKey()}<div class="row" style="margin-bottom:10px"><h2 style="margin:0">${esc(subj(S.sub).name)} 刷题</h2>
+   </div><div class="seg" style="margin-bottom:12px"><button data-dm="mcq" aria-pressed="${dMode==="mcq"}">选择题</button><button data-dm="open" aria-pressed="${dMode==="open"}">作答题</button><button data-dm="mix" aria-pressed="${dMode==="mix"}">混合</button><button data-dm="wrong" aria-pressed="${dMode==="wrong"}">错题本 (${S.wrong.filter(w=>w.s===S.sub).length})</button></div><div id="dBody"></div>`;
+  $$("[data-dm]").forEach(b=>b.onclick=()=>{dMode=b.dataset.dm;qz=null;rDrill()});(dMode==="wrong"?rWrong:rQuiz)()}
+function openHint(sid){return({
+ bm:"短答 / 语法 / 完成句子 / 短文理解，或一小段 (50-80 字) 写作，不要整篇作文",
+ bi:"short-answer / grammar / sentence completion / one-paragraph writing (not a full essay)",
+ bc:"短答、成语或修辞、病句修改，或一小段写作 (不要整篇作文)",
+ sej:"结构题 (a)(b) 式短答，或需要「观点 + 解释 + 例子」的短论述",
+ mat:"计算题和应用题，答案要写出步骤",
+ am:"计算题，答案要写出步骤"})[sid]||"结构题、简答、计算或解释题 (可含实验设计、图表分析)"}
+const DRILL_N={mcq:8,open:5,mix:8};
 function rQuiz(){
   const sid=S.sub,box=$("#dBody");
   if(qz&&qz.sid!==sid)qz=null;
   if(!qz){const nb=QUIZ.filter(q=>q[0]===sid).length;
-    box.innerHTML=`<div class="card" style="max-width:640px"><div class="controls"><label class="grow">题源<select id="qSrc"><option value="ai">AI 按章节出题</option><option value="bank" ${nb?"":"disabled"}>内置题库 (${nb} 题)</option></select></label>
-     <label class="grow" id="qCw">章节<select id="qC"><option value="">整科综合</option>${chapsOf(sid).filter(c=>c.core).map(c=>`<option value="${esc(c.k)}" ${S.pickChap===c.k?"selected":""}>${esc(c.t)}</option>`).join("")}</select></label></div>
-     <div class="controls"><label>题数<select id="qN"><option>5</option><option selected>8</option><option>10</option><option>15</option></select></label><label>难度<select id="qD"><option>基础</option><option selected>SPM 中等</option><option>KBAT 偏难</option></select></label><button class="btn pri" id="qGo">开始</button></div>
-     <div id="qMsg" class="fine muted"></div><p class="fine muted">AI 题目可能有错，答案和解析都会显示，可疑的请对照课本。答错的会进入错题本。</p></div>`;
-    const sync=()=>{const ai=$("#qSrc").value==="ai";$("#qCw").style.display=ai?"":"none";$("#qD").disabled=!ai;if(!aiOK()&&ai)$("#qGo").disabled=true;else $("#qGo").disabled=false};
-    if(!aiOK()&&nb)$("#qSrc").value="bank";$("#qSrc").onchange=sync;sync();
-    $("#qGo").onclick=async()=>{const src=$("#qSrc").value,n=+$("#qN").value;
-      if(src==="bank"){const pool=shuffle(QUIZ.filter(q=>q[0]===sid)).slice(0,n).map(q=>({q:q[1],o:q[2],a:q[3],e:q[4]}));qz={sid,qs:pool,i:0,score:0,picked:null,fin:false,ai:false};rQuiz();return}
+    box.innerHTML=`<div class="card" style="max-width:660px"><div class="controls"><label class="grow">题源<select id="qSrc"><option value="ai">AI 按章节出题</option><option value="bank" ${nb?"":"disabled"}>内置题库 (${nb} 题，仅选择题)</option></select></label></div>
+     <div class="controls"><label class="grow" id="qCw">章节<select id="qC"><option value="">整科综合</option>${chapsOf(sid).filter(c=>c.core).map(c=>`<option value="${esc(c.k)}" ${S.pickChap===c.k?"selected":""}>${esc(c.t)}</option>`).join("")}</select></label></div>
+     <div class="controls"><label>题数<select id="qN">${[3,5,8,10,15].map(n=>`<option ${n===DRILL_N[dMode]?"selected":""}>${n}</option>`).join("")}</select></label><label>难度<select id="qD"><option>基础</option><option selected>SPM 中等</option><option>KBAT 偏难</option></select></label><button class="btn pri" id="qGo">开始</button></div>
+     <div id="qMsg" class="fine muted"></div><p class="fine muted">作答题是一题一题做：写完点「提交批改」，AI 马上给分和评语，不用等整份卷做完。想做整份试卷请到「模拟卷」。AI 题目可能有错，可疑的请对照课本。答错或失分的会进入错题本。</p></div>`;
+    const sync=()=>{const t=dMode,ai=t!=="mcq"||$("#qSrc").value==="ai";if(t!=="mcq")$("#qSrc").value="ai";$("#qSrc").querySelector('[value="bank"]').disabled=t!=="mcq"||!nb;$("#qCw").style.display=ai?"":"none";$("#qD").disabled=!ai;$("#qGo").disabled=ai&&!aiOK()};
+    if(!aiOK()&&nb)$("#qSrc").value="bank";
+    $("#qSrc").onchange=sync;sync();
+    $("#qGo").onclick=async()=>{const t=dMode,src=$("#qSrc").value,n=+$("#qN").value;
+      if(t==="mcq"&&src==="bank"){const pool=shuffle(QUIZ.filter(q=>q[0]===sid)).slice(0,n).map(q=>({q:q[1],o:q[2],a:q[3],e:q[4]}));qz=newRun(sid,pool,false);rQuiz();return}
       const k=$("#qC").value,c=k?findChap(sid,k):null;S.pickChap=k;setBusy($("#qGo"),true,"生成中…");
-      try{const fp=await fileParts(sid);const ctx=c?`章节：${c.t}\n${chapText(c,3500)}`:"范围：这一科整个 KSSM 纲要 (Form 4 + Form 5)";
-        const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」出 ${n} 道单选题 (4 个选项)。难度：${$("#qD").value}。\n${ctx}\n要求：贴近 KSSM 与 SPM Kertas 1 风格；有且仅有一个正确答案；解析写出关键步骤；不要编造资料里没有的内容。\n只输出 JSON 数组：[{"q":"题目","o":["A内容","B内容","C内容","D内容"],"a":0,"e":"解析","qz":"题目和 4 个选项的华文翻译 (写成一段)","ez":"解析的华文翻译，加一句华文解释"}]。a 是正确选项序号 (0-3)。q、o、e 用考试语言 (见【语言规则】)；qz、ez 用华文${wantZh(sid)?"":"，这次不需要，留空字符串"}。`}]}],sysPrompt(sid),8192);
-        const arr=parseJSON(out,"[").filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!arr.length)throw new Error("AI 返回的题目格式不对，请再试一次。");
-        qz={sid,qs:arr,i:0,score:0,picked:null,fin:false,ai:true};rQuiz()}
+      try{const fp=await fileParts(sid);const ctx=c?`章节：${c.t}\n${chapText(c,3500)}`:"范围：这一科整个 KSSM 纲要 (Form 4 + Form 5)";const z=wantZh(sid);
+        const nOpen=t==="open"?n:t==="mix"?Math.round(n/2):0,nMcq=n-nOpen;
+        const spec=`${nMcq?`${nMcq} 道单选题 (4 个选项)`:""}${nMcq&&nOpen?" 和 ":""}${nOpen?`${nOpen} 道作答题 (${openHint(sid)})`:""}`;
+        const fmt=`只输出 JSON 对象：{"items":[${nMcq?`{"t":"mcq","q":"题目","o":["A内容","B内容","C内容","D内容"],"a":0,"e":"解析","qz":"${z?"题目和选项的华文翻译":""}","ez":"${z?"解析的华文翻译与一句解释":""}"}`:""}${nMcq&&nOpen?",":""}${nOpen?`{"t":"open","q":"题目","m":3,"scheme":"评分要点 (逐点列出得分点，可接受的答案)","qz":"${z?"题目的华文翻译":""}","cz":"${z?"评分要点的华文翻译":""}"}`:""}]}。a 是正确选项序号 (0-3)；m 是该作答题的分值 (1-6，和难度匹配)。${t==="mix"?"两种题型交错排列。":""}`;
+        const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」出 ${spec}，共 ${n} 题。难度：${$("#qD").value}。\n${ctx}\n要求：贴近 KSSM 与 SPM 风格；每题有明确答案；解析写出关键步骤；不要编造资料里没有的内容；题目、选项、解析、评分要点用考试语言 (见【语言规则】)，${z?"qz、ez、cz 用华文":"不需要华文翻译，qz、ez、cz 留空字符串"}。\n${fmt}`}]}],sysPrompt(sid),12000);
+        let items;if(t==="mcq"){const o=parseJSON(out,"{");items=o.items||[]}else{items=(parseJSON(out,"{").items)||[]}
+        const qs=items.map(x=>{if(!x||!x.q)return null;if(x.t==="open"&&nOpen)return{t:"open",q:String(x.q),m:Math.max(1,Math.min(10,Number(x.m)||2)),scheme:String(x.scheme||""),qz:x.qz||"",cz:x.cz||""};
+          if(Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4)return{t:"mcq",q:String(x.q),o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||""};return null}).filter(Boolean);
+        if(!qs.length)throw new Error("AI 返回的题目格式不对，请再试一次。");
+        qz=newRun(sid,qs,true);rQuiz()}
       catch(e){setBusy($("#qGo"),false);$("#qMsg").innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}};return}
-  if(qz.fin){box.innerHTML=`<div class="card qbox"><h3 style="margin-top:0">完成</h3><div class="score" style="margin:10px 0">${qz.score}/${qz.qs.length}</div><p class="muted">答错的题已放进错题本。</p><div class="row"><button class="btn pri" id="qAgain">再来一组</button><button class="btn" id="qWr">看错题本</button></div></div>`;
+  if(qz.fin){const mc=qz.qs.filter(x=>x.t!=="open").length;const oc=qz.qs.length-mc;
+    box.innerHTML=`<div class="card qbox"><h3 style="margin-top:0">完成</h3>${mc?`<div class="row"><span class="muted">选择题</span><span class="score" style="font-size:34px">${qz.score}/${mc}</span></div>`:""}${oc?`<div class="row"><span class="muted">作答题</span><span class="score" style="font-size:34px">${Math.round(qz.osc*10)/10}/${qz.omax}</span></div>`:""}<p class="muted">答错或失分的题已放进错题本。</p><div class="row"><button class="btn pri" id="qAgain">再来一组</button><button class="btn" id="qWr">看错题本</button></div></div>`;
     $("#qAgain").onclick=()=>{qz=null;rQuiz()};$("#qWr").onclick=()=>{dMode="wrong";qz=null;rDrill()};return}
-  const q=qz.qs[qz.i],L="ABCD";
-  box.innerHTML=`<div class="qbox"><div class="fine muted">第 ${qz.i+1} / ${qz.qs.length} 题 ${qz.ai?'<span class="tag warn">AI 生成</span>':""}</div>
+  const q=qz.qs[qz.i];if(q.t==="open")return renderOpen(q);renderMcq(q)}
+function newRun(sid,qs,ai){return{sid,qs,i:0,score:0,osc:0,omax:0,picked:null,fin:false,ai,res:null,ans:"",img:null}}
+function nextQ(){qz.i++;qz.picked=null;qz.res=null;qz.ans="";qz.img=null;if(qz.i>=qz.qs.length)qz.fin=true;rQuiz()}
+function renderMcq(q){
+  const box=$("#dBody"),L="ABCD";
+  box.innerHTML=`<div class="qbox"><div class="fine muted">第 ${qz.i+1} / ${qz.qs.length} 题 · 选择题 ${qz.ai?'<span class="tag warn">AI 生成</span>':""}</div>
    <h3 style="margin:10px 0 6px;font-family:var(--sans);font-size:18px">${esc(q.q)}</h3>
    ${q.qz?`<details style="margin:2px 0 6px"><summary class="fine muted" style="cursor:pointer">华文翻译</summary><div class="fine" style="margin-top:4px">${esc(q.qz)}</div></details>`:""}
    ${q.o.map((o,i)=>`<button class="opt ${qz.picked===null?"":i===q.a?"right":i===qz.picked?"wrong":""}" data-o="${i}" ${qz.picked!==null?"disabled":""}><span class="bub">${L[i]}</span><span>${esc(o)}</span></button>`).join("")}
    ${qz.picked!==null?`<div class="tip"><b>${qz.picked===q.a?"答对了":"答错了"}</b>：${esc(q.e||"")}${q.ez?`<div class="fine" style="margin-top:4px">华文：${esc(q.ez)}</div>`:""}</div><button class="btn pri" id="qNext">${qz.i+1>=qz.qs.length?"看结果":"下一题"}</button>`:""}</div>`;
-  $$("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;qz.picked=i;if(i===q.a)qz.score++;else{S.wrong.push({id:"q"+Date.now()+qz.i,type:"quiz",s:qz.sid,q:q.q+"  ("+q.o.map((o,k)=>L[k]+". "+o).join(" / ")+")",a:"正确答案："+L[q.a]+". "+q.o[q.a]+"。"+(q.e||"")+(q.ez?"\n华文："+q.ez:"")});save()}rQuiz()});
-  if($("#qNext"))$("#qNext").onclick=()=>{qz.i++;qz.picked=null;if(qz.i>=qz.qs.length)qz.fin=true;rQuiz()}}
+  $$("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;qz.picked=i;if(i===q.a)qz.score++;else{S.wrong.push({id:"q"+Date.now()+qz.i,type:"quiz",s:qz.sid,q:q.q+"  ("+q.o.map((o,k)=>L[k]+". "+o).join(" / ")+")",a:"正确答案："+L[q.a]+". "+q.o[q.a]+"。"+(q.e||"")+(q.ez?"\n华文："+q.ez:"")});save()}renderMcq(q)});
+  if($("#qNext"))$("#qNext").onclick=nextQ}
+function renderOpen(q){
+  const box=$("#dBody"),r=qz.res;
+  box.innerHTML=`<div class="qbox"><div class="fine muted">第 ${qz.i+1} / ${qz.qs.length} 题 · 作答题 <span class="tag">${q.m} 分</span> <span class="tag warn">AI 生成</span></div>
+   <h3 style="margin:10px 0 6px;font-family:var(--sans);font-size:18px;white-space:pre-wrap">${esc(q.q)}</h3>${zhBox(q.qz)}
+   <textarea id="oAns" placeholder="在这里作答" style="min-height:120px;margin-top:6px" ${r?"disabled":""}>${esc(qz.ans)}</textarea>
+   ${r?`<div class="fb ${r.score>=q.m?"full":r.score===0?"zero":""}" style="margin-top:8px"><b>${r.score}/${q.m}</b> ${esc(r.comment)}</div>
+     <details style="margin-top:6px" open><summary class="fine muted" style="cursor:pointer">评分要点 (参考答案)</summary><div class="fine" style="white-space:pre-wrap;margin-top:4px">${esc(q.scheme)}${q.cz?"\n\n华文："+esc(q.cz):""}</div></details>
+     <div class="row" style="margin-top:10px"><button class="btn pri" id="oNext">${qz.i+1>=qz.qs.length?"看结果":"下一题"}</button></div>`
+   :`<div class="row" style="margin-top:8px"><label class="btn small">📷 附手写照片<input type="file" id="oImg" accept="image/*" hidden></label>${qz.img?'<span class="tag ok">已附图</span>':""}<span class="spacer"></span><button class="btn" id="oSkip">跳过</button><button class="btn pri" id="oSub">提交批改</button></div><div id="oMsg" class="fine" style="margin-top:6px"></div>`}</div>`;
+  if(r){$("#oNext").onclick=nextQ;return}
+  $("#oAns").oninput=e=>{qz.ans=e.target.value};
+  $("#oImg").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{qz.img=await prepImg(f);qz.ans=$("#oAns").value;renderOpen(q)}catch(x){toast("图片读取失败")}};
+  $("#oSkip").onclick=()=>{finishOpen(q,{score:0,comment:"这题跳过了，先看下面的评分要点，再自己试着写一遍。"},true)};
+  $("#oSub").onclick=async()=>{const ans=$("#oAns").value.trim();if(!ans&&!qz.img){toast("先写点答案，或点「跳过」");return}
+    setBusy($("#oSub"),true,"批改中…");
+    try{const content=[{text:`请批改这道 SPM「${subj(qz.sid).name}」作答题。\n题目：${q.q}\n满分：${q.m}\n评分要点：${q.scheme}\n学生作答：${ans||"(见照片)"}\n\n规则：只依据学生写的内容给分，不要替学生补全；分数 ≤ 满分，可给 0.5 分；comment 用华文 2-3 句 (学生需要看懂)，指出得分点、失分原因和怎样答才能拿满分，关键词、标准答案和值得背的句子用考试语言写出来 (华文科目全部用华文)。学生如附了手写照片，先读出内容再批改，字迹看不清要在评语中说明。\n只输出 JSON：{"score":数字,"comment":"评语"}`}];
+      if(qz.img){content.push({text:"手写答案照片："});content.push({inline_data:{mime_type:"image/jpeg",data:qz.img}})}
+      const out=await gem([{role:"user",parts:content}],sysPrompt(qz.sid,"你现在是严格公正的 SPM 评卷员。"),2048);const o=parseJSON(out,"{");
+      finishOpen(q,{score:Math.max(0,Math.min(q.m,Number(o.score)||0)),comment:String(o.comment||"")},false,ans)}
+    catch(e){setBusy($("#oSub"),false);$("#oMsg").innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}}
+function finishOpen(q,r,skipped,ans){
+  qz.res=r;qz.osc+=r.score;qz.omax+=q.m;
+  if(r.score<q.m*.6){S.wrong.push({id:"d"+Date.now()+qz.i,type:"drill",s:qz.sid,q:q.q,a:`得分 ${r.score}/${q.m}\n评分要点：${q.scheme}${q.cz?"\n华文："+q.cz:""}\n我的作答：${skipped?"(跳过)":(ans||"(照片)")}\n评语：${r.comment}`});}
+  save();renderOpen(q)}
 function rWrong(){
   const sid=S.sub,ws=S.wrong.filter(w=>w.s===sid);
   $("#dBody").innerHTML=`<p class="muted fine">答错的闪卡、选择题和模拟卷失分点会在这里，也可以手动记录做真题时的错题。</p>
-  ${ws.length?ws.map(w=>`<div class="card" style="margin-bottom:8px"><div class="row"><span class="tag">${w.type==="exam"?"模拟卷":w.type==="manual"?"手动":w.type==="card"?"闪卡":"选择题"}</span><span class="spacer"></span><button class="btn small" data-wai="${esc(w.id)}">AI 讲解</button><button class="btn small" data-wdel="${esc(w.id)}">已搞懂，移除</button></div><b style="display:block;margin-top:6px;white-space:pre-wrap">${esc(w.q)}</b><div class="fine muted" style="margin-top:4px;white-space:pre-wrap">${esc(w.a||"")}</div></div>`).join(""):`<div class="empty">这一科的错题本是空的。</div>`}
+  ${ws.length?ws.map(w=>`<div class="card" style="margin-bottom:8px"><div class="row"><span class="tag">${w.type==="exam"?"模拟卷":w.type==="manual"?"手动":w.type==="card"?"闪卡":w.type==="drill"?"作答题":"选择题"}</span><span class="spacer"></span><button class="btn small" data-wai="${esc(w.id)}">AI 讲解</button><button class="btn small" data-wdel="${esc(w.id)}">已搞懂，移除</button></div><b style="display:block;margin-top:6px;white-space:pre-wrap">${esc(w.q)}</b><div class="fine muted" style="margin-top:4px;white-space:pre-wrap">${esc(w.a||"")}</div></div>`).join(""):`<div class="empty">这一科的错题本是空的。</div>`}
   <details class="chap" style="margin-top:14px"><summary><span class="t">＋ 手动记一道错题 (例如做真题错的)</span></summary><div class="body"><input type="text" id="mwQ" placeholder="题目或出处 (如 2024 Selangor Trial P2 Q5)" style="margin-bottom:8px"><textarea id="mwA" placeholder="正确做法 / 我错在哪里"></textarea><button class="btn pri small" id="mwAdd" style="margin-top:8px">保存</button></div></details>`;
   $("#mwAdd").onclick=()=>{const q=$("#mwQ").value.trim(),a=$("#mwA").value.trim();if(!q){toast("先写题目或出处");return}S.wrong.push({id:"m"+Date.now(),type:"manual",s:sid,q,a});save();rDrill()}}
 
@@ -1346,7 +1390,7 @@ document.addEventListener("click",e=>{
   else if(act==="gensubs"){genSubs(sid,k,a)}
   else if(act==="cardchap"){genCards(sid,k,10,a)}
   else if(act==="askchap"){S.scope[sid]=k;go("chat",sid)}
-  else if(act==="quizchap"){S.pickChap=k;dMode="quiz";qz=null;go("drill",sid)}
+  else if(act==="quizchap"){S.pickChap=k;dMode="mcq";qz=null;go("drill",sid)}
   else if(act==="copynote"){const n=S.notes[k];if(n&&navigator.clipboard)navigator.clipboard.writeText(n.md).then(()=>toast("已复制"),()=>toast("复制失败"))}
   else if(act==="histrestore"){const n=S.notes[k],h=n&&n.hist&&n.hist[+a.dataset.i];if(h&&confirm("恢复到这个版本？当前版本会放进历史版本里。")){putNote(k,h.md,h.at,+a.dataset.i);save();S.openChap=k;rNotes()}}
   else if(act==="delnote"){if(confirm("删除这一章的 AI 笔记 (连同历史版本)？")){delete S.notes[k];save();S.openChap=k;rNotes()}}
