@@ -104,7 +104,7 @@ p{margin:.45em 0}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:0 0 14px}
 .controls label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
-.controls .grow{flex:1 1 200px}.controls label{min-width:0;max-width:100%}.controls .grow select{width:100%}
+.controls .grow{flex:1 1 200px}.controls label{min-width:0;max-width:100%}.controls .grow select{width:100%}.controls label.chk{flex-direction:row;align-items:center;white-space:normal}.subs .tag{white-space:normal;line-height:1.4;padding:3px 10px;border-radius:12px;max-width:100%}
 select,input[type=text],input[type=password],input[type=number],input[type=date],textarea{border:1.5px solid var(--line);background:var(--sheet);border-radius:10px;padding:8px 10px;min-height:40px;max-width:100%}
 input[type=text],input[type=password],textarea{width:100%}
 textarea{min-height:90px;resize:vertical;line-height:1.6}
@@ -207,6 +207,7 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.aurora i,.spin{animation:none}}
 @media print{.aurora,.top,.subjects,.tabs,#petBox,#petBack,.no-print{display:none!important}.sheet{box-shadow:none;border:0;background:#fff}}
+.fig{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin:10px 0;overflow-x:auto;text-align:center}.fig svg{max-width:100%;height:auto}.fig.fine{padding:10px 12px;background:var(--sheet)}
 </style>
 </head>
 <body data-theme="auto">
@@ -219,6 +220,7 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
   <nav class="subjects no-print" id="subjects" aria-label="科目"></nav>
   <nav class="tabs no-print" id="tabs" role="tablist" aria-label="功能"></nav>
   <main class="sheet" id="sheet"></main>
+  <p class="fine muted no-print" style="text-align:center;margin:14px 8px 26px">笔记和答案由 AI 整理，仅供复习，请以课本和老师为准。</p>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <style id="pet-style">
@@ -938,7 +940,9 @@ CARDS2.forEach(c=>CARDS.push(c));
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const KEY="spm-notes-v2";
-const MODELS=["gemini-3.6-flash","gemini-3.5-flash-lite"];
+const MODELS=["gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"];
+const PROVS={mistral:{name:"Mistral",url:"https://api.mistral.ai/v1/chat/completions",model:"mistral-small-latest",get:"console.mistral.ai/api-keys"},groq:{name:"Groq",url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-120b",get:"console.groq.com/keys"},openrouter:{name:"OpenRouter",url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free",get:"openrouter.ai/keys"}};
+const PORDER=["gemini","mistral","groq","openrouter"];
 const DEF={theme:"auto",exam:EXAM.writtenStart,since:null,my:["bm","bi","sej","mat","sains","moral"],sub:"bm",tab:"today",conf:{},done:{},box:{},wrong:[],cards:[],
   tasks:{},ck:{},tt:{},goal:{},ai:{key:"",model:MODELS[0]},notes:{},req:{},subsAI:{},chat:{},exams:[],own:{},use:{},scope:{},strict:true,draft:null,lang:"auto",sync:{url:"",ts:0,hash:""}};
 let S;
@@ -947,7 +951,7 @@ function pd(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
 function dd(a,b){return Math.round((pd(b)-pd(a))/864e5)}
 const today=()=>ymd(new Date());
 function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
-  S=Object.assign({},DEF,o);S.ai=Object.assign({key:"",model:MODELS[0]},S.ai);S.sync=Object.assign({url:"",ts:0,hash:""},S.sync);
+  S=Object.assign({},DEF,o);S.ai=Object.assign({key:"",model:MODELS[0],provider:"gemini",fallback:true,imgModel:"gemini-3.1-flash-image-preview"},S.ai);S.ai.alt=Object.assign({},S.ai.alt);for(const p in PROVS){S.ai.alt[p]=Object.assign({key:"",model:PROVS[p].model},S.ai.alt[p])}if(S.ai.provider!=="gemini"&&!PROVS[S.ai.provider])S.ai.provider="gemini";if(S.ai.imgModel==="gemini-3.1-flash-image")S.ai.imgModel="gemini-3.1-flash-image-preview";if(!S.ai.mv){if(S.ai.model==="gemini-3.6-flash")S.ai.model=MODELS[0];S.ai.mv=2}S.sync=Object.assign({url:"",ts:0,hash:""},S.sync);
   if(!o.ai||!o.ai.key){try{const v1=JSON.parse(localStorage.getItem("spm-notes-v1")||"{}");if(v1.ai&&v1.ai.key)S.ai.key=v1.ai.key}catch(e){}}
   if(!S.since)S.since=today();if(!S.my.length)S.my=["bm"];if(!S.my.includes(S.sub))S.sub=S.my[0]}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));if(typeof scheduleSync==="function")scheduleSync()}catch(e){if(!save.w){save.w=1;setTimeout(()=>toast("浏览器存储空间满了，新内容可能没保存。请先导出备份，再删掉一些旧笔记或旧试卷。"),0)}}}
@@ -956,7 +960,98 @@ const subj=id=>SUBJECTS.find(s=>s.id===id);
 const mySubjects=()=>SUBJECTS.filter(s=>S.my.includes(s.id));
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function plain(h){const d=document.createElement("div");d.innerHTML=h||"";return d.textContent.replace(/\s+/g," ").trim()}
-function md(t){try{if(window.marked&&window.DOMPurify)return DOMPurify.sanitize(marked.parse(t,{breaks:true}))}catch(e){}return esc(t).replace(/\n/g,"<br>")}
+/* ---- AI 画图：```svg 与 ```plot 代码块会变成图 ---- */
+function cleanSVG(s){try{if(!window.DOMPurify)return"";return DOMPurify.sanitize(s,{USE_PROFILES:{svg:true,svgFilters:true},FORBID_TAGS:["style","foreignObject","image","a","script"]})}catch(e){return""}}
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p;return(f<=1?1:f<=2?2:f<=5?5:10)*p}
+function fmtN(v){return String(+v.toFixed(6)).replace("-","−")}
+function compileFn(ex){
+  const A={sin:"Math.sin",cos:"Math.cos",tan:"Math.tan",sqrt:"Math.sqrt",abs:"Math.abs",ln:"Math.log",log:"Math.log10",exp:"Math.exp",pi:"Math.PI",e:"Math.E",x:"x"};
+  let s=ex.replace(/\^/g,"**").replace(/×/g,"*").replace(/÷/g,"/").replace(/[−–]/g,"-").replace(/π/g,"pi");
+  if(/[^0-9a-z+\-*\/().,\s]/i.test(s))return null;
+  let bad=false;s=s.replace(/[a-z]+/gi,w=>{const k=w.toLowerCase();if(!(k in A)){bad=true;return w}return A[k]});
+  if(bad)return null;
+  s=s.replace(/(^|[(,+\-\/]|[^*]\*)\s*-\s*(?=[a-z0-9(.])/gi,"$1-1*");
+  s=s.replace(/(\d|\))\s*(Math\.|x\b|\()/g,"$1*$2").replace(/\bx\s*(\d|Math\.|x\b|\()/g,"x*$1");
+  try{const f=new Function("x","return ("+s+")");f(1);return f}catch(e){return null}}
+function plotSVG(spec){
+  const W=560,H=400,m={l:44,r:18,t:30,b:34};
+  const lines=spec.split("\n").map(s=>s.trim()).filter(Boolean);
+  const fns=[],pts=[],vl=[];let xr=[-6,6],yr=null,title="";
+  for(const ln of lines){let r;
+    if((r=ln.match(/^(x|y)\s*[:=]\s*(-?[\d.]+)\s*(?:\.\.|to|~|,)\s*(-?[\d.]+)$/i))){const a=+r[2],b=+r[3];if(a<b){if(r[1].toLowerCase()==="x")xr=[a,b];else yr=[a,b]}}
+    else if((r=ln.match(/^title\s*[:：]\s*(.+)$/i)))title=r[1];
+    else if((r=ln.match(/^points?\s*[:：]\s*(.+)$/i))){r[1].split(";").forEach(p=>{const q=p.match(/\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\)\s*(.*)/);if(q)pts.push({x:+q[1],y:+q[2],l:q[3].trim()})})}
+    else if((r=ln.match(/^x\s*=\s*(-?[\d.]+)$/i)))vl.push(+r[1]);
+    else if((r=ln.match(/^(?:y|f\(x\))\s*=\s*(.+)$/i))){const f=compileFn(r[1]);if(f)fns.push({f,t:r[1].trim()})}}
+  if(!fns.length&&!pts.length&&!vl.length)return"";
+  const N=500,samp=fns.map(o=>{const a=[];for(let i=0;i<=N;i++){const x=xr[0]+(xr[1]-xr[0])*i/N;let y;try{y=o.f(x)}catch(e){y=NaN}a.push([x,Number.isFinite(y)&&Math.abs(y)<1e5?y:NaN])}return a});
+  if(!yr){let lo=Infinity,hi=-Infinity;samp.forEach(a=>a.forEach(p=>{if(p[1]===p[1]&&Math.abs(p[1])<1e3){lo=Math.min(lo,p[1]);hi=Math.max(hi,p[1])}}));pts.forEach(p=>{lo=Math.min(lo,p.y);hi=Math.max(hi,p.y)});
+    if(!isFinite(lo)){lo=-5;hi=5}if(lo>0&&lo<hi*0.6)lo=0;if(hi<0&&hi>lo*0.6)hi=0;if(hi-lo<1e-9){lo-=1;hi+=1}const pad=(hi-lo)*.1;yr=[lo-pad,hi+pad]}
+  const pw=W-m.l-m.r,ph=H-m.t-m.b,X=x=>m.l+(x-xr[0])/(xr[1]-xr[0])*pw,Y=y=>m.t+(yr[1]-y)/(yr[1]-yr[0])*ph;
+  const ax=Math.min(Math.max(0,yr[0]),yr[1]),ay=Math.min(Math.max(0,xr[0]),xr[1]);
+  let g="",sx=niceStep((xr[1]-xr[0])/9),sy=niceStep((yr[1]-yr[0])/7);
+  for(let v=Math.ceil(xr[0]/sx)*sx;v<=xr[1]+1e-9;v+=sx){g+=`<line x1="${X(v)}" y1="${m.t}" x2="${X(v)}" y2="${m.t+ph}" stroke="#e5e7eb"/>`;if(Math.abs(v)>1e-9)g+=`<text x="${X(v)}" y="${Y(ax)+14}" font-size="11" text-anchor="middle" fill="#444">${fmtN(v)}</text>`}
+  for(let v=Math.ceil(yr[0]/sy)*sy;v<=yr[1]+1e-9;v+=sy){g+=`<line x1="${m.l}" y1="${Y(v)}" x2="${m.l+pw}" y2="${Y(v)}" stroke="#e5e7eb"/>`;if(Math.abs(v)>1e-9)g+=`<text x="${X(ay)-6}" y="${Y(v)+4}" font-size="11" text-anchor="end" fill="#444">${fmtN(v)}</text>`}
+  g+=`<line x1="${m.l}" y1="${Y(ax)}" x2="${m.l+pw}" y2="${Y(ax)}" stroke="#222" stroke-width="1.5"/><line x1="${X(ay)}" y1="${m.t}" x2="${X(ay)}" y2="${m.t+ph}" stroke="#222" stroke-width="1.5"/>`;
+  g+=`<text x="${m.l+pw+2}" y="${Y(ax)-6}" font-size="13" text-anchor="end" fill="#222" font-style="italic">x</text><text x="${X(ay)+6}" y="${m.t+10}" font-size="13" fill="#222" font-style="italic">y</text><text x="${X(ay)-6}" y="${Y(ax)+14}" font-size="11" text-anchor="end" fill="#444">0</text>`;
+  vl.forEach(v=>{if(v>=xr[0]&&v<=xr[1])g+=`<line x1="${X(v)}" y1="${m.t}" x2="${X(v)}" y2="${m.t+ph}" stroke="#888" stroke-dasharray="6 4"/><text x="${X(v)+4}" y="${m.t+ph-6}" font-size="11" fill="#555">x = ${fmtN(v)}</text>`});
+  const cols=["#2563eb","#dc2626","#16a34a","#9333ea"];
+  samp.forEach((a,k)=>{let d="",pen=false;for(const p of a){if(p[1]!==p[1]||p[1]<yr[0]-(yr[1]-yr[0])||p[1]>yr[1]+(yr[1]-yr[0])){pen=false;continue}d+=(pen?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)+" ";pen=true}
+    g+=`<path d="${d}" fill="none" stroke="${cols[k%4]}" stroke-width="2.2" clip-path="url(#pc)"/>`;
+    g+=`<text x="${m.l+8}" y="${m.t+16+k*16}" font-size="12" fill="${cols[k%4]}">y = ${esc(fns[k].t)}</text>`});
+  pts.forEach(p=>{g+=`<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="4" fill="#111"/><text x="${X(p.x)+7}" y="${Y(p.y)-7}" font-size="12" fill="#111">${esc(p.l||"("+fmtN(p.x)+", "+fmtN(p.y)+")")}</text>`});
+  if(title)g+=`<text x="${W/2}" y="18" font-size="14" font-weight="700" text-anchor="middle" fill="#222">${esc(title)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif"><defs><clipPath id="pc"><rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}"/></clipPath></defs>${g}</svg>`}
+const IMGMEM={};
+function imgKey(p){return"img:"+hash53(p)}
+function imgTag(r){return`<img alt="AI 生成的插图" style="max-width:100%;border-radius:8px" src="data:${r.mime};base64,${r.data}"><div class="fine muted">AI 生成的插图，仅供参考，文字标注可能不准。</div>`}
+function imgSlot(p){p=String(p||"").trim().slice(0,600);if(!p)return"";const hit=IMGMEM[imgKey(p)];
+  return`<div class="fig imgslot" data-ip="${esc(p)}">${hit?imgTag(hit):`<div class="fine muted">AI 想配一张插图：${esc(p.slice(0,90))}</div><button class="btn small genimg" style="margin-top:6px">🖼 生成插图</button>`}</div>`}
+async function genImageB64(prompt){
+  const models=[(S.ai.imgModel||"").trim(),"gemini-3.1-flash-image-preview","gemini-3.1-flash-image","gemini-2.5-flash-image"].filter((m,i,a)=>m&&a.indexOf(m)===i);
+  const text="Draw a clean, simple educational illustration for a Malaysian secondary-school (SPM) student. White background, clear outlines, very little text. Subject: "+prompt;
+  let lastErr=null;
+  for(const m of models){
+    let res;try{res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(m)+":generateContent?key="+encodeURIComponent(S.ai.key.trim()),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text}]}],generationConfig:{responseModalities:["TEXT","IMAGE"]}})})}
+    catch(e){throw new Error("网络请求失败")}
+    let d=null;try{d=await res.json()}catch(e){}
+    if(!res.ok){lastErr=new Error(((d&&d.error&&d.error.message)||"出错")+" ("+res.status+")");if(res.status===404)continue;throw lastErr}
+    const parts=(((d&&d.candidates||[])[0]||{}).content||{}).parts||[];
+    const im=parts.find(p=>p.inlineData||p.inline_data);
+    if(im){const x=im.inlineData||im.inline_data;return{mime:x.mimeType||x.mime_type||"image/png",data:x.data}}
+    throw new Error("模型没有返回图片")}
+  throw lastErr||new Error("找不到图片模型")}
+async function getImage(prompt){
+  const id=imgKey(prompt);if(IMGMEM[id])return IMGMEM[id];
+  try{const r=await DB.get(id);if(r&&r.data){IMGMEM[id]=r;return r}}catch(e){}
+  const im=await genImageB64(prompt);const rec={id,sid:"__img",name:"ai-image",size:0,mime:im.mime,data:im.data};
+  IMGMEM[id]=rec;try{await DB.put(rec)}catch(e){}return rec}
+async function svgFallback(prompt){
+  const out=await gem([{role:"user",parts:[{text:"请把下面这张图画成 SVG 示意图：\n"+prompt+"\n只输出一个 ```svg 代码块，不要其他文字。"}]}],"你是 SPM 备考助教，擅长画简洁清楚的教学示意图，每个部件都标上名称。\n"+FIGRULE,6000);
+  const m=out.match(/```svg[ \t]*\r?\n([\s\S]*?)```/i)||out.match(/(<svg[\s\S]*<\/svg>)/i);return m?m[1]:""}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest(".genimg");if(!b)return;const slot=b.closest(".imgslot");if(!slot)return;const prompt=slot.dataset.ip;
+  b.disabled=true;b.textContent="生成中…";
+  try{let html=null;
+    if(gemOK()){try{html=imgTag(await getImage(prompt))}catch(err){toast("图片模型暂时不能用，改画示意图");html=null}}
+    if(!html){const svg=await svgFallback(prompt);const c=svg?cleanSVG(svg):"";
+      html=c?c+'<div class="fine muted">图片模型暂时不能用，已改成示意图。</div>':'<div class="fine muted">这张图没画成功，请再试一次。</div>'}
+    slot.innerHTML=html}
+  catch(err){b.disabled=false;b.textContent="🖼 再试一次";toast(String(err.message||err).slice(0,80))}});
+function normFig(f){if(!f||typeof f!=="object")return null;const k=String(f.k||"").toLowerCase(),c=typeof f.c==="string"?f.c:"";if(!c||c.length>9000)return null;
+  if(k==="plot")return{k,c};if(k==="svg")return/<svg[\s>]/i.test(c)?{k,c}:null;if(k==="image"||k==="img")return{k:"image",c};return null}
+function figBox(f){return f&&f.k?figHTML(f.k,f.c):""}
+function figHTML(kind,body){
+  if(kind==="image")return imgSlot(body);
+  let svg=kind==="plot"?plotSVG(body):(/<svg[\s>]/i.test(body)?body:"");
+  svg=svg?cleanSVG(svg):"";
+  return svg?`<div class="fig">${svg}</div>`:`<div class="fig fine muted">(这张图没画成功，请再问一次，或让 AI 换个画法)</div>`}
+function md(t){
+  const figs=[];
+  t=String(t==null?"":t).replace(/```(svg|plot|image)[ \t]*\r?\n([\s\S]*?)```/gi,(m,k,b)=>{figs.push(figHTML(k.toLowerCase(),b));return"\n\nFIGPLACE"+(figs.length-1)+"X\n\n"});
+  let h;try{if(window.marked&&window.DOMPurify)h=DOMPurify.sanitize(marked.parse(t,{breaks:true}))}catch(e){}
+  if(h===undefined)h=esc(t).replace(/\n/g,"<br>");
+  return h.replace(/<p>\s*FIGPLACE(\d+)X\s*<\/p>/g,(m,i)=>figs[+i]||"").replace(/FIGPLACE(\d+)X/g,(m,i)=>figs[+i]||"")}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ---- 章节 (含小章节) ---- */
@@ -1001,6 +1096,7 @@ function blobB64(b){return new Promise((ok,no)=>{const r=new FileReader();r.onlo
 const INLINE_MAX=14*1024*1024;
 function guessMime(f){const n=(f.name||"").toLowerCase();if(f.type&&f.type!=="application/octet-stream")return f.type;if(/\.pdf$/.test(n))return "application/pdf";if(/\.png$/.test(n))return "image/png";if(/\.jpe?g$/.test(n))return "image/jpeg";if(/\.webp$/.test(n))return "image/webp";if(/\.(txt|md|csv)$/.test(n))return "text/plain";return "application/octet-stream"}
 async function fileParts(sid){const out=[];let inl=0,names=[];
+  if(!gemOK()||(S.ai.provider||"gemini")!=="gemini")return{parts:out,names};
   let all=[];try{all=await DB.all()}catch(e){}
   for(const f of all){if(f.sid!==sid||!S.use[f.id])continue;let mime=guessMime(f);if(/\.(md|txt|csv)$/i.test(f.name))mime="text/plain";
     if(f.size<=INLINE_MAX&&inl+f.size<=INLINE_MAX){inl+=f.size;out.push({text:"【学生上传的资料：《"+f.name+"》】"});out.push({inline_data:{mime_type:mime,data:await blobB64(f.blob)}});names.push(f.name)}
@@ -1025,7 +1121,10 @@ function langRule(sid){
 (3) 关键术语第一次出现时写成「${l==="ms"?"国语":"English"} (${other} / 华文)」三者对照，例如 ${l==="ms"?"kebarangkalian (probability / 概率)":"discriminant (pembeza / 判别式)"}；
 (4) 学生只问华文本身的问题，或明确要求只用华文时，可以直接用华文。`}
 /* ---- Gemini ---- */
-function aiOK(){return !!(S.ai.key&&S.ai.key.trim())}
+function gemOK(){return !!(S.ai.key&&S.ai.key.trim())}
+function altOK(p){const a=S.ai.alt&&S.ai.alt[p];return !!(a&&a.key&&a.key.trim())}
+function provOK(p){return p==="gemini"?gemOK():altOK(p)}
+function aiOK(){return PORDER.some(provOK)}
 function aiErr(status,data){const raw=(data&&data.error&&data.error.message)||"",code=(data&&data.error&&data.error.status)||"";
   if(status===400&&/API key|API_KEY/i.test(raw+" "+code))return "API key 无效。到「设置」重新粘贴 (前后不要有空格)，或到 aistudio.google.com/apikey 重新生成。";
   if(status===400&&/location|not supported in your/i.test(raw))return "当前网络或地区不能调用 Gemini："+raw;
@@ -1035,21 +1134,60 @@ function aiErr(status,data){const raw=(data&&data.error&&data.error.message)||""
   if(status===429){const m=raw.match(/retry in ([\d.]+)s/i);return "请求太频繁，或今天的免费额度用完了。"+(m?"约 "+Math.ceil(+m[1])+" 秒后可重试。":"等 1 分钟再试。")+"也可以换成 gemini-3.5-flash-lite。"}
   if(status>=500)return "Google 服务暂时繁忙 ("+status+")，稍后再试。";
   return "出错了 ("+status+")："+(raw||"未知错误")}
-async function gem(contents,system,maxTokens){
-  if(!aiOK())throw new Error("请先到「设置」填入 Gemini API key。");
-  const model=(S.ai.model||"").trim()||MODELS[0];
+async function gemCall(contents,system,maxTokens,modelOverride){
+  if(!gemOK())throw new Error("请先到「设置」填入 Gemini API key。");
+  const model=(modelOverride||S.ai.model||"").trim()||MODELS[0];
   const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent?key="+encodeURIComponent(S.ai.key.trim());
   const body={contents,generationConfig:{maxOutputTokens:maxTokens||8192}};if(system)body.systemInstruction={parts:[{text:system}]};
   for(let attempt=0;;attempt++){
     let res;try{res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})}
-    catch(e){throw new Error("网络请求失败。如果是在 claude.ai 里打开的预览版，那里不允许连接 Google；请用 GitHub Pages 或本地打开 index.html。其他情况请检查网络。")}
+    catch(e){const er=new Error("网络请求失败。如果是在 claude.ai 里打开的预览版，那里不允许连接 Google；请用 GitHub Pages 或本地打开 index.html。其他情况请检查网络。");er.fb=true;throw er}
     let data=null;try{data=await res.json()}catch(e){}
-    if(!res.ok){if((res.status===503||res.status===500)&&attempt<2){await sleep(3000*(attempt+1));continue}throw new Error(aiErr(res.status,data))}
+    if(!res.ok){if((res.status===503||res.status===500)&&attempt<2){await sleep(3000*(attempt+1));continue}{const er=new Error(aiErr(res.status,data));er.st=res.status;er.fb=(res.status===429||res.status>=500||res.status===401||res.status===403||res.status===404);throw er}}
     const cand=data&&data.candidates&&data.candidates[0];
     if(!cand){const br=data&&data.promptFeedback&&data.promptFeedback.blockReason;throw new Error(br?"请求被拦截了 ("+br+")，换个问法再试。":"模型没有返回内容，请重试。")}
     const text=((cand.content&&cand.content.parts)||[]).filter(p=>!p.thought&&typeof p.text==="string").map(p=>p.text).join("");
     if(!text.trim())throw new Error("模型没有返回文字"+(cand.finishReason?" ("+cand.finishReason+")":"")+"，请重试。");
     return text}}
+/* ---- 备用 AI：Mistral / Groq / OpenRouter (OpenAI 格式) ---- */
+function toOAI(contents,stripped){
+  const msgs=[];
+  for(const c of contents){const t=[];
+    for(const p of c.parts||[]){if(typeof p.text==="string")t.push(p.text);else if(p.inline_data||p.file_data||p.inlineData||p.fileData)stripped.n++}
+    msgs.push({role:c.role==="model"?"assistant":"user",content:t.join("\n")})}
+  return msgs}
+async function altCall(p,contents,system,maxTokens){
+  const P=PROVS[p],a=S.ai.alt[p],stripped={n:0};
+  const msgs=toOAI(contents,stripped);
+  const sys=(system||"")+(stripped.n?"\n【注意】这次学生附带的图片或 PDF 你看不到，只能依据上面的文字资料作答。需要看附件的地方，直接告诉学生「这个模型看不到附件」，不要猜。":"");
+  if(sys)msgs.unshift({role:"system",content:sys});
+  let res;
+  try{res=await fetch(P.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+a.key.trim()},body:JSON.stringify({model:(a.model||"").trim()||P.model,messages:msgs,max_tokens:maxTokens||8192})})}
+  catch(e){const er=new Error(P.name+" 网络请求失败，请检查网络。");er.fb=true;throw er}
+  let data=null;try{data=await res.json()}catch(e){}
+  if(!res.ok){const raw=(data&&data.error&&(data.error.message||data.error))||"";
+    const er=new Error(P.name+" 出错 ("+res.status+")："+(typeof raw==="string"?raw:JSON.stringify(raw)).slice(0,160));
+    er.fb=(res.status===429||res.status>=500||res.status===401||res.status===402||res.status===403||res.status===404||res.status===413);throw er}
+  let text=data&&data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content;
+  if(Array.isArray(text))text=text.map(x=>x&&x.text||"").join("");
+  text=String(text||"").replace(/<think>[\s\S]*?<\/think>/g,"").trim();
+  if(!text)throw new Error(P.name+" 没有返回文字，请重试。");
+  return text}
+async function gemTry(contents,system,maxTokens){
+  try{return await gemCall(contents,system,maxTokens)}
+  catch(e){if(e.st!==404)throw e;const cur=(S.ai.model||"").trim();
+    for(const m of MODELS){if(m===cur)continue;try{const o=await gemCall(contents,system,maxTokens,m);toast("原来的模型找不到，已改用 "+m);return o}catch(e2){if(e2.st!==404)throw e2}}
+    throw e}}
+async function gem(contents,system,maxTokens){
+  const order=[S.ai.provider||"gemini"].filter(provOK);
+  if(S.ai.fallback!==false)PORDER.forEach(p=>{if(provOK(p)&&!order.includes(p))order.push(p)});
+  if(!order.length)throw new Error("请先到「设置」填入至少一个 API key。");
+  let last;
+  for(let i=0;i<order.length;i++){const p=order[i];
+    try{const out=p==="gemini"?await gemTry(contents,system,maxTokens):await altCall(p,contents,system,maxTokens);
+      if(i>0)toast("已自动切换到 "+(p==="gemini"?"Gemini":PROVS[p].name));return out}
+    catch(e){last=e;if(!e.fb||i===order.length-1)break}}
+  throw last}
 function parseJSON(t,open){t=t.replace(/```json|```/g,"").trim();const a=t.indexOf(open),b=t.lastIndexOf(open==="["?"]":"}");if(a<0||b<a)throw new Error("AI 返回的格式没解析成功，请再试一次。");
   try{return JSON.parse(t.slice(a,b+1))}catch(e){throw new Error("AI 返回的格式没解析成功 (可能内容被截断)，请再试一次。")}}
 function sysPrompt(sid,extra){const s=subj(sid);
@@ -1073,7 +1211,7 @@ function renderNav(){
 function go(tab,sub){if(sub&&S.my.includes(sub))S.sub=sub;else if(sub&&!S.my.includes(sub)){S.my.push(sub);S.sub=sub}S.tab=tab;save();render();window.scrollTo(0,0);try{history.replaceState(null,"","#"+tab)}catch(e){}}
 function render(){if(exTimer&&S.tab!=="exam"){clearInterval(exTimer);exTimer=null}renderNav();
   ({today:rToday,notes:rNotes,flash:rFlash,drill:rDrill,exam:rExam,chat:rChat,res:rRes,set:rSet})[S.tab]()}
-function needKey(){return aiOK()?"":`<div class="notice warn"><b>先设置 API key</b><p>AI 功能（生成笔记、出题、模拟卷、问答）要用你自己的 Gemini key，免费申请：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>。</p><button class="btn pri small" data-act="goset">去设置</button></div>`}
+function needKey(){return aiOK()?"":`<div class="notice warn"><b>先设置 API key</b><p>AI 功能（生成笔记、出题、模拟卷、问答）要用你自己的 API key (Gemini，或设置里的备用 AI)，Gemini 免费申请：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>。</p><p class="fine muted">第一次用？到「设置」最上面有新手指南，几步就能开始。</p><button class="btn pri small" data-act="goset">去设置</button></div>`}
 
 /* ---- SPM 2026 官方时间表 (JWP 18 Ogos 2026，据 LP 公布整理) ---- */
 const JWP={
@@ -1198,7 +1336,8 @@ function bindChaps(){
   $$("[data-req]").forEach(t=>t.onchange=()=>{S.req[t.dataset.req]=t.value.trim()||undefined;save();toast("章节要求已保存")});
   $$("details.chap[data-k]").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)S.openChap=d.dataset.k}));}
 function findChap(sid,k){return chapsOf(sid).find(c=>c.k===k)}
-function noteSystem(sid){return sysPrompt(sid,"你现在是 SPM 笔记整理老师：只整理考试用得上的内容，条理清晰，宁可短也不要编造。")}
+const FIGRULE="【作图规则】是否需要图由你自己判断：凡是看图比看文字更容易懂、或 SPM 常考看图作答的内容 (如生物的细胞、器官、系统结构图，食物链和各种循环图，实验装置图，化学仪器和分子结构，电路图、光线图、受力图，几何图形，函数图像，地理或历史示意图，流程图)，即使学生没要求也主动画出来，不要只用文字描述；一句话能讲清楚的就不画。生物结构图画简化的示意即可，每个部分用引线加文字标出名称，图后再用文字列出各部分的功能。用三个反引号代码块，有三种写法：\n(1) 函数图像：```plot 代码块，每行一项。例如 y = x^2 - 4x + 3 (可以多条)；可选 x: -2..6 和 y: -4..10 设定范围；points: (1,0) A; (3,0) B 标出点；x = 2 画竖虚线 (如对称轴)；title: 标题。\n(2) 其他示意图 (装置图、几何、电路)：```svg 代码块，写完整的 <svg viewBox=\"0 0 600 400\" xmlns=\"http://www.w3.org/2000/svg\">，不要填背景色，线条和文字用深色 (#222)，文字 font-size 14-16，每个部件都标上名称 (如「烧瓶」「冷凝管」)；不要用 script、image、style 或外部链接。画不准的细节宁可简化，并说明这是示意图。\n(3) 写实插图：```image 代码块，里面用一句英文写画面描述 (画什么、什么风格)。只在需要「看起来像真的」而且不需要精确文字标注时才用 (如器官外观、显微镜下的样子、地貌)；有标注的结构图一律用 svg。学生点一下按钮才会生成，所以不要滥用。\n代码块前后照常用文字讲解。";
+function noteSystem(sid){return sysPrompt(sid,"你现在是 SPM 笔记整理老师：只整理考试用得上的内容，条理清晰，宁可短也不要编造。\n"+FIGRULE)}
 async function genNote(sid,k,btn){
   const c=findChap(sid,k),s=subj(sid);if(!c)return;setBusy(btn,true,"生成中…");
   try{const fp=await fileParts(sid);
@@ -1460,16 +1599,16 @@ async function genExam(type,std,nCustom,diff,limitSel,zh){
   try{const fp=await fileParts(sid);const cs=chapsOf(sid).filter(c=>c.core);const picked=cs.filter(c=>exSel&&exSel.set.has(c.k));
     const scope=picked.length?"范围 (只能考这些章节)：\n"+picked.map(c=>"- "+c.t+(c.subs.length?"（"+c.subs.join("；")+"）":"")).join("\n")+"\n\n参考资料：\n"+picked.map(c=>chapText(c,1800)).join("\n---\n").slice(0,9000):"范围：这一科整个 KSSM 纲要 (Form 4 + Form 5)，按 SPM 常见比例分布。";
     const ref=fp.names.length?`\n学生上传并勾选了这些资料：${fp.names.join("、")}。如果其中有 Trial 卷或历届真题，请模仿它们的题型、设问方式、图表或情境的写法、分值分布和难度；绝对不要照抄原题。`:"";
-    const common=`请为 SPM「${s.name}」出一份仿真模拟卷。\n卷别：${type.label}\n${diffTxt}\n${scope}${ref}\n\n硬性要求：仿 KSSM / SPM 风格；不要声称这是某年真题；资料里没有的内容不要编；题目与评分要点用考试语言 (见【语言规则】)；公式用 Unicode，不用 LaTeX；无法在纯文字里呈现的图形题，用文字描述图或换成表格数据。\n`;
+    const common=`请为 SPM「${s.name}」出一份仿真模拟卷。\n卷别：${type.label}\n${diffTxt}\n${scope}${ref}\n\n硬性要求：仿 KSSM / SPM 风格；不要声称这是某年真题；资料里没有的内容不要编；题目与评分要点用考试语言 (见【语言规则】)；公式用 Unicode，不用 LaTeX；需要配图的题 (如生物结构图、实验装置图、函数图像、电路图、统计图表)：只有真的需要看图才能作答的题才配图，大多数题不需要，整份卷子配图的题大约不超过五分之一，不要每题都配。配图写在该题 (选择题对象或大题对象，和 stem 同一层) 的 "fig" 字段，不需要就省略这个字段。格式 {"k":"plot"或"svg","c":"内容"}：plot 的 c 每行一项，行与行之间用 \\n，例如 y = x^2 - 4x + 3、x: -2..6、y: -4..10、points: (1,0) A; (3,0) B、x = 2、title: 标题；svg 的 c 是完整的 <svg viewBox='0 0 600 400' xmlns='http://www.w3.org/2000/svg'>…</svg>，属性一律用单引号，不要填背景色，线条和文字用深色 #222，不要用 script、image、style。考生要回答的部位用字母 (如 P、Q) 标出，不要把答案名称写在图上；题目文字里要写明「根据下图」。\n`;
     const sysp=sysPrompt(sid,"你现在是 SPM 出卷老师，也是严谨的评卷员，答案和评分要点必须正确。");
     const partFmt=`"parts":[{"p":"(a)","q":"小问","qz":"${zh?"小问的华文翻译":""}","m":2,"scheme":"评分要点 (逐点列出得分点，说明可接受的答案；计算题标明方法分 M 与答案分 A)","cz":"${zh?"评分要点的华文翻译":""}"}]`;
-    const cleanQ=(q,i,sec)=>({no:0,sec:sec||null,stem:q.stem||"",sz:q.sz||"",parts:q.parts.map(p=>({p:p.p||"",q:String(p.q||""),qz:p.qz||"",m:Number(p.m)||1,scheme:String(p.scheme||""),cz:p.cz||""}))});
+    const cleanQ=(q,i,sec)=>({no:0,sec:sec||null,fig:normFig(q.fig),stem:q.stem||"",sz:q.sz||"",parts:q.parts.map(p=>({p:p.p||"",q:String(p.q||""),qz:p.qz||"",m:Number(p.m)||1,scheme:String(p.scheme||""),cz:p.cz||""}))});
     let qs=[],title="",instr="",secs=null;
     if(type.kind==="mcq"){const n=useSpec&&sp.n?sp.n:nCustom;
       prog(`出 ${n} 道选择题…`);
       const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`出 ${n} 道单选题 (4 个选项，每题 1 分)，覆盖面要广。只输出 JSON：{"title":"卷名","instructions":"说明","mcq":[{"q":"题目","o":["A","B","C","D"],"a":0,"e":"解析","qz":"${zh?"题目和选项的华文翻译":""}","ez":"${zh?"解析的华文翻译":""}"}]}${zh?"\nqz、ez 用华文，其余用考试语言。":""}`}]}],sysp,30000);
       const o=parseJSON(out,"{");const m=(o.mcq||[]).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!m.length)throw new Error("AI 返回的题目格式不对，请再试一次。");
-      qs=m.map((x,i)=>({no:i+1,mcq:true,stem:x.q,o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||"",m:1}));title=o.title||"";instr=o.instructions||""}
+      qs=m.map((x,i)=>({no:i+1,mcq:true,fig:normFig(x.fig),stem:x.q,o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||"",m:1}));title=o.title||"";instr=o.instructions||""}
     else if(useSpec&&sp.secs){secs=sp.secs.map(x=>({id:x.id,label:x.label,n:x.n,ans:x.ans,opt:x.ans<x.n,per:x.per||0,total:secTotal(x)}));const used=[];
       for(let si=0;si<sp.secs.length;si++){const sc=sp.secs[si];prog(`出卷中 ${si+1}/${sp.secs.length}：${sc.label}…`);let got=null,err=null;
         for(let tryN=0;tryN<2&&!got;tryN++){try{
@@ -1492,8 +1631,8 @@ function secHead(e,q,qi){if(!e.secs||!q.sec)return "";const prev=e.qs[qi-1];if(p
 function showPaper(){
   const e=EX;let body="";
   e.qs.forEach((q,qi)=>{body+=secHead(e,q,qi);
-    if(q.mcq){body+=`<div class="qcard"><div class="qh"><span class="qno">${q.no}.</span><span class="tag">1 分</span></div><div class="stem">${esc(q.stem)}</div>${zhBox(q.qz)}${q.o.map((o,i)=>`<button class="opt ${e.pick[qi]===i?"sel":""}" data-mc="${qi}" data-i="${i}"><span class="bub">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("")}</div>`}
-    else{body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span><span class="tag">${q.parts.reduce((a,p)=>a+p.m,0)} 分${q.opt?" · 选答":""}</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>${zhBox(q.sz)}`:""}
+    if(q.mcq){body+=`<div class="qcard"><div class="qh"><span class="qno">${q.no}.</span><span class="tag">1 分</span></div><div class="stem">${esc(q.stem)}</div>${figBox(q.fig)}${zhBox(q.qz)}${q.o.map((o,i)=>`<button class="opt ${e.pick[qi]===i?"sel":""}" data-mc="${qi}" data-i="${i}"><span class="bub">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("")}</div>`}
+    else{body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span><span class="tag">${q.parts.reduce((a,p)=>a+p.m,0)} 分${q.opt?" · 选答":""}</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>${zhBox(q.sz)}`:""}${figBox(q.fig)}
      ${q.parts.map((p,pi)=>{const id=qi+"-"+pi;return `<div class="part"><span class="tag pm">${p.m} 分</span><div class="stem"><b>${esc(p.p)}</b> ${esc(p.q)}</div>${zhBox(p.qz)}
        <textarea data-an="${id}" placeholder="在这里作答${e.kind==="writing"?" (整篇写在这里)":""}" style="min-height:${e.kind==="writing"?260:80}px;margin-top:6px">${esc(e.ans[id]||"")}</textarea>
        <div class="row" style="margin-top:4px"><label class="btn small">📷 附手写答案照片<input type="file" accept="image/*" data-img="${id}" hidden></label>${e.imgs[id]?`<span class="tag ok">已附图</span> <button class="btn small" data-imgx="${id}">移除</button>`:""}</div></div>`}).join("")}</div>`}});
@@ -1540,12 +1679,12 @@ function exTimerResume(){const e=EX;clearInterval(exTimer);exTimer=setInterval((
 function showResult(){
   const e=EX,r=e.result;let body="";
   e.qs.forEach((q,qi)=>{
-    if(q.mcq){const x=r.res["m"+qi];body+=`<div class="qcard"><div class="qh"><span class="qno">${q.no}.</span><span class="tag ${x.score?"ok":"red"}">${x.score}/1</span></div><div class="stem">${esc(q.stem)}</div><div class="fine" style="margin-top:6px">你的答案：${e.pick[qi]===undefined?"未作答":"ABCD"[e.pick[qi]]} · 正确：${"ABCD"[q.a]}</div><div class="fb ${x.score?"full":"zero"}">${esc(x.comment)}${q.ez?`<div style="margin-top:4px">华文：${esc(q.ez)}</div>`:""}</div></div>`}
+    if(q.mcq){const x=r.res["m"+qi];body+=`<div class="qcard"><div class="qh"><span class="qno">${q.no}.</span><span class="tag ${x.score?"ok":"red"}">${x.score}/1</span></div><div class="stem">${esc(q.stem)}</div>${figBox(q.fig)}<div class="fine" style="margin-top:6px">你的答案：${e.pick[qi]===undefined?"未作答":"ABCD"[e.pick[qi]]} · 正确：${"ABCD"[q.a]}</div><div class="fb ${x.score?"full":"zero"}">${esc(x.comment)}${q.ez?`<div style="margin-top:4px">华文：${esc(q.ez)}</div>`:""}</div></div>`}
     else{const ps=q.parts.map((p,pi)=>{const id=qi+"-"+pi,x=r.res[id];if(!x)return "";return `<div class="part"><span class="tag pm ${x.score>=x.max?"ok":x.score===0?"red":"warn"}">${x.score}/${x.max}</span><div class="stem"><b>${esc(p.p)}</b> ${esc(p.q)}</div>
         <div class="fine muted" style="margin-top:4px;white-space:pre-wrap">我的作答：${esc(e.ans[id]||(e.imgs[id]?"(照片)":"(未作答)"))}</div>
         <div class="fb ${x.score>=x.max?"full":x.score===0?"zero":""}">${esc(x.comment)}</div>
         <details style="margin-top:4px"><summary class="fine muted" style="cursor:pointer">参考评分要点</summary><div class="fine" style="white-space:pre-wrap;margin-top:4px">${esc(p.scheme)}</div>${p.cz?`<div class="fine muted" style="white-space:pre-wrap;margin-top:4px">华文：${esc(p.cz)}</div>`:""}</details></div>`}).join("");
-      if(ps.trim())body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>`:""}${ps}</div>`;
+      if(ps.trim())body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>`:""}${figBox(q.fig)}${ps}</div>`;
       else if((r.skip||[]).includes(qi))body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span><span class="tag">选答 · 未批改</span></div><div class="fine muted">这道题超过了本部分的选答题数，所以没有批改。</div></div>`}});
   $("#sheet").innerHTML=`<div class="row"><h2 style="margin:0">${esc(e.title)}</h2><span class="tag">${esc(e.label)}</span></div>
    <div class="card" style="margin:12px 0"><div class="row"><div class="score">${Math.round(r.total*10)/10}<span class="muted" style="font-size:22px"> / ${r.max}</span></div><span class="tag blue" style="font-size:15px">${r.pct}%</span><span class="spacer"></span>
@@ -1566,7 +1705,7 @@ async function buildCtx(sid,query){
   const catalog="【本科章节目录】\n"+cs.map(c=>c.t+(c.subs.length?"（"+c.subs.join("；")+"）":"")).join("\n");
   const fp=await fileParts(sid);
   const rule=S.strict?"回答规则：只依据下面【资料】和学生上传的文件作答。资料没有覆盖的点，先明确说「资料里没有这一点」，再用 SPM 通用知识补充，并在该段前标注 [通用知识]。不要把通用知识说成是课本原文。":"回答规则：优先依据下面【资料】和学生上传的文件；资料没写到的，可用 SPM 通用知识补充，并标注 [通用知识]。";
-  return{system:sysPrompt(sid,rule+"\n\n"+catalog+"\n\n"+blocks.join("\n\n")),parts:fp.parts,used,files:fp.names}}
+  return{system:sysPrompt(sid,rule+"\n"+FIGRULE+"\n\n"+catalog+"\n\n"+blocks.join("\n\n")),parts:fp.parts,used,files:fp.names}}
 function rChat(){
   const sid=S.sub,h=S.chat[sid]||[],cs=chapsOf(sid).filter(c=>c.core);let nFiles=0;
   $("#sheet").innerHTML=`${needKey()}<div class="row" style="margin-bottom:8px"><h2 style="margin:0">${esc(subj(sid).name)} 问答</h2><span class="spacer"></span><button class="btn small" id="chClr">清空对话</button></div>
@@ -1615,7 +1754,7 @@ async function renderUploads(sid){
 async function addFiles(sid,list){let n=0;for(const f of list){const ok=/\.(pdf|png|jpe?g|webp|txt|md|csv)$/i.test(f.name)||/^image\//.test(f.type)||f.type==="application/pdf";if(!ok){toast("不支持："+f.name+"（PPT/Word 请先另存为 PDF）");continue}
     if(f.size>300*1048576){toast("太大了 (上限 300 MB)："+f.name);continue}
     try{const id="f"+Date.now()+Math.random().toString(36).slice(2,6);const rec={id,sid,name:f.name,type:f.type,size:f.size,blob:f};await DB.put(rec);S.use[id]=true;n++;
-      if(f.size>INLINE_MAX&&aiOK())ensureRemote(rec,guessMime(rec)).then(()=>{toast("已上传到 Google ✓");renderUploads(sid)},e=>toast(e.message.slice(0,90)))}catch(e){toast("保存失败："+f.name)}}
+      if(f.size>INLINE_MAX&&gemOK())ensureRemote(rec,guessMime(rec)).then(()=>{toast("已上传到 Google ✓");renderUploads(sid)},e=>toast(e.message.slice(0,90)))}catch(e){toast("保存失败："+f.name)}}
   save();if(n)toast("已添加 "+n+" 个文件，并勾选为 AI 参考");renderUploads(sid)}
 function resLinks(sid,s,yrs){
   const tb=TB[sid]||[];
@@ -1658,7 +1797,7 @@ async function uploadToGemini(blob,name,mime){
   if(file.state==="FAILED")throw new Error("Google 无法处理这个文件，请换一个或拆分后再试。");
   return{uri:file.uri,mime:file.mimeType||mime,expires:file.expirationTime?new Date(file.expirationTime).getTime():Date.now()+47*3600e3}}
 async function ensureRemote(f,mime){
-  if(!aiOK())throw new Error("大文件要先上传到 Google，请先到「设置」填写 API key。");
+  if(!gemOK())throw new Error("大文件要先上传到 Google，请先到「设置」填写 API key。");
   const r=f.remote;if(r&&r.expires-Date.now()>30*60e3&&r.keyId===keyTag())return r;
   toast(`正在上传「${f.name}」到 Google…`);
   const up=await uploadToGemini(f.blob,f.name,mime);f.remote={uri:up.uri,mime:up.mime,expires:up.expires,keyId:keyTag()};await DB.put(f);return f.remote}
@@ -1667,7 +1806,7 @@ async function ensureRemote(f,mime){
 const SYNC_SALT="spm-notes-sync-v1";
 let syncTimer=null,syncBusy=false,lastPull=0;
 function syncBase(){return(S.sync.url||"").trim().replace(/\/+$/,"")}
-function syncOn(){return !!(syncBase()&&aiOK())}
+function syncOn(){return !!(syncBase()&&gemOK())}
 function syncSet(t,cls){const e=document.getElementById("syncStatus");if(e){e.textContent=t;e.style.color=cls==="bad"?"var(--bad)":cls==="ok"?"var(--ok)":""}}
 function hash53(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}
   h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return(4294967296*(2097151&h2)+(h1>>>0)).toString(36)}
@@ -1695,7 +1834,7 @@ async function syncPush(){
   if(!syncOn()||syncBusy)return;if(syncHashNow()===S.sync.hash)return;syncBusy=true;
   try{syncSet("上传中…");await doPush();syncSet("已同步 ✓ "+fmtAt(S.sync.ts),"ok")}catch(e){syncSet(e.message,"bad")}finally{syncBusy=false}}
 async function syncPull(manual){
-  if(!syncOn()){if(manual)syncSet(aiOK()?"请先填 Worker 网址":"请先在设置里填 Gemini API key (同步内容用它加密)","bad");return}
+  if(!syncOn()){if(manual)syncSet(gemOK()?"请先填 Worker 网址":"请先在设置里填 Gemini API key (同步内容用它加密)","bad");return}
   if(syncBusy)return;syncBusy=true;if(manual)syncSet("同步中…");
   try{const{id,key}=await syncKeys();let res;
     try{res=await fetch(syncBase()+"/s/"+id,{cache:"no-store"})}catch(e){throw new Error("连不上同步服务，请检查网址和网络。")}
@@ -1718,11 +1857,24 @@ function applyTheme(){document.body.dataset.theme=S.theme||"auto"}
 function rSet(){
   const themes=[["auto","跟随系统"],["light","浅色"],["night","夜间"],["sakura","樱花"],["mint","薄荷"],["paper","纸张"]];
   $("#sheet").innerHTML=`<h2>设置</h2>
+  <details class="chap" id="guide" ${aiOK()?"":"open"} style="margin-bottom:14px"><summary><span class="t">🌱 新手指南 (第一次用，看这里)</span></summary><div class="body">
+    <ol style="margin:0 0 8px;padding-left:20px;line-height:1.7">
+      <li><b>申请免费 Gemini key</b>：打开 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>，用 Google 账号登录，点「Create API key」，把那一长串 key 复制下来。</li>
+      <li><b>贴进来</b>：粘贴到下面「Gemini API key」那一栏，点「保存」。模型不用改，用预设的就好。</li>
+      <li><b>开始用</b>：到「笔记」选一章，点「✨ AI 生成这一章的笔记」；「问答」可以问题目 (也能附图片)；「刷题」和「模拟卷」可以出题并批改。</li>
+      <li><b>备用 key (可选)</b>：免费额度有限，用完会提示太频繁。可以再申请 Mistral、Groq、OpenRouter 的免费 key，填在「备用 AI」那一块，Gemini 用完会自动切换。备用模型看不到你上传的 PDF 和图片。</li>
+    </ol>
+    <p class="fine muted" style="margin:6px 0 0">小提醒：key 只保存在你自己的浏览器里，不要发给别人，也不要截图；Google 免费版的内容可能被用来改进它的产品，所以不要输入个人资料；AI 整理的笔记可能有错，仅供复习，请以课本和老师为准；额度用完等一两分钟或隔天再试。</p></div></details>
   <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p>
     <input type="password" id="sKey" placeholder="粘贴 API key" value="${esc(S.ai.key)}" autocomplete="off">
     <div class="controls" style="margin-top:8px"><label class="grow">模型<select id="sMd">${MODELS.map(m=>`<option ${S.ai.model===m?"selected":""}>${m}</option>`).join("")}${MODELS.includes(S.ai.model)?"":`<option selected>${esc(S.ai.model)}</option>`}</select></label><button class="btn pri" id="sKeyOk">保存</button></div><div id="sKeyMsg" class="fine"></div></div>
    <div class="card"><h3 style="margin-top:0">笔试开始日</h3><input type="date" id="sEx" value="${S.exam}"><p class="fine muted">默认是 SPM 2026 笔试第一天 (2026-11-23)。考的是别的日期就改这里。</p>
     <h3>AI 回答语言</h3><div class="seg"><button data-lang="auto" aria-pressed="${(S.lang||"auto")==="auto"}">考试语言 + 华文翻译</button><button data-lang="exam" aria-pressed="${S.lang==="exam"}">只用考试语言</button><button data-lang="zh" aria-pressed="${S.lang==="zh"}">全部华文</button></div><p class="fine muted">国语、历史、道德用国语；英文和数学、理科、附加数学用英文；华文科目用华文。默认会在每段后面附「华文：」翻译和解释。</p><h3>外观</h3><div class="seg">${themes.map(t=>`<button data-th="${t[0]}" aria-pressed="${S.theme===t[0]}">${t[1]}</button>`).join("")}</div></div></div>
+  <div class="card" style="margin-top:14px"><h3 style="margin-top:0">备用 AI 与生图</h3><p class="fine muted">Gemini 额度用完时自动切换。key 只保存在这个浏览器里，只发给对应的服务。备用模型读不到上传的 PDF 和图片，只用 app 内置笔记的文字。</p>
+    <div class="controls"><label class="grow">主要使用<select id="pvMain">${["gemini",...Object.keys(PROVS)].map(p=>`<option value="${p}" ${(S.ai.provider||"gemini")===p?"selected":""}>${p==="gemini"?"Gemini":PROVS[p].name}</option>`).join("")}</select></label><label class="chk"><input type="checkbox" id="pvFb" ${S.ai.fallback!==false?"checked":""}> 额度用完自动切换</label></div>
+    ${Object.keys(PROVS).map(p=>`<div style="margin-top:10px"><b>${PROVS[p].name}</b> <span class="fine muted">· 申请：<a href="https://${PROVS[p].get}" target="_blank" rel="noopener noreferrer">${PROVS[p].get}</a></span><input type="password" data-pk="${p}" placeholder="粘贴 API key" value="${esc(S.ai.alt[p].key)}" autocomplete="off"><input type="text" data-pm="${p}" value="${esc(S.ai.alt[p].model)}" style="margin-top:6px" autocomplete="off"></div>`).join("")}
+    <div style="margin-top:12px"><b>AI 生图模型</b> <span class="fine muted">· 用上面的 Gemini key。免费版不一定有图片额度；不能用时会自动改画示意图</span><input type="text" id="sImgM" value="${esc(S.ai.imgModel||"")}" style="margin-top:6px" autocomplete="off"></div>
+    <div class="row" style="margin-top:10px"><button class="btn pri" id="pvSave">保存</button><span id="pvMsg" class="fine"></span></div><p class="fine muted">下面的模型名可以改：免费模型的名字常常变，如果提示「找不到模型」，到该服务的网站查最新名字再填进来。</p></div>
   <h3>我考的科目 & 信心</h3><p class="fine muted">信心 1 = 没把握，5 = 很稳。越没把握，越常排进每日重点。</p>
   <div class="grid g3">${SUBJECTS.map(s=>`<div class="card"><label class="chk" style="color:var(--ink);font-size:15px"><input type="checkbox" data-my="${s.id}" ${S.my.includes(s.id)?"checked":""}> <b>${esc(s.name)}</b></label><div class="row" style="margin-top:6px"><span class="fine muted">信心</span><select data-cf="${s.id}">${[1,2,3,4,5].map(n=>`<option ${(S.conf[s.id]||3)===n?"selected":""}>${n}</option>`).join("")}</select></div></div>`).join("")}</div>
   <div class="card" style="margin-top:14px"><h3 style="margin-top:0">云端同步 (Cloudflare)</h3><p class="fine muted">把进度、AI 笔记、错题、模拟卷同步到你的 Cloudflare Worker，手机和电脑共用。内容用你的 API key 加密，换设备时填同一个 key 才能读取。可以和「考前助手」共用同一个 Worker，数据分开存，不会互相覆盖。上传的资料文件不同步。</p>
@@ -1732,6 +1884,7 @@ function rSet(){
   <h3>备份</h3><p class="fine muted">进度、AI 笔记和错题都只在这个浏览器里。换设备或清缓存前先导出 (导出文件不含 API key，也不含上传的文件)。</p>
   <div class="row"><button class="btn" id="bkOut">导出 JSON</button><label class="btn">导入 JSON<input type="file" id="bkIn" accept=".json" hidden></label><button class="btn badb" id="bkRs">清空全部进度</button></div>`;
   $("#sKeyOk").onclick=()=>{S.ai.key=$("#sKey").value.trim();S.ai.model=$("#sMd").value;save();$("#sKeyMsg").innerHTML=S.ai.key?'<span style="color:var(--ok)">已保存 ✓</span>':"已清除 key";toast(S.ai.key?"已保存":"已清除 key")};
+  $("#pvSave").onclick=()=>{S.ai.provider=$("#pvMain").value;S.ai.fallback=$("#pvFb").checked;S.ai.imgModel=$("#sImgM").value.trim()||"gemini-3.1-flash-image-preview";$$("[data-pk]").forEach(i=>{S.ai.alt[i.dataset.pk].key=i.value.trim()});$$("[data-pm]").forEach(i=>{S.ai.alt[i.dataset.pm].model=i.value.trim()||PROVS[i.dataset.pm].model});save();$("#pvMsg").innerHTML='<span style="color:var(--ok)">已保存 ✓</span>';toast("已保存")};
   $("#syncSave").onclick=()=>{S.sync.url=$("#syncUrl").value.trim().replace(/\/+$/,"");save();if(!S.sync.url){syncSet("未启用");rSet();return}syncPull(true)};
   if($("#syncNow"))$("#syncNow").onclick=()=>syncPull(true);
   if($("#syncOff"))$("#syncOff").onclick=()=>{S.sync={url:"",ts:0,hash:""};save();rSet()};
@@ -1740,8 +1893,8 @@ function rSet(){
   $$("[data-th]").forEach(b=>b.onclick=()=>{S.theme=b.dataset.th;save();applyTheme();rSet()});
   $$("[data-my]").forEach(c=>c.onchange=()=>{S.my=SUBJECTS.filter(s=>$(`[data-my="${s.id}"]`).checked).map(s=>s.id);if(!S.my.length){c.checked=true;S.my=[c.dataset.my]}if(!S.my.includes(S.sub))S.sub=S.my[0];save();renderNav()});
   $$("[data-cf]").forEach(c=>c.onchange=()=>{S.conf[c.dataset.cf]=+c.value;save()});
-  $("#bkOut").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(Object.assign({},S,{ai:Object.assign({},S.ai,{key:""}),draft:null}),null,1)],{type:"application/json"}));a.download="spm-notes-backup.json";a.click()};
-  $("#bkIn").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const k=S.ai.key,m=S.ai.model;S=Object.assign({},DEF,JSON.parse(t));S.ai={key:k,model:m};bust();save();toast("已导入");render()}catch(x){toast("文件格式不对")}})};
+  $("#bkOut").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(Object.assign({},S,{ai:Object.assign({},S.ai,{key:"",alt:{}}),draft:null}),null,1)],{type:"application/json"}));a.download="spm-notes-backup.json";a.click()};
+  $("#bkIn").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const keepAI=S.ai;S=Object.assign({},DEF,JSON.parse(t));S.ai=keepAI;bust();save();toast("已导入");render()}catch(x){toast("文件格式不对")}})};
   $("#bkRs").onclick=()=>{if(confirm("确定清空所有进度、AI 笔记和错题？这个操作不能撤销。(API key 会保留)")){const k=S.ai;S=Object.assign({},DEF,{since:today(),ai:k});bust();save();go("today")}}}
 
 /* ---- 事件 ---- */
