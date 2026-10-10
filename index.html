@@ -468,7 +468,7 @@ const EXAM = { writtenStart:"2026-11-23", writtenEnd:"2026-12-17" };
 const ET = (s,y)=>`https://edukaji.my/spm-trial-paper-download/${s}/${y}-all`;
 const SUBJECTS = [
  {id:"bm",lang:"ms",name:"国语 BM",ms:"Bahasa Melayu",code:"1103",color:"#d33a2c",ep:"bahasa-melayu",core:true,
-  fmt:"Kertas 1 作文 + 摘要/Kertas 2 理解、语法、文学；另有口试(Ujian Bertutur)和听力(Ujian Mendengar)",
+  fmt:"Kertas 1 作文 100 分 (2 小时)：Bahagian A 必答 30 分 + Bahagian B 四选一 70 分。Kertas 2 语言系统、理解、摘要 100 分 (2 小时 30 分钟)：A 5 题 35 分、B 3 题 35 分、C 摘要 30 分。另有口试 Ujian Bertutur (70 分) 和听力 Ujian Mendengar (30 分)，由中央评估。(据 LP 2021 起的格式表)",
   ch:[
    ["Kertas 1：Karangan (Bahagian A 事件/Bahagian B 议论)",`<ul><li>先<b>圈出题目的文体</b>：Rencana(文章)、Ucapan(演讲)、Cerita(叙事)、Laporan、Surat。</li><li>开头：以谚语/问句/定义引入 → 主题句。结尾：总结 + 劝告/希望。</li><li>每段结构：<b>isi + huraian + contoh + kesimpulan 句</b>。</li><li>语法是失分大头：<code>di-</code> 前缀与介词 <code>di</code> 的分写、<code>kepada</code> 不写 <code>kepada nya</code>、<code>oleh itu / maka / lantaran</code> 的正确使用。</li></ul><div class="tip">每篇至少放 2 个谚语 (peribahasa) 和 2 个成语，必须用对语境，用错比不用更扣分。</div>`],
    ["Kertas 1：Ringkasan (摘要)",`<ul><li>先划出<b>要点(isi penting)</b>，再用自己的话连成 1 段，不要抄原句。</li><li>字数遵守题目限制；一般先写草稿数字数。</li><li>不加个人意见，不加例子，只保留原文观点。</li></ul>`],
@@ -478,7 +478,7 @@ const SUBJECTS = [
    ["Ujian Bertutur & Mendengar (口试/听力)",`<ul><li>口试：用完整句子，开头<b>表明观点</b>，给 2 个理由，结尾总结；不要停顿太久，卡住时用「Pada pendapat saya ...」补位。</li><li>听力：先读题再听，抓<b>名词、数字、转折词</b>。</li></ul>`]
   ]},
  {id:"bi",lang:"en",name:"英文 BI",ms:"English",code:"1119",color:"#2c47d6",ep:"english",core:true,
-  fmt:"Paper 1 (Reading & Writing)、Paper 2 (Listening)、Speaking；以 CEFR 标准评分",
+  fmt:"Paper 1 Reading & Use of English 40 分 (1 小时 30 分钟)，Paper 2 Writing 60 分 (1 小时 30 分钟)，Speaking 20 分，Listening 30 分 (40 分钟)；难度对应 CEFR B1–B2。(据 LP 2021 起的格式表)",
   ch:[
    ["Writing: Directed Writing (Part 1)",`<ul><li>格式：Email / Letter / Report / Proposal 等，<b>必须覆盖题目给的每个 content point</b>。</li><li>开头 purpose 句：<code>I am writing to ...</code>；结尾：<code>I look forward to hearing from you.</code></li><li>注意 register：给朋友非正式；给校长/公司正式，不用缩写。</li></ul>`],
    ["Writing: Continuous Writing (Part 2)",`<ul><li>文体：Essay、Article、Short story、Review、Speech 等，先看 genre 再写。</li><li>结构：Introduction (hook) → 2-3 body paragraphs (P.E.E: Point, Evidence, Explain) → Conclusion。</li><li>高分要点：多样句型、linking words (however, moreover, consequently)、正确时态。</li></ul><div class="tip">写完检查三件事：主谓一致、时态一致、a/an/the。</div>`],
@@ -487,7 +487,7 @@ const SUBJECTS = [
    ["Listening & Speaking",`<ul><li>Listening：先预读选项，圈关键词，听到答案立刻做记号。</li><li>Speaking：每个 task 说 3-4 句以上，给理由 + 例子，不要只答 yes/no。</li></ul>`]
   ]},
  {id:"sej",lang:"ms",name:"历史 Sejarah",ms:"Sejarah",code:"1249",color:"#8a5a00",ep:"sejarah",core:true,must:true,
-  fmt:"Kertas 1 (40 题选择)；Kertas 2 (结构 + 论述)。SPM 必须及格 (E 以上) 才能拿证书。",
+  fmt:"Kertas 1 (1 小时)：40 题选择。Kertas 2 (2 小时 30 分钟)：Bahagian A 4 题 40 分 (全答)、Bahagian B 5 题 60 分 (选答 3 题，每题 20 分)。难度比例 5:3:2。SPM 必须及格才能拿证书。",
   ch:[
    ["T4 Bab 1 Warisan Negara Bangsa",`<ul><li>满刺加 (Melaka) 作为<b>negara bangsa</b>：有政治体系、领土、人民、主权。</li><li>特点：Sultan 为最高统治者，Bendahara、Temenggung、Laksamana、Syahbandar 分工；<b>Undang-undang Kanun Melaka</b> 和 Undang-undang Laut Melaka。</li></ul>`],
    ["T4 Bab 2 Kebangkitan Nasionalisme",`<ul><li>民族主义的意义；欧洲、亚洲、东南亚的发展；本国觉醒因素：教育、媒体、宗教改革(Kaum Muda)、外来思想。</li></ul>`],
@@ -505,7 +505,7 @@ const SUBJECTS = [
    ["答题技巧 (KBAT)",`<ul><li>Kertas 2 的「Huraikan」要有：<b>Isi (point) + Huraian (explain) + Contoh/Bukti</b>。</li><li>「Pada pendapat anda ...」类题一定要给立场 + 理由。</li><li>时间线：背<b>年份主线</b>：1511 → 1786 → 1824 → 1941-45 → 1946 → 1948 → 1955 → 1957 → 1963 → 1969 → 1971 → 1991。</li></ul>`]
   ]},
  {id:"mat",lang:"en",name:"数学 Matematik",ms:"Matematik",code:"1449",color:"#17795a",ep:"mathematics",core:true,
-  fmt:"Kertas 1 (40 题选择，1 小时 15 分) + Kertas 2 (Bahagian A/B/C，2 小时 30 分)",
+  fmt:"Kertas 1 (1 小时 30 分钟)：40 题选择 (40 分)。Kertas 2 (2 小时 30 分钟，共 100 分)：A 10 题 40 分、B 5 题 45 分 (都全答)、C 2 题选答 1 题 15 分。难度比例 5:3:2。",
   ch:[
    ["T4 Bab 1 Fungsi dan Persamaan Kuadratik",`<ul><li>标准形式 <code>ax² + bx + c = 0</code>；求根公式 <code>x = [-b ± √(b²-4ac)] / 2a</code>。</li><li>判别式：<code>b²-4ac &gt; 0</code> 两个不同实根；<code>= 0</code> 两个相等实根；<code>&lt; 0</code> 无实根。</li><li>两根之和 <code>-b/a</code>，积 <code>c/a</code>。</li></ul>`],
    ["T4 Bab 2 Asas Nombor",`<ul><li>换算进制：先转十进制再转目标进制。</li><li>二进制加减法，逢二进一。</li></ul>`],
@@ -527,7 +527,7 @@ const SUBJECTS = [
    ["常用公式速记",`<table><tr><th>项目</th><th>公式</th></tr><tr><td>圆周 / 面积</td><td>2πr / πr²</td></tr><tr><td>圆柱体体积</td><td>πr²h</td></tr><tr><td>圆锥体体积</td><td>⅓πr²h</td></tr><tr><td>球体体积</td><td>4/3 πr³</td></tr><tr><td>勾股定理</td><td>a² + b² = c²</td></tr><tr><td>梯形面积</td><td>½(a+b)h</td></tr><tr><td>直线斜率</td><td>m = (y₂-y₁)/(x₂-x₁)</td></tr></table>`]
   ]},
  {id:"sains",lang:"en",name:"科学 Sains",ms:"Sains",code:"1511",color:"#00838f",ep:"science",core:true,
-  fmt:"Kertas 1：40 题选择 (40 分，1 小时 15 分钟)。Kertas 2：Bahagian A (4 题)、B (5 题)、C (选答 1 题)，共 80 分，2 小时 30 分钟；难度比例 低:中:高 = 5:3:2。另有 Ujian Amali。(据 Pandai 整理，以 LP 格式文件为准)",
+  fmt:"Kertas 1 (1 小时 15 分钟)：40 题选择。Kertas 2 (2 小时 30 分钟，共 80 分)：Bahagian A 4 题 20 分、B 6 题 38 分、C 第 11 题必答 10 分 + 第 12/13 题选答 1 题 12 分。难度比例 5:3:2。另有 Ujian Amali。(据 LP 2021 起的格式表)",
   ch:[
    ["答题万能句式",`<ul><li>「Mengapa」：<b>因为 (sebab) + 现象 + 科学原理</b>。</li><li>实验设计三变量：<b>manipulated (操纵)、responding (响应)、fixed (固定)</b>。</li><li>结论：「Semakin ... semakin ...」。</li></ul>`],
    ["生物基础",`<ul><li>细胞：动物 vs 植物 (植物有细胞壁、叶绿体、液泡)。</li><li>扩散 (diffusion)、渗透 (osmosis)；呼吸作用 <code>葡萄糖 + 氧 → 二氧化碳 + 水 + 能量</code>；光合作用 <code>二氧化碳 + 水 →(光,叶绿素) 葡萄糖 + 氧</code>。</li></ul>`],
@@ -535,13 +535,13 @@ const SUBJECTS = [
    ["物理基础",`<ul><li>速度 = 距离/时间；力 F = ma；压强 P = F/A；功 W = Fd；功率 P = W/t。</li><li>电流 I，电压 V，电阻 R：<code>V = IR</code>。</li></ul>`]
   ]},
  {id:"moral",lang:"ms",name:"道德 / 伊斯兰教育",ms:"Pendidikan Moral / Islam",code:"1225 / 1223",color:"#7b4fb3",ep:null,core:true,
-  fmt:"Kertas 1 (选择) + Kertas 2 (结构 / 论述)。非穆斯林学生修读 Pendidikan Moral，穆斯林修读 Pendidikan Islam。",
+  fmt:"只有一份笔试卷 (1225)，共 100 分，2 小时 30 分钟：Bahagian A 5 题 50 分 (全答)、Bahagian B 5 题 10 分 (选 1 题)、Bahagian C 2 题 40 分 (全答)。穆斯林学生修读 Pendidikan Islam (另一套格式)。(据 LP 2021 起的格式表)",
   ch:[
    ["Pendidikan Moral 答题方法",`<ul><li>结构：<b>nilai murni + definisi + situasi + akibat</b>。</li><li>常考价值：kasih sayang, hormat-menghormati, bertanggungjawab, keadilan, rasional, baik hati, kerjasama, integriti, kejujuran。</li><li>案例题：先指出问题，再引用价值，再给建议。</li></ul>`],
    ["Pendidikan Islam",`<ul><li>三大范畴：Akidah、Syariah、Akhlak；Al-Quran 与 Hadis 的引用要写准。</li><li>此部分请以你学校课本和老师的纲要为准。</li></ul>`]
   ]},
  {id:"am",lang:"en",name:"附加数学 Add Maths",ms:"Matematik Tambahan",code:"3472",color:"#c25e00",ep:"additional-mathematics",
-  fmt:"Kertas 1 + Kertas 2；公式表在考卷附页，但要熟悉用法",
+  fmt:"Kertas 1 (2 小时，80 分)：A 12 题 64 分 (全答)、B 3 题选答 2 题 16 分。Kertas 2 (2 小时 30 分钟，100 分)：A 7 题 50 分 (全答)、B 4 题选答 3 题 30 分、C 4 题选答 2 题 20 分。",
   ch:[
    ["T4 Bab 1 Fungsi",`<ul><li>函数 f(x)、定义域/值域、复合函数 <code>fg(x) = f(g(x))</code>、反函数 <code>f⁻¹</code> (交换 x, y 后解 y)。</li></ul>`],
    ["T4 Bab 2-3 Persamaan & Fungsi Kuadratik",`<ul><li>顶点式 <code>f(x) = a(x-p)² + q</code>：顶点 (p, q)；a&gt;0 开口向上有最小值。</li><li>二次不等式：画草图，看图取区间。</li></ul>`],
@@ -558,7 +558,7 @@ const SUBJECTS = [
    ["T5 Fungsi Trigonometri, Pengaturcaraan Linear, Kinematik",`<ul><li>sin²θ + cos²θ = 1；1 + tan²θ = sec²θ；sin2A = 2sinAcosA。</li><li>线性规划：画约束不等式 → 找可行区域 → 取顶点代入目标函数。</li><li>运动：v = ds/dt；a = dv/dt；距离 = ∫v dt。</li></ul>`]
   ]},
  {id:"fiz",lang:"en",name:"物理 Fizik",ms:"Fizik",code:"4531",color:"#1565c0",ep:"physics",
-  fmt:"Kertas 1 (40 选择)、Kertas 2 (结构 + 论述)、Kertas 3 (实验设计)；另有 Ujian Amali",
+  fmt:"Kertas 1 (1 小时 15 分钟)：40 题选择。Kertas 2 (2 小时 30 分钟，共 100 分)：A 8 题 60 分 (全答)、B 2 题选答 1 题 20 分、C 1 题 20 分。Kertas 3 为 Ujian Amali (30 分)。难度比例 5:3:2。(据 LP 2021 起的格式表)",
   ch:[
    ["T4 Asas Pengukuran",`<ul><li>基本量：长度 m、质量 kg、时间 s、电流 A、温度 K。</li><li>游标卡尺 0.01 cm，螺旋测微器 0.01 mm；<b>零误差</b>要先修正。</li></ul>`],
    ["T4 Daya dan Gerakan I",`<ul><li>公式：<code>v = u + at</code>；<code>s = ut + ½at²</code>；<code>v² = u² + 2as</code>。</li><li><code>F = ma</code>；动量 <code>p = mv</code>；碰撞守恒；冲量 <code>Ft = mv - mu</code>。</li></ul>`],
@@ -575,7 +575,7 @@ const SUBJECTS = [
    ["答题模板",`<ul><li>解释现象：<b>观察 + 原理 + 结论</b>。</li><li>Kertas 3 实验题：aim、variables (3 个)、apparatus、arrangement、procedure、table、analysis。</li></ul>`]
   ]},
  {id:"kim",lang:"en",name:"化学 Kimia",ms:"Kimia",code:"4541",color:"#ad1457",ep:"chemistry",
-  fmt:"Kertas 1 (40 选择)、Kertas 2、Kertas 3；另有 Ujian Amali",
+  fmt:"Kertas 1 (1 小时 15 分钟)：40 题选择。Kertas 2 (2 小时 30 分钟，共 100 分)：A 8 题 60 分 (全答)、B 2 题选答 1 题 20 分、C 1 题 20 分。Kertas 3 为 Ujian Amali (30 分)。难度比例 5:3:2。(据 LP 2021 起的格式表)",
   ch:[
    ["T4 Pengenalan kepada Kimia / Jirim & Atom",`<ul><li>原子结构：质子数 = 原子序 (proton number)；<b>nucleon number = 质子 + 中子</b>；同位素：质子数同、中子数不同。</li><li>物态变化：熔化、凝固、沸腾、升华。</li></ul>`],
    ["T4 Konsep Mol",`<ul><li><code>n = m / M</code> (质量/摩尔质量)；<code>n = N / 6.02×10²³</code>；<code>n = V / 24 dm³</code> (室温室压) 或 <code>22.4 dm³</code> (STP)。</li><li>配平方程式后用<b>摩尔比</b>求量。</li></ul>`],
@@ -590,7 +590,7 @@ const SUBJECTS = [
    ["T5 Polimer & Kimia Konsumer",`<ul><li>加聚 (addition) vs 缩聚 (condensation)；肥皂 vs 洗涤剂 (detergent 在硬水中也能用)；药物种类。</li></ul>`]
   ]},
  {id:"bio",lang:"en",name:"生物 Biologi",ms:"Biologi",code:"4551",color:"#2e7d32",ep:"biology",
-  fmt:"Kertas 1、Kertas 2、Kertas 3；另有 Ujian Amali",
+  fmt:"Kertas 1 (1 小时 15 分钟)：40 题选择。Kertas 2 (2 小时 30 分钟，共 100 分)：A 8 题 60 分 (全答)、B 2 题选答 1 题 20 分、C 1 题 20 分。Kertas 3 为 Ujian Amali (30 分)。难度比例 5:3:2。(据 LP 2021 起的格式表)",
   ch:[
    ["提示：章节以你的课本目录为准",`<div class="warnbox">KSSM 生物的章节顺序各版本说明不一，下面按「主题」整理，不按章号。你可以在设置里添加、改名或删除章节。</div>`],
    ["细胞生物学 & 膜运输",`<ul><li>细胞器：线粒体 (呼吸)、叶绿体 (光合)、核糖体 (合成蛋白)、高尔基体 (修饰包装)、内质网。</li><li>扩散 / 渗透 / 主动运输 (需 ATP)。<b>等渗、高渗、低渗</b>溶液对细胞的影响。</li></ul>`],
@@ -1344,8 +1344,8 @@ function paperTypes(sid){
   const wr=(id,label,n,hint)=>({id,kind:"writing",label,n,hint}),op=(id,label,n,hint)=>({id,kind:"open",label,n,hint}),mc=(id,label,n)=>({id,kind:"mcq",label,n});
   const sci=[op("k2","Kertas 2 结构 + 论述",5,"Bahagian A/B 为结构题 (每小问 1-3 分)，最后 1 题为论述/开放题 (约 10-12 分)，含实验设计、图表分析、KBAT 情境。"),mc("k1","Kertas 1 选择题",20)];
   return({
-   bm:[wr("w","Kertas 1 作文 (Karangan)",3,"出 3 道不同文体的作文题 (如 Rencana / Ucapan / Cerita)，学生选 1 题作答，每题满分 40。评分点按 内容与观点、语言、结构、词汇 四项。"),op("p","Kertas 2 阅读理解 + 语法",4,"含 1 篇短文的理解题、摘要/语法题和 1 道文学 (Komsas) 概念题。")],
-   bi:[wr("w","Paper 1 Writing (Directed + Continuous)",2,"出 1 道 Directed Writing (给出要点，如邮件/报告，满分 20) 和 1 道 Continuous Writing (给 3 个题目选 1 个，满分 30)。评分按 内容、语言、结构、词汇。"),op("r","Reading + Grammar",4,"含 1 篇短文的理解题、词汇语境题、语法改错、完成句子。")],
+   bm:[wr("k1","Kertas 1 (1103/1) 作文",2,"Bahagian A 必答 + Bahagian B 四选一的作文卷；评分按 内容与观点、语言、结构、词汇 四项。"),op("k2","Kertas 2 (1103/2) 语言系统、理解、摘要",3,"含语言系统、阅读理解和摘要三部分。")],
+   bi:[op("k1","Paper 1 Reading & Use of English (1119/1)",5,"阅读与语言运用，共 5 个 Part，每个小问 1 分。"),wr("k2","Paper 2 Writing (1119/2)",3,"写作卷：Part 1、Part 2 必答，Part 3 三选一。")],
    bc:[wr("w","作文 / 应用文",2,"出 1 道应用文 (书信/通告等) 和 1 道作文 (记叙/议论)，评分按 内容、语言、结构、书写规范。"),op("r","阅读理解 + 语文知识",4,"含 1 篇短文理解、成语/修辞、病句修改。")],
    sej:[op("k2","Kertas 2 结构 + 论述",5,"含史料/情境结构题 (a)(b)(c)，以及需要给立场并论证的 KBAT 论述题，评分按「观点 + 解释 + 例子/证据」。"),mc("k1","Kertas 1 选择题",20)],
    mat:[op("k2","Kertas 2 (计算与应用)",6,"Bahagian A 短题、B 中等题、C 综合应用题。每小问写明分值，答案需要完整步骤；评分点包含方法分 (M) 和答案分 (A)。"),mc("k1","Kertas 1 选择题",20)],
@@ -1353,8 +1353,62 @@ function paperTypes(sid){
    sains:sci,fiz:[op("k2","Kertas 2 结构 + 论述",5,"含计算、图表分析、实验设计 (操纵/响应/固定变量) 与 KBAT 论述。"),mc("k1","Kertas 1 选择题",20)],
    kim:[op("k2","Kertas 2 结构 + 论述",5,"含方程式、计算 (摩尔)、实验设计与 KBAT 论述。"),mc("k1","Kertas 1 选择题",20)],
    bio:[op("k2","Kertas 2 结构 + 论述",5,"含图表 (可用文字描述图)、实验设计与 KBAT 论述。"),mc("k1","Kertas 1 选择题",20)],
-   moral:[op("k2","Kertas 2 结构 + 论述",4,"含情境结构题与价值观论述 (价值 + 情境 + 后果/建议)。"),mc("k1","Kertas 1 选择题",20)]
+   moral:[op("k1","Kertas 1 (1225) 结构 + 论述",3,"品德科只有一份笔试卷：Bahagian A 结构题、B 限制回应题、C 开放回应题；回答用「价值 + 情境 + 后果/建议」。")]
   })[sid]||sci}
+/* ---- 历届结构 (据 LP 格式，Pandai/Pelangi 整理) ---- */
+const SPECS={
+ sains:{k1:{n:40,time:75},k2:{time:150,secs:[
+   {id:"A",label:"Bahagian A",n:4,total:20,ans:4,hint:"结构题，每题约 5 分，考基础概念与图表读取"},
+   {id:"B",label:"Bahagian B",n:6,total:38,ans:6,hint:"结构题，含解释、比较和应用"},
+   {id:"C1",label:"Bahagian C 第 11 题 (必答)",n:1,total:10,ans:1,hint:"实验设计题 (Mengeksperimen)：目的、变量、器材、步骤、结果列表、结论"},
+   {id:"C2",label:"Bahagian C 第 12-13 题 (选答 1 题)",n:2,per:12,ans:1,hint:"开放题 / KBAT 论述，每题 12 分"}]}},
+ fiz:{k1:{n:40,time:75},k2:{time:150,secs:[
+   {id:"A",label:"Bahagian A",n:8,total:60,ans:8,hint:"结构题 (item berstruktur)，含计算、图表分析、概念解释"},
+   {id:"B",label:"Bahagian B",n:2,per:20,ans:1,hint:"限制回应题 (respons terhad)，每题 20 分，含计算和解释"},
+   {id:"C",label:"Bahagian C",n:1,total:20,ans:1,hint:"开放回应题 (respons terbuka)，KBAT：实验设计、比较、推理或决策"}]}},
+ am:{k1:{time:120,secs:[
+   {id:"A",label:"Bahagian A",n:12,total:64,ans:12,hint:"短题，每题 1-5 分，考公式和基本计算"},
+   {id:"B",label:"Bahagian B",n:3,per:8,ans:2,hint:"每题 8 分，较长的计算或应用，选答 2 题"}]},
+  k2:{time:150,secs:[
+   {id:"A",label:"Bahagian A",n:7,total:50,ans:7,hint:"计算与应用，全部必答"},
+   {id:"B",label:"Bahagian B",n:4,per:10,ans:3,hint:"每题 10 分，选答 3 题"},
+   {id:"C",label:"Bahagian C",n:4,per:10,ans:2,hint:"每题 10 分，选答 2 题 (含应用题)"}]}},
+ mat:{k1:{n:40,time:90},k2:{time:150,secs:[
+   {id:"A",label:"Bahagian A",n:10,total:40,ans:10,hint:"短题，每题 3-5 分，全部必答"},
+   {id:"B",label:"Bahagian B",n:5,total:45,ans:5,hint:"每题约 9 分，较长的计算和应用，全部必答"},
+   {id:"C",label:"Bahagian C",n:2,per:15,ans:1,hint:"综合应用，每题 15 分，选答 1 题"}]}},
+ sej:{k1:{n:40,time:60},k2:{time:150,secs:[
+   {id:"A",label:"Bahagian A",n:4,total:40,ans:4,hint:"限制回应题 (结构题)，每题 10 分，含史料或情境"},
+   {id:"B",label:"Bahagian B",n:5,per:20,ans:3,hint:"开放回应题 (论述题)，每题 20 分，需「观点 + 解释 + 例子」，选答 3 题"}]}}
+};
+SPECS.kim=JSON.parse(JSON.stringify(SPECS.fiz));SPECS.bio=JSON.parse(JSON.stringify(SPECS.fiz));
+
+SPECS.bm={k1:{time:120,secs:[
+   {id:"A",label:"Bahagian A",n:1,total:30,ans:1,hint:"1 道必答作文，依据给定的文字或图像材料写作 (karangan berpandu / respons terhad)，满分 30"},
+   {id:"B",label:"Bahagian B",n:4,per:70,ans:1,hint:"4 道不同文体的作文题 (如 Rencana, Ucapan, Cerita, Laporan，议论/叙事/说明)，选答 1 题，每题 70 分"}]},
+  k2:{time:150,note:"Kertas 2 三部分的题数与分值取自 LP 的格式表；各部分的具体题型，请对照样卷。",secs:[
+   {id:"A",label:"Bahagian A (Sistem dan Aplikasi Bahasa)",n:5,total:35,ans:5,hint:"语言系统与运用：语法、词汇、谚语/惯用语、句子改错、综合运用"},
+   {id:"B",label:"Bahagian B (Pemahaman)",n:3,total:35,ans:3,hint:"阅读理解：基于不同类型的文本 (含文学文本)，各题含多个小问"},
+   {id:"C",label:"Bahagian C (Rumusan)",n:1,total:30,ans:1,hint:"摘要 (rumusan)：给一篇较长的文章，要求写出摘要"}]}};
+SPECS.bi={k1:{time:90,note:"Paper 1 五个 Part 的分值取自 LP 的格式表 (8+10+8+6+8=40)；每个 Part 的具体题型请对照样卷。",secs:[
+   {id:"P1",label:"Part 1",n:1,total:8,ans:1,hint:"一组短文本 / 图文材料，8 个各 1 分的小问 (选择、匹配或简答)"},
+   {id:"P2",label:"Part 2",n:1,total:10,ans:1,hint:"一篇材料，10 个各 1 分的小问 (如完成句子或语法/词汇运用)"},
+   {id:"P3",label:"Part 3",n:1,total:8,ans:1,hint:"一篇材料，8 个各 1 分的小问 (如选择或匹配)"},
+   {id:"P4",label:"Part 4",n:1,total:6,ans:1,hint:"一篇材料，6 个各 1 分的小问"},
+   {id:"P5",label:"Part 5",n:1,total:8,ans:1,hint:"一篇较长的阅读材料，8 个各 1 分的小问 (含简答)"}]},
+  k2:{time:90,note:"Paper 2 的 Part 1/2/3 分值与选答规则取自 LP 的格式表 (20+20+20，Part 3 三选一)；各 Part 的体裁是我按 CEFR 风格设的。",secs:[
+   {id:"W1",label:"Part 1",n:1,total:20,ans:1,hint:"短篇功能性写作 (如 email、message、note)，20 分"},
+   {id:"W2",label:"Part 2",n:1,total:20,ans:1,hint:"引导写作 (guided writing)：依据给定的要点或材料写文章或报告，20 分"},
+   {id:"W3",label:"Part 3",n:3,per:20,ans:1,hint:"3 个延伸写作题目 (essay / story / article 等)，选答 1 题，每题 20 分"}]}};
+SPECS.moral={k1:{time:150,secs:[
+   {id:"A",label:"Bahagian A",n:5,total:50,ans:5,hint:"结构题 / 情境题，每题约 10 分，全部必答"},
+   {id:"B",label:"Bahagian B",n:5,per:10,ans:1,hint:"限制回应题，每题 10 分，选答 1 题"},
+   {id:"C",label:"Bahagian C",n:2,total:40,ans:2,hint:"开放回应 / 论述题，每题 20 分，全部必答，需要价值观分析、情境和建议"}]}};
+function specOf(sid,typeId){const s=SPECS[sid];return s&&s[typeId]||null}
+function secTotal(sc){return sc.total||sc.per*sc.n}
+function specText(sp){if(!sp)return "";if(sp.n&&!sp.secs)return `${sp.n} 题 (每题 1 分，共 ${sp.n} 分)，全部必答${sp.time?"，历届时长 "+sp.time+" 分钟":""}`;
+  const tot=sp.secs.reduce((a,s)=>a+(s.ans<s.n?s.ans*(s.per||s.total/s.n):secTotal(s)),0);
+  return sp.secs.map(s=>`${s.label}：${s.n} 题，${s.per?`每题 ${s.per} 分`:`共 ${s.total} 分`}，${s.ans<s.n?`选答 ${s.ans} 题`:"全部必答"}`).join("；")+`。合计 ${tot} 分${sp.time?"，历届时长 "+sp.time+" 分钟":""}。`+(sp.note?`(${sp.note})`:"")}
 let EX=null,exPick={},exSel=null;
 function exSave(){if(!EX)return;const{imgs,...rest}=EX;try{S.draft=rest;save()}catch(e){}}
 function rExam(){
@@ -1366,11 +1420,14 @@ function rExam(){
   const hist=S.exams.filter(e=>e.sid===sid).sort((a,b)=>b.at-a.at);
   const avg=SUBJECTS.filter(s=>S.my.includes(s.id)).map(s=>{const a=S.exams.filter(e=>e.sid===s.id);return a.length?{s,avg:Math.round(a.reduce((x,e)=>x+e.pct,0)/a.length),n:a.length}:null}).filter(Boolean);
   $("#sheet").innerHTML=`${needKey()}<h2>${esc(subj(sid).name)} 模拟卷</h2>
-  <div class="notice"><p>AI 会按 KSSM / SPM 的风格出一份模拟卷，你在页面里作答，交卷后 AI 按评分要点批改并写评语。这是<b>仿真练习</b>，不是某一年的真题；真题和 Trial 卷请到「资料」页下载，做完可以在下面手动记一笔成绩。</p></div>
+  <div class="notice"><p>AI 会按 KSSM / SPM 的风格出一份模拟卷，你在页面里作答，交卷后 AI 按评分要点批改并写评语。这是<b>仿真练习</b>，不是某一年的真题；真题和 Trial 卷请到「资料」页下载，做完可以在下面手动记一笔成绩。</p><p class="fine" id="exRef"></p></div>
   <div class="controls"><label class="grow">卷别<select id="exT">${pts.map(t=>`<option value="${t.id}">${esc(t.label)}</option>`).join("")}</select></label>
-   <label>题数<input type="number" id="exN" min="1" max="40" value="${pts[0].n}" style="width:80px"></label>
-   <label>难度<select id="exD"><option>基础</option><option selected>SPM 中等</option><option>KBAT 偏难</option><option>Trial 水平</option></select></label>
-   ${wantZh(sid)?`<label class="chk" style="color:var(--ink);font-size:14px;align-self:center"><input type="checkbox" id="exZ"> 附华文翻译</label>`:""}<label>限时<select id="exL"><option value="0">不限时</option><option>30</option><option>45</option><option>60</option><option>90</option><option>150</option></select></label></div>
+   <label>题数<select id="exNm"><option value="std">跟历届一样 (默认)</option><option value="custom">自定义</option></select></label>
+   <label id="exNw" style="display:none">大题数<input type="number" id="exN" min="1" max="40" value="${pts[0].n}" style="width:80px"></label>
+   <label>难度<select id="exD"><option value="std">跟历届一样 (低:中:高 = 5:3:2)</option><option>基础</option><option>SPM 中等</option><option>KBAT 偏难</option><option>Trial 水平</option></select></label>
+   ${wantZh(sid)?`<label class="chk" style="color:var(--ink);font-size:14px;align-self:center"><input type="checkbox" id="exZ"> 附华文翻译</label>`:""}
+   <label>限时<select id="exL"><option value="std">跟历届时长</option><option value="0">不限时</option><option>30</option><option>45</option><option>60</option><option>90</option><option>150</option></select></label></div>
+  <div class="fine muted" id="exSpec" style="margin:-4px 0 10px"></div>
   <details class="chap"><summary><span class="t">范围：${exSel.set.size?`已选 ${exSel.set.size} 章`:"整科综合 (点这里可选章节)"}</span></summary><div class="body">
    <div class="row" style="margin-bottom:6px"><button class="btn small" id="exAll">全选</button><button class="btn small" id="exNone">清空</button><span class="fine muted">不选 = 整科综合</span></div>
    ${cs.map(c=>`<label class="chk" style="display:flex;margin:5px 0;color:var(--ink);font-size:15px"><input type="checkbox" data-exc="${esc(c.k)}" ${exSel.set.has(c.k)?"checked":""}> ${esc(c.t)}</label>`).join("")}</div></details>
@@ -1380,35 +1437,63 @@ function rExam(){
   ${avg.length?`<div class="grid g3">${avg.map(a=>`<div class="card"><b style="color:${a.s.color}">${esc(a.s.name)}</b> <span class="fine muted">平均 ${a.avg}% · ${a.n} 套</span><div class="bar" style="margin-top:6px"><i style="width:${a.avg}%;background:${a.s.color}"></i></div></div>`).join("")}</div>`:`<div class="empty">还没有记录。做完一套模拟卷，或在下面手动记一套真题成绩。</div>`}
   ${hist.length?`<div class="scroll-x" style="margin-top:10px"><table class="t"><thead><tr><th>日期</th><th>名称</th><th>得分</th><th>%</th><th></th></tr></thead><tbody>${hist.map(e=>`<tr><td>${e.date}</td><td>${esc(e.title)}${e.manual?' <span class="tag">手动</span>':""}</td><td>${e.score}/${e.max}</td><td><b>${e.pct}%</b></td><td style="white-space:nowrap">${e.snap?`<button class="btn small" data-exview="${e.id}">查看</button> `:""}<button class="btn small" data-exdel="${e.id}">删</button></td></tr>`).join("")}</tbody></table></div>`:""}
   <details class="chap" style="margin-top:12px"><summary><span class="t">＋ 手动记一套外部真题 / Trial 成绩</span></summary><div class="body"><div class="controls"><label class="grow">名称<input type="text" id="mxT" placeholder="如 2025 Perak Trial K2"></label><label>得分<input type="number" id="mxS" style="width:90px" min="0"></label><label>满分<input type="number" id="mxF" value="100" style="width:90px" min="1"></label><button class="btn pri" id="mxAdd">保存</button></div></div></details>`;
-  $("#exT").onchange=()=>{const t=pts.find(x=>x.id===$("#exT").value);$("#exN").value=t.n};
+  const sync=()=>{const t=pts.find(x=>x.id===$("#exT").value),sp=specOf(sid,t.id),std=$("#exNm").value==="std";
+    $("#exNw").style.display=std?"none":"";if(!std)$("#exN").value=t.n;
+    $("#exSpec").textContent=std?(sp?"历届结构："+specText(sp):`这一科的历届结构我没有核实到，会按常见格式出题 (${t.n} ${t.kind==="mcq"?"题":"道大题"})，具体以 LP 格式文件为准。`):`自定义：出 ${$("#exN").value||t.n} ${t.kind==="mcq"?"道选择题":"道大题"}。`;
+    const L=$("#exL");if(L.value==="std"&&false)L.value="std"};
+  $("#exT").onchange=sync;$("#exNm").onchange=sync;$("#exN").oninput=sync;sync();
+  (async()=>{let n=0,names=[];try{(await DB.all()).forEach(f=>{if(f.sid===sid&&S.use[f.id]){n++;names.push(f.name)}})}catch(e){}
+    const el=$("#exRef");if(el)el.innerHTML=n?`出卷时会参考你勾选的 ${n} 份上传资料 (${esc(names.slice(0,3).join("、"))}${n>3?"…":""})：如果里面有 Trial 卷或真题，AI 会模仿它的题型、设问方式、分值分布和难度，但不会照抄原题。`:`还没有勾选上传资料，所以只按 SPM 格式仿写。想更像 Trial，到「资料」页上传一份 Trial 卷 (PDF 或照片) 并勾选，再来出卷。`})();
   $$("[data-exc]").forEach(c=>c.onchange=()=>{c.checked?exSel.set.add(c.dataset.exc):exSel.set.delete(c.dataset.exc);c.closest("details").querySelector(".t").textContent=exSel.set.size?`范围：已选 ${exSel.set.size} 章`:"范围：整科综合 (点这里可选章节)"});
   $("#exAll").onclick=()=>{cs.forEach(c=>exSel.set.add(c.k));rExam();$("details.chap").open=true};$("#exNone").onclick=()=>{exSel.set.clear();rExam()};
   $$("[data-exview]").forEach(b=>b.onclick=()=>{const x=S.exams.find(y=>String(y.id)===b.dataset.exview);if(!x||!x.snap)return;EX=Object.assign(JSON.parse(JSON.stringify(x.snap)),{imgs:{},review:true,limit:0});rExam()});
   $$("[data-exdel]").forEach(b=>b.onclick=()=>{S.exams=S.exams.filter(e=>String(e.id)!==b.dataset.exdel);save();rExam()});
   $("#mxAdd").onclick=()=>{const sc=parseFloat($("#mxS").value),fm=parseFloat($("#mxF").value),t=$("#mxT").value.trim()||"外部真题";if(isNaN(sc)||isNaN(fm)||fm<=0||sc<0||sc>fm){toast("检查一下得分和满分");return}
     S.exams.push({id:Date.now(),sid,title:t,date:today(),at:Date.now(),score:sc,max:fm,pct:Math.round(sc/fm*100),manual:true});save();rExam()};
-  $("#exGo").onclick=()=>genExam(pts.find(x=>x.id===$("#exT").value),Math.max(1,Math.min(40,+$("#exN").value||5)),$("#exD").value,+$("#exL").value,!!($("#exZ")&&$("#exZ").checked));
+  $("#exGo").onclick=()=>genExam(pts.find(x=>x.id===$("#exT").value),$("#exNm").value==="std",Math.max(1,Math.min(40,+$("#exN").value||5)),$("#exD").value,$("#exL").value,!!($("#exZ")&&$("#exZ").checked));
 }
-async function genExam(type,n,diff,limit,zh){
-  const sid=S.sub,s=subj(sid),btn=$("#exGo"),msg=$("#exMsg");setBusy(btn,true,"出卷中，约 20-60 秒…");
+async function genExam(type,std,nCustom,diff,limitSel,zh){
+  const sid=S.sub,s=subj(sid),btn=$("#exGo"),msg=$("#exMsg");setBusy(btn,true,"出卷中…");
+  const sp=specOf(sid,type.id),useSpec=std&&sp,limit=limitSel==="std"?(sp&&sp.time||0):+limitSel;
+  const diffTxt=diff==="std"?"难度分布跟历届一样：低:中:高 = 5:3:2 (低=记忆和理解，中=应用，高=KBAT 分析评价)":"难度："+diff;
+  const prog=t=>{btn.innerHTML='<span class="spin"></span>'+t};
   try{const fp=await fileParts(sid);const cs=chapsOf(sid).filter(c=>c.core);const picked=cs.filter(c=>exSel&&exSel.set.has(c.k));
     const scope=picked.length?"范围 (只能考这些章节)：\n"+picked.map(c=>"- "+c.t+(c.subs.length?"（"+c.subs.join("；")+"）":"")).join("\n")+"\n\n参考资料：\n"+picked.map(c=>chapText(c,1800)).join("\n---\n").slice(0,9000):"范围：这一科整个 KSSM 纲要 (Form 4 + Form 5)，按 SPM 常见比例分布。";
-    const common=`请为 SPM「${s.name}」出一份仿真模拟卷。\n卷别：${type.label}\n难度：${diff}\n${scope}\n\n硬性要求：仿 KSSM / SPM 风格；不要声称这是某年真题；资料里没有的内容不要编；题目与评分要点用考试语言 (见【语言规则】)；公式用 Unicode，不用 LaTeX；无法在纯文字里呈现的图形题，用文字描述图或换成表格数据。\n`;
-    let prompt,max=16384;
-    if(type.kind==="mcq"){prompt=common+`出 ${n} 道单选题 (4 个选项，每题 1 分)。只输出 JSON：{"title":"卷名","instructions":"说明","mcq":[{"q":"题目","o":["A","B","C","D"],"a":0,"e":"解析","qz":"${zh?"题目和选项的华文翻译":""}","ez":"${zh?"解析的华文翻译":""}"}]}${zh?"\nqz、ez 用华文，其余用考试语言。":""}`}
-    else{prompt=common+`共 ${n} 道大题。${type.hint}\n${type.kind==="writing"?"每道题只有 1 个 part，m 为满分 (见上面说明)，scheme 写评分标准 (内容/语言/结构/词汇各档的要求和常见扣分点)。学生只需选 1 题作答。":"每道大题含 1-4 个小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme (逐点列出得分点，说明可接受的答案；计算题标明方法分 M 与答案分 A)。"}\n只输出 JSON：{"title":"卷名","instructions":"考生须知","questions":[{"no":1,"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}","parts":[{"p":"(a)","q":"小问","qz":"${zh?"小问的华文翻译":""}","m":2,"scheme":"评分要点","cz":"${zh?"评分要点的华文翻译":""}"}]}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}
-    const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],sysPrompt(sid,"你现在是 SPM 出卷老师，也是严谨的评卷员，答案和评分要点必须正确。"),max);
-    const o=parseJSON(out,"{");let qs;
-    if(type.kind==="mcq"){const m=(o.mcq||[]).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!m.length)throw new Error("AI 返回的题目格式不对，请再试一次。");qs=m.map((x,i)=>({no:i+1,mcq:true,stem:x.q,o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||"",m:1}))}
-    else{qs=(o.questions||[]).filter(q=>q&&Array.isArray(q.parts)&&q.parts.length).map((q,i)=>({no:q.no||i+1,stem:q.stem||"",sz:q.sz||"",parts:q.parts.map(p=>({p:p.p||"",q:String(p.q||""),qz:p.qz||"",m:Number(p.m)||1,scheme:String(p.scheme||""),cz:p.cz||""}))}));if(!qs.length)throw new Error("AI 返回的试卷格式不对，请再试一次。")}
-    EX={sid,type:type.id,kind:type.kind,label:type.label,title:o.title||s.name+" 模拟卷",instr:o.instructions||"",qs,ans:{},pick:{},started:Date.now(),limit,imgs:{},result:null};exSave();rExam()}
+    const ref=fp.names.length?`\n学生上传并勾选了这些资料：${fp.names.join("、")}。如果其中有 Trial 卷或历届真题，请模仿它们的题型、设问方式、图表或情境的写法、分值分布和难度；绝对不要照抄原题。`:"";
+    const common=`请为 SPM「${s.name}」出一份仿真模拟卷。\n卷别：${type.label}\n${diffTxt}\n${scope}${ref}\n\n硬性要求：仿 KSSM / SPM 风格；不要声称这是某年真题；资料里没有的内容不要编；题目与评分要点用考试语言 (见【语言规则】)；公式用 Unicode，不用 LaTeX；无法在纯文字里呈现的图形题，用文字描述图或换成表格数据。\n`;
+    const sysp=sysPrompt(sid,"你现在是 SPM 出卷老师，也是严谨的评卷员，答案和评分要点必须正确。");
+    const partFmt=`"parts":[{"p":"(a)","q":"小问","qz":"${zh?"小问的华文翻译":""}","m":2,"scheme":"评分要点 (逐点列出得分点，说明可接受的答案；计算题标明方法分 M 与答案分 A)","cz":"${zh?"评分要点的华文翻译":""}"}]`;
+    const cleanQ=(q,i,sec)=>({no:0,sec:sec||null,stem:q.stem||"",sz:q.sz||"",parts:q.parts.map(p=>({p:p.p||"",q:String(p.q||""),qz:p.qz||"",m:Number(p.m)||1,scheme:String(p.scheme||""),cz:p.cz||""}))});
+    let qs=[],title="",instr="",secs=null;
+    if(type.kind==="mcq"){const n=useSpec&&sp.n?sp.n:nCustom;
+      prog(`出 ${n} 道选择题…`);
+      const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`出 ${n} 道单选题 (4 个选项，每题 1 分)，覆盖面要广。只输出 JSON：{"title":"卷名","instructions":"说明","mcq":[{"q":"题目","o":["A","B","C","D"],"a":0,"e":"解析","qz":"${zh?"题目和选项的华文翻译":""}","ez":"${zh?"解析的华文翻译":""}"}]}${zh?"\nqz、ez 用华文，其余用考试语言。":""}`}]}],sysp,30000);
+      const o=parseJSON(out,"{");const m=(o.mcq||[]).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!m.length)throw new Error("AI 返回的题目格式不对，请再试一次。");
+      qs=m.map((x,i)=>({no:i+1,mcq:true,stem:x.q,o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||"",m:1}));title=o.title||"";instr=o.instructions||""}
+    else if(useSpec&&sp.secs){secs=sp.secs.map(x=>({id:x.id,label:x.label,n:x.n,ans:x.ans,opt:x.ans<x.n,per:x.per||0,total:secTotal(x)}));const used=[];
+      for(let si=0;si<sp.secs.length;si++){const sc=sp.secs[si];prog(`出卷中 ${si+1}/${sp.secs.length}：${sc.label}…`);let got=null,err=null;
+        for(let tryN=0;tryN<2&&!got;tryN++){try{
+          const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`\n这是整份试卷的第 ${si+1}/${sp.secs.length} 部分：${sc.label}。\n要求：出 ${sc.n} 道大题；${sc.per?`每道大题满分都是 ${sc.per} 分`:`这一部分所有题目的分值加起来必须是 ${sc.total} 分`}；${sc.ans<sc.n?`学生只需选答 ${sc.ans} 题，所以每道题分值必须相同，而且要覆盖不同的章节；`:"全部必答；"}题型：${sc.hint}。${type.hint?"\n整卷风格：" + type.hint:""}\n已经出过的主题 (不要重复)：${used.join("；")||"无"}\n每道大题含若干小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme。小问分值加起来必须等于该大题满分。\n只输出 JSON：{"questions":[{"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}",${partFmt}}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}]}],sysp,16000);
+          const o=parseJSON(out,"{");const arr=(o.questions||[]).filter(q=>q&&Array.isArray(q.parts)&&q.parts.length);if(!arr.length)throw new Error("AI 返回的试卷格式不对");got=arr}catch(e){err=e}}
+        if(!got)throw new Error(`${sc.label} 生成失败：${err?err.message:"未知错误"}。请再点一次生成。`);
+        got.slice(0,sc.n).forEach((q,i)=>{const cq=cleanQ(q,i,sc.id);cq.opt=sc.ans<sc.n;used.push(String(q.stem||q.parts[0].q).slice(0,24));qs.push(cq)})}
+      qs.forEach((q,i)=>q.no=i+1);title=s.name+" 模拟卷"}
+    else{prog("出卷中，约 20-60 秒…");const n=nCustom;
+      const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`共 ${n} 道大题。${type.hint}\n${type.kind==="writing"?"每道题只有 1 个 part，m 为满分 (见上面说明)，scheme 写评分标准 (内容/语言/结构/词汇各档的要求和常见扣分点)。学生只需选 1 题作答。":"每道大题含 1-4 个小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme (逐点列出得分点，说明可接受的答案；计算题标明方法分 M 与答案分 A)。"}\n只输出 JSON：{"title":"卷名","instructions":"考生须知","questions":[{"no":1,"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}",${partFmt}}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}]}],sysp,24000);
+      const o=parseJSON(out,"{");qs=(o.questions||[]).filter(q=>q&&Array.isArray(q.parts)&&q.parts.length).map((q,i)=>{const cq=cleanQ(q,i);cq.no=q.no||i+1;return cq});if(!qs.length)throw new Error("AI 返回的试卷格式不对，请再试一次。");title=o.title||"";instr=o.instructions||""}
+    EX={sid,type:type.id,kind:type.kind,label:type.label,title:title||s.name+" 模拟卷",instr:instr||(secs?"依历届结构出卷："+specText(sp):""),qs,secs,ans:{},pick:{},started:Date.now(),limit,imgs:{},result:null};exSave();rExam()}
   catch(e){setBusy(btn,false);if(msg)msg.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}
-function exMax(){let t=0;EX.qs.forEach(q=>{if(q.mcq)t+=q.m;else q.parts.forEach(p=>t+=p.m)});return t}
+function qMarks(q){return q.mcq?q.m:q.parts.reduce((a,p)=>a+p.m,0)}
+function exMax(){const e=EX;let t=0;if(!e.secs){e.qs.forEach(q=>t+=qMarks(q));return Math.round(t*10)/10}
+  e.secs.forEach(sc=>{const qs=e.qs.filter(q=>q.sec===sc.id);if(!sc.opt)qs.forEach(q=>t+=qMarks(q));else t+=sc.ans*(qs.length?qMarks(qs[0]):(sc.per||0))});return Math.round(t*10)/10}
+function secHead(e,q,qi){if(!e.secs||!q.sec)return "";const prev=e.qs[qi-1];if(prev&&prev.sec===q.sec)return "";const sc=e.secs.find(x=>x.id===q.sec);if(!sc)return "";
+  const qs=e.qs.filter(x=>x.sec===sc.id),tot=sc.opt?sc.ans*qMarks(qs[0]):qs.reduce((a,x)=>a+qMarks(x),0);
+  return `<h3 style="margin:22px 0 2px">${esc(sc.label)}</h3><div class="fine muted" style="margin-bottom:6px">${qs.length} 题 · ${sc.opt?`选答 ${sc.ans} 题 (每题 ${qMarks(qs[0])} 分，共 ${tot} 分)。作答超过 ${sc.ans} 题时，只批改前 ${sc.ans} 题`:`共 ${tot} 分，全部必答`}</div>`}
 function showPaper(){
   const e=EX;let body="";
-  e.qs.forEach((q,qi)=>{
+  e.qs.forEach((q,qi)=>{body+=secHead(e,q,qi);
     if(q.mcq){body+=`<div class="qcard"><div class="qh"><span class="qno">${q.no}.</span><span class="tag">1 分</span></div><div class="stem">${esc(q.stem)}</div>${zhBox(q.qz)}${q.o.map((o,i)=>`<button class="opt ${e.pick[qi]===i?"sel":""}" data-mc="${qi}" data-i="${i}"><span class="bub">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("")}</div>`}
-    else{body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span><span class="tag">${q.parts.reduce((a,p)=>a+p.m,0)} 分</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>${zhBox(q.sz)}`:""}
+    else{body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span><span class="tag">${q.parts.reduce((a,p)=>a+p.m,0)} 分${q.opt?" · 选答":""}</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>${zhBox(q.sz)}`:""}
      ${q.parts.map((p,pi)=>{const id=qi+"-"+pi;return `<div class="part"><span class="tag pm">${p.m} 分</span><div class="stem"><b>${esc(p.p)}</b> ${esc(p.q)}</div>${zhBox(p.qz)}
        <textarea data-an="${id}" placeholder="在这里作答${e.kind==="writing"?" (整篇写在这里)":""}" style="min-height:${e.kind==="writing"?260:80}px;margin-top:6px">${esc(e.ans[id]||"")}</textarea>
        <div class="row" style="margin-top:4px"><label class="btn small">📷 附手写答案照片<input type="file" accept="image/*" data-img="${id}" hidden></label>${e.imgs[id]?`<span class="tag ok">已附图</span> <button class="btn small" data-imgx="${id}">移除</button>`:""}</div></div>`}).join("")}</div>`}});
@@ -1430,7 +1515,9 @@ function fmtT(s){const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;retur
 async function submitExam(){
   const e=EX,btn=$("#exSub");const s=subj(e.sid);
   const open=[];e.qs.forEach((q,qi)=>{if(!q.mcq)q.parts.forEach((p,pi)=>{const id=qi+"-"+pi;open.push({id,qi,pi,q,p,ans:(e.ans[id]||"").trim(),img:e.imgs[id]})})});
-  const answered=open.filter(x=>x.ans||x.img);
+  const skip=new Set();
+  if(e.secs){e.secs.filter(sc=>sc.opt).forEach(sc=>{const idxs=e.qs.map((q,i)=>q.sec===sc.id?i:-1).filter(i=>i>=0);const ai=idxs.filter(i=>open.some(x=>x.qi===i&&(x.ans||x.img)));ai.slice(sc.ans).forEach(i=>skip.add(i))})}
+  const answered=open.filter(x=>(x.ans||x.img)&&!skip.has(x.qi));
   if(!answered.length&&!Object.keys(e.pick).length){toast("还没有作答");return}
   if(open.length&&!aiOK()){toast("批改需要 API key");return}
   setBusy(btn,true,"批改中，约 20-60 秒…");clearInterval(exTimer);
@@ -1442,12 +1529,12 @@ async function submitExam(){
       const out=await gem([{role:"user",parts:content}],sysPrompt(e.sid,"你现在是严格公正的 SPM 评卷员。"),8192);const arr=parseJSON(out,"[");
       arr.forEach(r=>{const x=answered.find(a=>a.id===String(r.id));if(x)res[x.id]={score:Math.max(0,Math.min(x.p.m,Number(r.score)||0)),max:x.p.m,comment:String(r.comment||"")}})}
     let total=0,max=0,added=0;
-    open.forEach(x=>{if(!res[x.id]){if(e.kind==="writing"){return}res[x.id]={score:0,max:x.p.m,comment:"未作答。"}}});
-    Object.values(res).forEach(r=>{total+=r.score;max+=r.max});
+    open.forEach(x=>{if(!res[x.id]){if((e.kind==="writing"&&!e.secs)||x.q.opt){return}res[x.id]={score:0,max:x.p.m,comment:"未作答。"}}});
+    Object.values(res).forEach(r=>{total+=r.score;if(!e.secs)max+=r.max});if(e.secs)max=exMax();
     open.forEach(x=>{const r=res[x.id];if(r&&r.score<r.max*.6&&(x.ans||x.img)){S.wrong.push({id:"e"+Date.now()+x.id,type:"exam",s:e.sid,q:`[${e.title}] 第 ${x.q.no} 题 ${x.p.p} ${x.p.q}`,a:`得分 ${r.score}/${r.max}\n评分要点：${x.p.scheme}\n我的作答：${x.ans||"(照片)"}\n评语：${r.comment}`});added++}});
     e.qs.forEach((q,qi)=>{if(q.mcq&&res["m"+qi].score===0&&e.pick[qi]!==undefined){S.wrong.push({id:"e"+Date.now()+"m"+qi,type:"exam",s:e.sid,q:q.stem+"  ("+q.o.map((o,k)=>"ABCD"[k]+". "+o).join(" / ")+")",a:"正确答案："+"ABCD"[q.a]+"。"+q.e});added++}});
-    const pct=max?Math.round(total/max*100):0;e.result={res,total,max,pct,added};
-    S.exams.push({id:Date.now(),sid:e.sid,title:e.title,date:today(),at:Date.now(),score:Math.round(total*10)/10,max,pct,snap:{sid:e.sid,type:e.type,kind:e.kind,label:e.label,title:e.title,instr:e.instr,qs:e.qs,ans:e.ans,pick:e.pick,started:e.started,result:e.result}});S.exams.filter(x=>x.snap).sort((x,y)=>y.at-x.at).slice(12).forEach(x=>{delete x.snap});S.draft=null;save();rExam()}
+    const pct=max?Math.round(total/max*100):0;e.result={res,total,max,pct,added,skip:[...skip]};
+    S.exams.push({id:Date.now(),sid:e.sid,title:e.title,date:today(),at:Date.now(),score:Math.round(total*10)/10,max,pct,snap:{sid:e.sid,type:e.type,kind:e.kind,label:e.label,title:e.title,instr:e.instr,qs:e.qs,secs:e.secs,ans:e.ans,pick:e.pick,started:e.started,result:e.result}});S.exams.filter(x=>x.snap).sort((x,y)=>y.at-x.at).slice(12).forEach(x=>{delete x.snap});S.draft=null;save();rExam()}
   catch(err){setBusy(btn,false);toast(err.message.slice(0,80));const m=$("#exMsg2");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(err.message)}</span>`;exTimerResume()}}
 function exTimerResume(){const e=EX;clearInterval(exTimer);exTimer=setInterval(()=>{const el=$("#exClock");if(!el)return;const sec=Math.floor((Date.now()-e.started)/1000);el.textContent=(e.limit?(e.limit*60-sec<0?"超时 ":"剩余 ")+fmtT(Math.abs(e.limit*60-sec)):"已用 "+fmtT(sec))},1000)}
 function showResult(){
@@ -1458,13 +1545,14 @@ function showResult(){
         <div class="fine muted" style="margin-top:4px;white-space:pre-wrap">我的作答：${esc(e.ans[id]||(e.imgs[id]?"(照片)":"(未作答)"))}</div>
         <div class="fb ${x.score>=x.max?"full":x.score===0?"zero":""}">${esc(x.comment)}</div>
         <details style="margin-top:4px"><summary class="fine muted" style="cursor:pointer">参考评分要点</summary><div class="fine" style="white-space:pre-wrap;margin-top:4px">${esc(p.scheme)}</div>${p.cz?`<div class="fine muted" style="white-space:pre-wrap;margin-top:4px">华文：${esc(p.cz)}</div>`:""}</details></div>`}).join("");
-      if(ps.trim())body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>`:""}${ps}</div>`}});
+      if(ps.trim())body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span></div>${q.stem?`<div class="stem">${esc(q.stem)}</div>`:""}${ps}</div>`;
+      else if((r.skip||[]).includes(qi))body+=`<div class="qcard"><div class="qh"><span class="qno">第 ${esc(q.no)} 题</span><span class="tag">选答 · 未批改</span></div><div class="fine muted">这道题超过了本部分的选答题数，所以没有批改。</div></div>`}});
   $("#sheet").innerHTML=`<div class="row"><h2 style="margin:0">${esc(e.title)}</h2><span class="tag">${esc(e.label)}</span></div>
    <div class="card" style="margin:12px 0"><div class="row"><div class="score">${Math.round(r.total*10)/10}<span class="muted" style="font-size:22px"> / ${r.max}</span></div><span class="tag blue" style="font-size:15px">${r.pct}%</span><span class="spacer"></span>
    <button class="btn pri" id="exNew">${e.review?"返回成绩记录":"再出一份"}</button><button class="btn" id="exRedo">重做这份卷</button></div>${r.added?`<p class="fine muted" style="margin:8px 0 0">已把 ${r.added} 个失分点放进「刷题 → 错题本」。</p>`:""}
    <p class="fine muted" style="margin:6px 0 0">${e.review?"这是保存下来的旧试卷 (只保留最近 12 份的题目和作答，更早的只留成绩)。":""}这是 AI 评分，仅供练习参考；作文和开放题的分数可能偏松或偏严，建议再请老师看一遍。</p></div>${body}`;
   $("#exNew").onclick=()=>{EX=null;S.draft=null;save();rExam()};
-  $("#exRedo").onclick=()=>{EX={sid:e.sid,type:e.type,kind:e.kind,label:e.label,title:e.title,instr:e.instr,qs:JSON.parse(JSON.stringify(e.qs)),ans:{},pick:{},started:Date.now(),limit:0,imgs:{},result:null};exSave();rExam()}}
+  $("#exRedo").onclick=()=>{EX={sid:e.sid,type:e.type,kind:e.kind,label:e.label,title:e.title,instr:e.instr,secs:e.secs,qs:JSON.parse(JSON.stringify(e.qs)),ans:{},pick:{},started:Date.now(),limit:0,imgs:{},result:null};exSave();rExam()}}
 
 /* ---- 问答 ---- */
 let chatBusy=false,chatImg=null,chatPending=null,chatErr="";
@@ -1548,6 +1636,7 @@ function resLinks(sid,s,yrs){
    ${sid==="sains"?link("https://app.pandai.org/app/learn/kssm-f4/kssm-sc/kssm-f4-sc-02/videos","Pandai：Sains Form 4","每章有速记、视频、实验、练习 (部分需免费注册)。",["学习站"])+link("https://app.pandai.org/app/learn/kssm-f5/kssm-sc/exam-overview/spm-preparation1763220753","Pandai：Sains Form 5 + SPM 备考","含 SPM 格式说明和历年各州 Trial 列表。",["学习站"]):""}
    ${sid==="sej"?link("https://get.pandai.org/app/learn/kssm-f4/kssm-sj/kssm-f4-sj-03/videos","Pandai：Sejarah Form 4","章节视频 (部分需免费注册)。",["学习站"]):""}</div>
   <h3>格式与往年题</h3><div class="grid g3">
+   ${link("https://pubhtml5.com/undwl/ezny/basic/51-62","SPM 2021 起各科考试格式表 (官方格式的转载)","国语、英文、数学、科学、物理/化学/生物、历史、道德等科的卷数、题数、分值和选答规则；本站「跟历届一样」就是照它设的。在其中的第 39-51 页。",["格式","blue"])}
    ${link("https://www.komunitasbelajar.id/2020/12/buku-format-pentaksiran-spm-mulai-2021.html","Format Pentaksiran SPM 2021 起","各科格式书汇总下载入口 (第三方整理)。官方最新版请到 LP 确认。",["第三方","warn"])}
    ${link("https://afterschool.my/articles/actual-collection-of-spm-past-year-questions-for-2014-2015-2016-2017-2018-2019-spm-repeat-bahasa-melayu-mathematics-history","SPM 真题合集 2014-2019","旧格式 (KBSM)，适合练内容，不适合当格式参考。",["旧格式","warn"])}</div>`}
 
