@@ -941,8 +941,8 @@ const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelecto
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const KEY="spm-notes-v2";
 const MODELS=["gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"];
-const PROVS={mistral:{name:"Mistral",url:"https://api.mistral.ai/v1/chat/completions",model:"mistral-small-latest",get:"console.mistral.ai/api-keys"},groq:{name:"Groq",url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-120b",get:"console.groq.com/keys"},openrouter:{name:"OpenRouter",url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free",get:"openrouter.ai/keys"}};
-const PORDER=["gemini","mistral","groq","openrouter"];
+const PROVS={groq:{name:"Groq",url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-120b",get:"console.groq.com/keys"},openrouter:{name:"OpenRouter",url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free",get:"openrouter.ai/keys"}};
+const PORDER=["gemini","groq","openrouter"];
 const DEF={theme:"auto",exam:EXAM.writtenStart,since:null,my:["bm","bi","sej","mat","sains","moral"],sub:"bm",tab:"today",conf:{},done:{},box:{},wrong:[],cards:[],
   tasks:{},ck:{},tt:{},goal:{},ai:{key:"",model:MODELS[0]},notes:{},req:{},subsAI:{},chat:{},exams:[],own:{},use:{},scope:{},strict:true,draft:null,lang:"auto",sync:{url:"",ts:0,hash:""}};
 let S;
@@ -951,7 +951,7 @@ function pd(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
 function dd(a,b){return Math.round((pd(b)-pd(a))/864e5)}
 const today=()=>ymd(new Date());
 function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
-  S=Object.assign({},DEF,o);S.ai=Object.assign({key:"",model:MODELS[0],provider:"gemini",fallback:true,imgModel:"gemini-3.1-flash-image-preview"},S.ai);S.ai.alt=Object.assign({},S.ai.alt);for(const p in PROVS){S.ai.alt[p]=Object.assign({key:"",model:PROVS[p].model},S.ai.alt[p])}if(S.ai.provider!=="gemini"&&!PROVS[S.ai.provider])S.ai.provider="gemini";if(S.ai.imgModel==="gemini-3.1-flash-image")S.ai.imgModel="gemini-3.1-flash-image-preview";if(!S.ai.mv){if(S.ai.model==="gemini-3.6-flash")S.ai.model=MODELS[0];S.ai.mv=2}S.sync=Object.assign({url:"",ts:0,hash:""},S.sync);
+  S=Object.assign({},DEF,o);S.ai=Object.assign({key:"",model:MODELS[0],provider:"gemini",fallback:true,imgModel:"gemini-3.1-flash-image-preview"},S.ai);S.ai.alt=Object.assign({},S.ai.alt);for(const p in PROVS){S.ai.alt[p]=Object.assign({key:"",model:PROVS[p].model},S.ai.alt[p])}for(const p in S.ai.alt){if(!PROVS[p])delete S.ai.alt[p]}if(S.ai.provider!=="gemini"&&!PROVS[S.ai.provider])S.ai.provider="gemini";if(S.ai.imgModel==="gemini-3.1-flash-image")S.ai.imgModel="gemini-3.1-flash-image-preview";if(!S.ai.mv){if(S.ai.model==="gemini-3.6-flash")S.ai.model=MODELS[0];S.ai.mv=2}S.sync=Object.assign({url:"",ts:0,hash:""},S.sync);
   if(!o.ai||!o.ai.key){try{const v1=JSON.parse(localStorage.getItem("spm-notes-v1")||"{}");if(v1.ai&&v1.ai.key)S.ai.key=v1.ai.key}catch(e){}}
   if(!S.since)S.since=today();if(!S.my.length)S.my=["bm"];if(!S.my.includes(S.sub))S.sub=S.my[0]}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));if(typeof scheduleSync==="function")scheduleSync()}catch(e){if(!save.w){save.w=1;setTimeout(()=>toast("浏览器存储空间满了，新内容可能没保存。请先导出备份，再删掉一些旧笔记或旧试卷。"),0)}}}
@@ -1149,7 +1149,7 @@ async function gemCall(contents,system,maxTokens,modelOverride){
     const text=((cand.content&&cand.content.parts)||[]).filter(p=>!p.thought&&typeof p.text==="string").map(p=>p.text).join("");
     if(!text.trim())throw new Error("模型没有返回文字"+(cand.finishReason?" ("+cand.finishReason+")":"")+"，请重试。");
     return text}}
-/* ---- 备用 AI：Mistral / Groq / OpenRouter (OpenAI 格式) ---- */
+/* ---- 备用 AI：Groq / OpenRouter (OpenAI 格式) ---- */
 function toOAI(contents,stripped){
   const msgs=[];
   for(const c of contents){const t=[];
@@ -1862,7 +1862,7 @@ function rSet(){
       <li><b>申请免费 Gemini key</b>：打开 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>，用 Google 账号登录，点「Create API key」，把那一长串 key 复制下来。</li>
       <li><b>贴进来</b>：粘贴到下面「Gemini API key」那一栏，点「保存」。模型不用改，用预设的就好。</li>
       <li><b>开始用</b>：到「笔记」选一章，点「✨ AI 生成这一章的笔记」；「问答」可以问题目 (也能附图片)；「刷题」和「模拟卷」可以出题并批改。</li>
-      <li><b>备用 key (可选)</b>：免费额度有限，用完会提示太频繁。可以再申请 Mistral、Groq、OpenRouter 的免费 key，填在「备用 AI」那一块，Gemini 用完会自动切换。备用模型看不到你上传的 PDF 和图片。</li>
+      <li><b>备用 key (可选)</b>：免费额度有限，用完会提示太频繁。可以再申请 Groq、OpenRouter 的免费 key，填在「备用 AI」那一块，Gemini 用完会自动切换。备用模型看不到你上传的 PDF 和图片，仍可读取内置资料。</li>
     </ol>
     <p class="fine muted" style="margin:6px 0 0">小提醒：key 只保存在你自己的浏览器里，不要发给别人，也不要截图；Google 免费版的内容可能被用来改进它的产品，所以不要输入个人资料；AI 整理的笔记可能有错，仅供复习，请以课本和老师为准；额度用完等一两分钟或隔天再试。</p></div></details>
   <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p>
