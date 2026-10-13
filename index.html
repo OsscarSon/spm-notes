@@ -296,6 +296,28 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
 @media (max-width:640px){.ppt-slide{border-radius:22px;padding:26px 16px 22px}.ppt-ul li{padding:10px 12px 10px 52px}.ppt-ul li::before{left:12px;top:10px;width:30px;height:30px;font-size:14px}.ppt-foot .btn{padding:7px 12px}}
 @media print{.ppt{display:none!important}}
 .katex{font-size:1.06em}.katex-display{overflow-x:auto;overflow-y:hidden;margin:.6em 0}
+
+/* ===== 打印 / 存为 PDF ===== */
+#printArea{display:none}
+@page{margin:14mm 13mm}
+@media print{
+  body.printing>*:not(#printArea){display:none!important}
+  html,body.printing{background:#fff!important}
+  body.printing #printArea{display:block!important;position:static;margin:0;padding:0;max-width:none;color:#17263f;background:#fff;color-scheme:light;font-size:12pt;line-height:1.75;
+    --sheet2:#f1f4fb;--ink:#17263f;--muted:#5d6b7c;--line:#d3dbe8;--blue:#2f55d4;--a1:#9ec1ff;--a2:#c3b3ff;--hl:#ffe45e;--warn-soft:#fff1c9;--ok:#1b7f55;--bad:#c23b32;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #printArea .pa-head{margin:0 0 14pt;padding-bottom:8pt;border-bottom:2pt solid #17263f}
+  #printArea .pa-head h1{margin:0;font:700 22pt var(--kai);color:#17263f}
+  #printArea .pa-meta{margin-top:4pt;font-size:9.5pt;color:#5d6b7c}
+  #printArea .pa-sec{margin:0}
+  #printArea .pa-break{break-before:page;page-break-before:always}
+  #printArea .pa-title{margin:0 0 8pt;padding-left:10px;border-left:6px solid #9ec1ff;font:700 17pt var(--kai);color:#17263f;break-after:avoid}
+  #printArea h2,#printArea h3,#printArea h4{break-after:avoid;page-break-after:avoid}
+  #printArea table,#printArea pre,#printArea .fig,#printArea blockquote,#printArea img,#printArea svg,#printArea tr{break-inside:avoid;page-break-inside:avoid}
+  #printArea img,#printArea svg{max-width:100%;height:auto}
+  #printArea .md,#printArea .note{overflow:visible}
+  #printArea a{color:inherit;text-decoration:none}
+}
 </style>
 </head>
 <body data-theme="auto">
@@ -461,13 +483,16 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
       st.b = Math.min(Math.max(4, st.b), Math.max(4, window.innerHeight - s - 4));
     }
     function place() { clamp(); box.style.right = st.r + 'px'; box.style.bottom = st.b + 'px'; back.style.right = '16px'; back.style.bottom = '16px'; }
-    var sel = document.getElementById('petSel');
-    var kindSel = document.getElementById('petKind');
-    function skin() { setLines(); svgEl.innerHTML = buildSvg(st.kind); back.textContent = KINDS[st.kind].emoji; if (kindSel) kindSel.value = st.kind; }
-    function show() { box.hidden = !st.on || st.hidden; back.hidden = !st.on || !st.hidden; if (sel) sel.value = st.on ? 'on' : 'off'; skin(); if (!box.hidden) place(); }
+    function skin() { setLines(); svgEl.innerHTML = buildSvg(st.kind); back.textContent = KINDS[st.kind].emoji; var kindSel = document.getElementById('petKind'); if (kindSel) kindSel.value = st.kind; }
+    function show() { box.hidden = !st.on || st.hidden; back.hidden = !st.on || !st.hidden; var sel = document.getElementById('petSel'); if (sel) sel.value = st.on ? 'on' : 'off'; skin(); if (!box.hidden) place(); }
     show();
-    if (sel) sel.addEventListener('change', function () { st.on = sel.value !== 'off'; if (st.on) st.hidden = false; persist(); show(); });
-    if (kindSel) kindSel.addEventListener('change', function () { if (KINDS[kindSel.value]) { st.kind = kindSel.value; persist(); skin(); if (st.on && !st.hidden) { box.classList.remove('sleep'); pet(); } } });
+    /* 设置页会重画，所以用事件委托：不管下拉框重画几次都有效 */
+    document.addEventListener('change', function (e) {
+      var t = e.target; if (!t || !t.id) return;
+      if (t.id === 'petSel') { st.on = t.value !== 'off'; if (st.on) st.hidden = false; persist(); show(); }
+      else if (t.id === 'petKind' && KINDS[t.value]) { st.kind = t.value; persist(); skin(); if (st.on && !st.hidden) { box.classList.remove('sleep'); pet(); } }
+    });
+    window.petState = function () { return { on: st.on, kind: st.kind }; };
 
     var COMMON = ['嘿嘿~', '再摸摸~', '好舒服…', '加油复习！', '我陪着你~', '摸摸头，考试顺利', '你好棒！', '蹭蹭~'];
     var lines = COMMON.slice();
@@ -1521,7 +1546,7 @@ function rNotes(){
   <div class="row" style="margin-bottom:10px"><h2 style="margin:0">${esc(s.name)} 笔记</h2><span class="tag">${esc(s.ms)} · ${esc(s.code)}</span>${s.must?'<span class="tag red">必须及格</span>':""}<span class="spacer"></span>
    <input type="text" id="nq" placeholder="搜索所有科目的笔记…" value="${esc(nQ)}" style="max-width:240px"></div>
   ${q?`<p class="muted fine">搜索结果：${cs.length} 条</p>`:`<div class="card" style="margin-bottom:12px"><div class="row"><span class="fine muted">${p.d}/${p.n} 章已复习 · ${gen} 章有 AI 笔记</span><span class="tag blue" title="可在设置里改">AI 语言：${langLabel(sid)}</span><span class="spacer"></span>
-   <button class="btn small pri" id="bulkBtn" ${aiOK()?"":"disabled"}>${bulk.on?"停止批量生成":"✨ 批量生成本科笔记"}</button></div><div class="bar" style="margin:8px 0"><i style="width:${p.p}%;background:${s.color}"></i></div>
+   <button class="btn small" data-act="printsubj" data-sub="${sid}" ${gen?"":"disabled"} title="把本科所有 AI 笔记一次打印 / 存成 PDF">🖨 打印本科笔记</button> <button class="btn small pri" id="bulkBtn" ${aiOK()?"":"disabled"}>${bulk.on?"停止批量生成":"✨ 批量生成本科笔记"}</button></div><div class="bar" style="margin:8px 0"><i style="width:${p.p}%;background:${s.color}"></i></div>
    <div class="fine muted">考试形式：${esc(s.fmt)}</div><div id="bulkMsg" class="fine" style="margin-top:6px"></div></div>`}
   <div>${cs.map(c=>chapHTML(c,c.sid||sid,!!q)).join("")}</div>
   ${q?"":`<details class="chap" style="margin-top:14px"><summary><span class="t">＋ 添加我自己的笔记 / 章节</span></summary><div class="body"><input type="text" id="ncT" placeholder="标题，例如：T5 Bab 3 要点" style="margin-bottom:8px"><textarea id="ncN" placeholder="内容 (换行会保留)"></textarea><button class="btn pri small" id="ncAdd" style="margin-top:8px">保存到 ${esc(s.name)}</button></div></details>`}`;
@@ -2121,6 +2146,7 @@ function chapHTML(c,sid,open){
     <div class="row" style="margin-top:10px">
       ${c.core||c.quick?`<button class="btn small pri" data-act="gennote" data-k="${esc(c.k)}" data-sub="${sid}" ${aiOK()?"":"disabled"}>${has?"重新生成笔记":"✨ AI 生成这一章的笔记"}</button>`:""}
       ${c.core||c.quick?`<button class="btn small" data-act="ppt" data-k="${esc(c.k)}" data-sub="${sid}">📊 PPT</button>`:""}
+      ${has||c.n?`<button class="btn small" data-act="printnote" data-k="${esc(c.k)}" data-sub="${sid}" title="打开打印窗口；在目的地选「另存为 PDF」就能存成 PDF">🖨 打印 / 存 PDF</button>`:""}
       ${has?`<button class="btn small" data-act="copynote" data-k="${esc(c.k)}">复制</button><button class="btn small" data-act="delnote" data-k="${esc(c.k)}">删除 AI 笔记</button>`:""}
       ${c.core?`<button class="btn small" data-act="askchap" data-k="${esc(c.k)}" data-sub="${sid}">问 AI</button><button class="btn small" data-act="cardchap" data-k="${esc(c.k)}" data-sub="${sid}" ${aiOK()?"":"disabled"}>出闪卡</button><button class="btn small" data-act="quizchap" data-k="${esc(c.k)}" data-sub="${sid}">出题</button>`:""}
       ${c.own?`<button class="btn small badb" data-act="delown" data-id="${c.id}" data-sub="${sid}">删除这条</button>`:""}
@@ -2716,6 +2742,9 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 
 /* ---- 设置 ---- */
 function applyTheme(){document.body.dataset.theme=S.theme||"auto"}
+function petUI(){const P=(window.petState&&window.petState())||{on:true,kind:"dog"};
+  const K=[["dog","🐶 小狗"],["cat","🐱 小猫"],["rabbit","🐰 小兔"],["panda","🐼 熊猫"],["bear","🐻 小熊"]];
+  return `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><h3 style="margin:0 0 6px">小宠物</h3><div class="controls"><label class="grow">种类<select id="petKind">${K.map(k=>`<option value="${k[0]}" ${P.kind===k[0]?"selected":""}>${k[1]}</option>`).join("")}</select></label><label class="grow">显示<select id="petSel"><option value="on" ${P.on?"selected":""}>陪我复习</option><option value="off" ${P.on?"":"selected"}>不要出现</option></select></label></div><p class="fine muted" style="margin:6px 0 0">默认是小狗，住在页面右下角。点点它会有反应，可以拖到别处；一分钟没人理它会睡着，点一下就醒。</p></div>`}
 function rSet(){
   const themes=[["auto","跟随系统"],["light","浅色"],["night","夜间"],["sakura","樱花"],["mint","薄荷"],["paper","纸张"]];
   $("#sheet").innerHTML=`<h2>设置</h2>
@@ -2729,7 +2758,7 @@ function rSet(){
     <p class="fine muted" style="margin:6px 0 0">小提醒：key 只保存在你自己的浏览器里，不要发给别人，也不要截图；Google 免费版的内容可能被用来改进它的产品，所以不要输入个人资料；AI 整理的笔记可能有错，仅供复习，请以课本和老师为准；额度用完等一两分钟或隔天再试。</p></div></details>
   <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p>
     <input type="password" id="sKey" placeholder="粘贴 API key" value="${esc(S.ai.key)}" autocomplete="off">
-    <div class="controls" style="margin-top:8px"><label class="grow">模型<select id="sMd">${MODELS.map(m=>`<option ${S.ai.model===m?"selected":""}>${m}</option>`).join("")}${MODELS.includes(S.ai.model)?"":`<option selected>${esc(S.ai.model)}</option>`}</select></label><button class="btn pri" id="sKeyOk">保存</button></div><div id="sKeyMsg" class="fine"></div></div>
+    <div class="controls" style="margin-top:8px"><label class="grow">模型<select id="sMd">${MODELS.map(m=>`<option ${S.ai.model===m?"selected":""}>${m}</option>`).join("")}${MODELS.includes(S.ai.model)?"":`<option selected>${esc(S.ai.model)}</option>`}</select></label><button class="btn pri" id="sKeyOk">保存</button></div><div id="sKeyMsg" class="fine"></div>${petUI()}</div>
    <div class="card"><h3 style="margin-top:0">笔试开始日</h3><input type="date" id="sEx" value="${S.exam}"><p class="fine muted">默认是 SPM 2026 笔试第一天 (2026-11-23)。考的是别的日期就改这里。</p>
     <h3>AI 回答语言</h3><div class="seg"><button data-lang="auto" aria-pressed="${(S.lang||"auto")==="auto"}">考试语言 + 华文翻译</button><button data-lang="exam" aria-pressed="${S.lang==="exam"}">只用考试语言</button><button data-lang="zh" aria-pressed="${S.lang==="zh"}">全部华文</button></div><p class="fine muted">国语、历史、道德用国语；英文和数学、理科、附加数学用英文；华文科目用华文。默认会在每段后面附「华文：」翻译和解释。</p><h3>外观</h3><div class="seg">${themes.map(t=>`<button data-th="${t[0]}" aria-pressed="${S.theme===t[0]}">${t[1]}</button>`).join("")}</div></div></div>
   <div class="card" style="margin-top:14px"><h3 style="margin-top:0">备用 AI 与生图</h3><p class="fine muted">Gemini 额度用完时自动切换。key 只保存在这个浏览器里，只发给对应的服务。备用模型读不到上传的 PDF 和图片，只用 app 内置笔记的文字。</p>
@@ -2769,7 +2798,9 @@ document.addEventListener("click",e=>{
   if(act==="goset"){S.tab="set";save();render()}
   else if(act==="opennote"){S.openChap=k;go("notes",sid);setTimeout(()=>{const d=document.querySelector(`details[data-k="${CSS.escape(k)}"]`);if(d){d.open=true;d.scrollIntoView({block:"center"})}},50)}
   else if(act==="gosub"){go(a.dataset.tab||"notes",sid)}
-  else if(act==="gennote"){genNote(sid,k,a)}
+  else if(act==="printnote"){printNote(sid,k)}
+else if(act==="printsubj"){printSubj(sid)}
+else if(act==="gennote"){genNote(sid,k,a)}
   else if(act==="ppt"){openPpt(sid,k)}
   else if(act==="gensubs"){genSubs(sid,k,a)}
   else if(act==="cardchap"){genCards(sid,k,10,a)}
@@ -2784,6 +2815,38 @@ document.addEventListener("click",e=>{
 document.addEventListener("click",e=>{const w=e.target.closest("[data-wai]");if(w){const x=S.wrong.find(y=>y.id===w.dataset.wai);if(!x)return;chatPending=`我做错了这道 SPM ${subj(x.s)?subj(x.s).name:""} 的题，请讲清楚：为什么错、正确思路、这个知识点怎么避免再错。\n题目：${x.q}\n${x.a?"参考答案/笔记："+x.a:""}`;go("chat",x.s)}
   const d=e.target.closest("[data-wdel]");if(d){S.wrong=S.wrong.filter(y=>y.id!==d.dataset.wdel);save();rWrong()}});
 $("#btnSet").onclick=()=>{S.tab="set";save();render()};
+
+/* ---- 打印 / 存为 PDF ---- */
+function noteHTML(c){
+  if(S.notes[c.k]){
+    const live=document.getElementById("ai-"+c.k);
+    if(live&&live.innerHTML.trim()){ /* 直接用页面上已经渲染好的内容：公式、自己划的重点都会保留 */
+      const cl=live.cloneNode(true);cl.removeAttribute("id");
+      cl.querySelectorAll("button,script,.no-print").forEach(x=>x.remove());
+      return cl.innerHTML}
+    return md(S.notes[c.k].md)}
+  return c.n||""}
+function printDoc(title,sections){
+  const old=document.getElementById("printArea");if(old)old.remove();
+  const box=document.createElement("div");box.id="printArea";
+  const d=new Date().toLocaleDateString("zh-CN",{year:"numeric",month:"long",day:"numeric"});
+  box.innerHTML=`<div class="pa-head"><h1>${esc(title)}</h1><div class="pa-meta">SPM 备考本 · 打印于 ${d}</div></div>`+
+    sections.map((x,i)=>`<section class="pa-sec${i?" pa-break":""}">${x.t?`<h2 class="pa-title">${esc(x.t)}</h2>`:""}<div class="md">${x.html}</div></section>`).join("");
+  document.body.appendChild(box);document.body.classList.add("printing");
+  const oldTitle=document.title;document.title=title; /* 浏览器会拿它当 PDF 文件名 */
+  let finished=false;
+  const done=()=>{if(finished)return;finished=true;document.body.classList.remove("printing");box.remove();document.title=oldTitle;window.removeEventListener("afterprint",done)};
+  window.addEventListener("afterprint",done);
+  const needMath=/\\\(|\\\[|\$\$/.test(box.textContent);
+  setTimeout(()=>{try{window.print()}catch(e){done();toast("这个浏览器不能直接打印，请用浏览器菜单里的「打印」")}},needMath?700:120)}
+function printNote(sid,k){
+  const c=findChap(sid,k);if(!c)return;
+  const html=noteHTML(c);if(!html){toast("这一章还没有笔记可以打印");return}
+  printDoc(`${subj(sid).name} · ${c.t}`,[{t:"",html}])}
+function printSubj(sid){
+  const cs=chapsOf(sid).filter(c=>S.notes[c.k]);
+  if(!cs.length){toast("这一科还没有生成笔记");return}
+  printDoc(`${subj(sid).name} 笔记`,cs.map(c=>({t:c.t,html:noteHTML(c)})))}
 
 /* ---- 启动 ---- */
 load();applyTheme();
