@@ -1075,7 +1075,7 @@ CARDS2.forEach(c=>CARDS.push(c));
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const KEY="spm-notes-v2";
-const MODELS=["gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite"];
+const MODELS=["gemini-3.8-flash","gemini-3.7-flash","gemini-3.6-flash","gemini-3.5-flash-lite"];
 const PROVS={groq:{name:"Groq",url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-120b",get:"console.groq.com/keys"},openrouter:{name:"OpenRouter",url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free",get:"openrouter.ai/keys"}};
 const PORDER=["gemini","groq","openrouter"];
 const DEF={theme:"auto",exam:EXAM.writtenStart,since:null,my:["bm","bi","sej","mat","sains","moral"],sub:"bm",tab:"today",conf:{},done:{},box:{},wrong:[],cards:[],
@@ -1226,7 +1226,7 @@ function chapsOf(sid){
 function bust(){for(const k in chapCache)delete chapCache[k]}
 function prog(sid){const cs=chapsOf(sid).filter(c=>c.core);const d=cs.filter(c=>S.done[c.k]).length;return{d,n:cs.length,p:cs.length?Math.round(d/cs.length*100):0}}
 function fmtAt(t){return new Date(t).toLocaleString("zh-CN",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}
-function putNote(k,md,at,restoreIdx){const old=S.notes[k];const hist=old&&old.hist?old.hist.slice():[];if(old)hist.unshift({md:old.md,at:old.at});if(restoreIdx!==undefined)hist.splice(restoreIdx+1,1);S.notes[k]={md,at:at||Date.now(),hist:hist.slice(0,10)}}
+function putNote(k,md,at,restoreIdx){const old=S.notes[k];const hist=old&&old.hist?old.hist.slice():[];if(old)hist.unshift({md:old.md,at:old.at,by:old.by});if(restoreIdx!==undefined)hist.splice(restoreIdx+1,1);const by=restoreIdx!==undefined?((old&&old.hist&&old.hist[restoreIdx]||{}).by||""):(at===undefined?aiLabel():"");S.notes[k]={md,at:at||Date.now(),by,hist:hist.slice(0,10)}}
 function chapText(c,max){let t="";if(c.subs&&c.subs.length)t+="小章节："+c.subs.join("；")+"\n";if(S.req[c.k])t+="学生提供的章节要求："+S.req[c.k]+"\n";
   if(c.n)t+="内置要点："+plain(c.n)+"\n";if(S.notes[c.k])t+="已生成的笔记：\n"+S.notes[c.k].md+"\n";return max?t.slice(0,max):t}
 
@@ -1290,7 +1290,7 @@ async function gemCall(contents,system,maxTokens,modelOverride){
     if(!cand){const br=data&&data.promptFeedback&&data.promptFeedback.blockReason;throw new Error(br?"请求被拦截了 ("+br+")，换个问法再试。":"模型没有返回内容，请重试。")}
     const text=((cand.content&&cand.content.parts)||[]).filter(p=>!p.thought&&typeof p.text==="string").map(p=>p.text).join("");
     if(!text.trim())throw new Error("模型没有返回文字"+(cand.finishReason?" ("+cand.finishReason+")":"")+"，请重试。");
-    return text}}
+    lastAI={p:"gemini",m:model};return text}}
 /* ---- 备用 AI：Groq / OpenRouter (OpenAI 格式) ---- */
 function toOAI(contents,stripped){
   const msgs=[];
@@ -1298,13 +1298,13 @@ function toOAI(contents,stripped){
     for(const p of c.parts||[]){if(typeof p.text==="string")t.push(p.text);else if(p.inline_data||p.file_data||p.inlineData||p.fileData)stripped.n++}
     msgs.push({role:c.role==="model"?"assistant":"user",content:t.join("\n")})}
   return msgs}
-async function altCall(p,contents,system,maxTokens){
+async function altCall(p,contents,system,maxTokens,mo){
   const P=PROVS[p],a=S.ai.alt[p],stripped={n:0};
   const msgs=toOAI(contents,stripped);
   const sys=(system||"")+(stripped.n?"\n【注意】这次学生附带的图片或 PDF 你看不到，只能依据上面的文字资料作答。需要看附件的地方，直接告诉学生「这个模型看不到附件」，不要猜。":"");
   if(sys)msgs.unshift({role:"system",content:sys});
   let res;
-  try{res=await fetch(P.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+a.key.trim()},body:JSON.stringify({model:(a.model||"").trim()||P.model,messages:msgs,max_tokens:maxTokens||8192})})}
+  try{res=await fetch(P.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+a.key.trim()},body:JSON.stringify({model:mo||(a.model||"").split(",")[0].trim()||P.model,messages:msgs,max_tokens:maxTokens||8192})})}
   catch(e){const er=new Error(P.name+" 网络请求失败，请检查网络。");er.fb=true;throw er}
   let data=null;try{data=await res.json()}catch(e){}
   if(!res.ok){const raw=(data&&data.error&&(data.error.message||data.error))||"";
@@ -1314,24 +1314,30 @@ async function altCall(p,contents,system,maxTokens){
   if(Array.isArray(text))text=text.map(x=>x&&x.text||"").join("");
   text=String(text||"").replace(/<think>[\s\S]*?<\/think>/g,"").trim();
   if(!text)throw new Error(P.name+" 没有返回文字，请重试。");
-  return text}
+  lastAI={p,m:(data&&typeof data.model==="string"&&data.model)||mo||(a.model||"").split(",")[0].trim()||P.model};return text}
 async function gemTry(contents,system,maxTokens){
   try{return await gemCall(contents,system,maxTokens)}
   catch(e){if(e.st!==404)throw e;const cur=(S.ai.model||"").trim();
     for(const m of MODELS){if(m===cur)continue;try{const o=await gemCall(contents,system,maxTokens,m);toast("原来的模型找不到，已改用 "+m);return o}catch(e2){if(e2.st!==404)throw e2}}
     throw e}}
-/* ---- 自动选择 AI：生成前先用规则评分，不额外耗额度 (按任务类型、今天各家用量、最近是否被限流) ---- */
+/* ---- 自动选择 AI：三步。①先选哪一家 (Gemini / Groq / OpenRouter)；②再按任务轻重选这一家的哪类模型；③最后看额度选具体模型。全部用规则判断，不额外耗额度 ---- */
 let RT={};try{RT=JSON.parse(localStorage.getItem("spm-route")||"{}")}catch(e){}
 function rtSave(){try{localStorage.setItem("spm-route",JSON.stringify(RT))}catch(e){}}
 function rtGet(p){const d=new Date().toLocaleDateString("en-CA"),r=RT[p]||(RT[p]={});if(r.day!==d){r.day=d;r.n=0;r.f=0}return r}
-function rtCool(p){return !!(RT[p]&&RT[p].cd>Date.now())}
+const GEMT={heavy:[["gemini-3.8-flash",20],["gemini-3.7-flash",20],["gemini-3.6-flash",20]],light:[["gemini-3.5-flash-lite",500]]};/* [模型名, 每天免费次数]：来自 AI Studio 额度页，账号不同会不一样 */
+function mUsable(m,rpd){const r=rtGet("m:"+m);return !(r.dead||(r.cd&&r.cd>Date.now())||(rpd&&r.n>=rpd))}
+function gemUsable(){return GEMT.heavy.concat(GEMT.light).some(x=>mUsable(x[0],x[1]))}
+function rtCool(p){if(p==="gemini")return !gemUsable();return !!(RT[p]&&RT[p].cd>Date.now())}
 function rtName(p){return p==="gemini"?"Gemini":PROVS[p].name}
 function rtTask(contents,system,maxTokens){
   let chars=(system||"").length,vision=false,txt="";
   for(const c of contents)for(const x of c.parts||[]){if(typeof x.text==="string"){chars+=x.text.length;txt+=x.text.slice(0,800)}else if(x.inline_data||x.inlineData||x.file_data||x.fileData)vision=true}
   const sm=(system||"").match(/当前科目：([^(（\n]+)/),sj=sm?sm[1]:"";
   const reasoning=/Matematik|Mathematics|Additional|Fizik|Physics|Kimia|Chemistry|数学|物理|化学/i.test(sj)||/计算|求值|证明|解方程|solve|calculate/i.test(txt);
-  return{vision,chars,reasoning,json:/JSON/.test(txt+(system||"").slice(-500)),long:(maxTokens||0)>=12000}}
+  const grader=/评卷员/.test(system||"");
+  const light=!grader&&!vision&&((maxTokens||8192)<=4096||/闪卡/.test(txt));
+  return{vision,chars,reasoning,light,json:/JSON/.test(txt+(system||"").slice(-500)),long:(maxTokens||0)>=12000}}
+/* 第①步：选哪一家 */
 function rtOrder(T){
   const main=S.ai.provider||"gemini",ps=PORDER.filter(provOK),total=ps.reduce((a,p)=>a+rtGet(p).n,0),sc={};
   ps.forEach(p=>{const r=rtGet(p);let v;
@@ -1341,20 +1347,38 @@ function rtOrder(T){
     if(T.vision&&p!=="gemini")v-=100;
     if(r.maxChars&&T.chars>r.maxChars)v-=100;
     v-=30*r.n/(total+3);v-=Math.min(30,(r.f||0)*8);if(p===main)v+=8;sc[p]=v});
-  const ok=ps.filter(p=>!rtCool(p)).sort((a,b)=>sc[b]-sc[a]),cool=ps.filter(rtCool).sort((a,b)=>RT[a].cd-RT[b].cd);
+  const ok=ps.filter(p=>!rtCool(p)).sort((a,b)=>sc[b]-sc[a]),cool=ps.filter(rtCool).sort((a,b)=>(RT[a]&&RT[a].cd||0)-(RT[b]&&RT[b].cd||0));
   return ok.concat(cool)}
+/* 第②③步：Gemini 内部。重任务先找最强的 Flash，轻任务先用 Flash Lite；再看额度，3.8 用完换 3.7，再换 3.6 */
+function rtGemModels(T){
+  const cat=T.light?GEMT.light.concat(GEMT.heavy):GEMT.heavy.concat(GEMT.light);
+  let list=cat.filter(x=>mUsable(x[0],x[1])).map(x=>x[0]);
+  const cur=(S.ai.model||"").trim();
+  if(cur&&!MODELS.includes(cur)&&mUsable(cur))list.unshift(cur);
+  return list}
+/* OpenRouter / Groq 内部：模型栏可填多个 (逗号分隔)，按任务挑最合适的，没填多个就用那一个 */
+function rtAltModels(p,T){
+  const a=S.ai.alt[p],list=String(a.model||"").split(",").map(x=>x.trim()).filter(Boolean);
+  if(!list.length)list.push(PROVS[p].model);
+  const fit=m=>(T.reasoning&&/deepseek|r1|think|reason|gpt-oss|qwq/i.test(m)?2:0)+(T.light&&/flash|lite|mini|small|nano|openrouter\/free/i.test(m)?1:0);
+  const ok=list.filter(m=>mUsable(p+":"+m));
+  return ok.sort((x,y)=>fit(y)-fit(x))}
 function rtWait(e){const m=String(e.message||"");let s=90;
   if(/per ?day|daily|PerDay/i.test(m))s=6*3600;
   else{const x=m.match(/(?:retry|try again) in ([\d.]+)\s*(ms|s|m)\b/i);if(x){s=+x[1]*(x[2]==="ms"?0.001:x[2]==="m"?60:1)+5}}
   return Math.max(20,Math.min(s,6*3600))}
-function rtOk(p){const r=rtGet(p);r.n++;r.f=Math.max(0,(r.f||0)-1);rtSave()}
+function rtOk(p,m){const r=rtGet(p);r.n++;r.f=Math.max(0,(r.f||0)-1);if(m)rtGet("m:"+m).n++;rtSave()}
+function rtFailM(key,e){const r=rtGet("m:"+key);if(e.st===429)r.cd=Date.now()+rtWait(e)*1000;if(e.st===404)r.dead=true;rtSave()}
 function rtFail(p,e,T){const r=rtGet(p);r.f=(r.f||0)+1;
-  if(e.st===429)r.cd=Date.now()+rtWait(e)*1000;
+  if(p!=="gemini"&&e.st===429)r.cd=Date.now()+rtWait(e)*1000;
   if(e.st===413)r.maxChars=Math.floor(T.chars*0.8);
   rtSave()}
+function rtPace(){if(lastAI&&lastAI.p==="gemini")return /lite/.test(lastAI.m)?4500:13000;return 2500}
 function rtStat(){const ps=PORDER.filter(provOK);if(!ps.length)return"";
-  return "今天的使用："+ps.map(p=>{const r=rtGet(p);return rtName(p)+" "+r.n+" 次"+(rtCool(p)?"（被限流，约 "+Math.max(1,Math.ceil((RT[p].cd-Date.now())/60000))+" 分钟后再用）":"")}).join(" · ")}
-let rtLast="";
+  return "今天的使用："+ps.map(p=>{if(p==="gemini")return "Gemini（"+GEMT.heavy.concat(GEMT.light).map(x=>x[0].replace("gemini-","")+" "+rtGet("m:"+x[0]).n+"/"+x[1]).join("、")+"）";
+    const r=rtGet(p);return rtName(p)+" "+r.n+" 次"+(rtCool(p)?"（被限流，约 "+Math.max(1,Math.ceil((RT[p].cd-Date.now())/60000))+" 分钟后再用）":"")}).join(" · ")}
+let rtLast="";let lastAI=null;
+function aiLabel(){if(!lastAI)return"";return lastAI.p==="gemini"?lastAI.m:rtName(lastAI.p)+" · "+lastAI.m}
 async function gem(contents,system,maxTokens){
   const T=rtTask(contents,system,maxTokens),auto=S.ai.route!=="manual";
   let order;
@@ -1363,8 +1387,20 @@ async function gem(contents,system,maxTokens){
   if(!order.length)throw new Error("请先到「设置」填入至少一个 API key。");
   let last;
   for(let i=0;i<order.length;i++){const p=order[i];
-    try{const out=p==="gemini"?await gemTry(contents,system,maxTokens):await altCall(p,contents,system,maxTokens);
-      rtOk(p);if(p!==rtLast&&(i>0||p!==(S.ai.provider||"gemini"))){toast((auto&&i===0?"自动选择了 ":"已自动切换到 ")+rtName(p))}rtLast=p;return out}
+    try{let out,used=p;
+      if(!auto)out=p==="gemini"?await gemTry(contents,system,maxTokens):await altCall(p,contents,system,maxTokens);
+      else{
+        const ms=p==="gemini"?rtGemModels(T):rtAltModels(p,T);
+        if(!ms.length){const er=new Error(rtName(p)+" 的模型暂时都不能用。");er.fb=true;throw er}
+        let le;
+        for(const m of ms){
+          try{out=p==="gemini"?await gemCall(contents,system,maxTokens,m):await altCall(p,contents,system,maxTokens,m);used=m;break}
+          catch(e){le=e;rtFailM(p==="gemini"?m:p+":"+m,e);if(!(e.st===429||e.st===404||e.st>=500))throw e}}
+        if(out===undefined)throw le;
+        rtOk(p,p==="gemini"?used:p+":"+used);
+      }
+      if(!auto)rtOk(p);
+      if(p!==rtLast&&(i>0||p!==(S.ai.provider||"gemini"))){toast((auto&&i===0?"自动选择了 ":"已自动切换到 ")+rtName(p))}rtLast=p;return out}
     catch(e){last=e;rtFail(p,e,T);if(!e.fb||i===order.length-1)break}}
   throw last}
 function fixTex(t){return t.replace(/(?<!\\)\\(?=[()\[\]]|(?:frac|dfrac|sqrt|times|div|cdot|theta|pi|alpha|beta|gamma|delta|Delta|sigma|Sigma|mu|lambda|omega|Omega|sin|cos|tan|sec|cot|csc|log|ln|lim|sum|int|infty|leq|geq|neq|le|ge|ne|pm|mp|approx|to|rightarrow|leftarrow|Rightarrow|Leftrightarrow|left|right|text|mathrm|ce|vec|overline|bar|hat|cdots|ldots|circ|angle|perp|parallel|propto|therefore|because|binom|quad|qquad|mathbf|lt|gt)(?![A-Za-z]))/g,"\\\\")}
@@ -2080,7 +2116,7 @@ function chapHTML(c,sid,open){
     ${c.core?`<label class="fine muted" style="display:block;margin:6px 0 4px">章节要求 / 老师划的范围 (AI 生成笔记、出题、回答时都会参考)</label><textarea data-req="${esc(c.k)}" placeholder="例如：1.2 只考定义和公式；1.4 不考…" style="min-height:60px">${esc(S.req[c.k]||"")}</textarea>`:""}
     ${c.n?`<div class="note"><div class="fine muted" style="margin-top:8px">内置要点</div>${c.n}</div>`:""}
     <div id="ai-${esc(c.k)}" class="md" style="margin-top:10px">${has?md(S.notes[c.k].md):""}</div>
-    ${has&&S.notes[c.k].at?`<div class="fine muted" style="margin-top:4px">生成于 ${fmtAt(S.notes[c.k].at)}</div>`:""}
+    ${has&&S.notes[c.k].at?`<div class="fine muted" style="margin-top:4px">生成于 ${fmtAt(S.notes[c.k].at)}${S.notes[c.k].by?` · 由 ${esc(S.notes[c.k].by)} 完成`:""}</div>`:""}
     ${has&&(S.notes[c.k].hist||[]).length?`<details class="chap" style="margin-top:8px"><summary><span class="t">历史版本 (${S.notes[c.k].hist.length})</span></summary><div class="body">${S.notes[c.k].hist.map((h,i)=>`<details style="margin:6px 0"><summary class="fine" style="cursor:pointer">${fmtAt(h.at)} 的版本 <button class="btn small" data-act="histrestore" data-k="${esc(c.k)}" data-i="${i}">恢复这个版本</button> <button class="btn small" data-act="histdel" data-k="${esc(c.k)}" data-i="${i}" style="color:var(--bad)">删除这个版本</button></summary><div class="md" style="margin-top:6px">${md(h.md)}</div></details>`).join("")}</div></details>`:""}
     <div class="row" style="margin-top:10px">
       ${c.core||c.quick?`<button class="btn small pri" data-act="gennote" data-k="${esc(c.k)}" data-sub="${sid}" ${aiOK()?"":"disabled"}>${has?"重新生成笔记":"✨ AI 生成这一章的笔记"}</button>`:""}
@@ -2111,7 +2147,7 @@ async function bulkGen(sid){
   for(let i=0;i<todo.length&&!bulk.stop;i++){const c=todo[i];const m=$("#bulkMsg");if(m)m.innerHTML=`<span class="spin"></span>正在生成 ${i+1}/${todo.length}：${esc(c.t)}`;
     try{const fp=await fileParts(sid);const s=subj(sid);
       const prompt=`请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：每个小章节单独成一节 (二级标题)，${c.subs.length?"依据给出的小章节，一个都不合并、不省略":"不确定课本小章节名称时按 DSKP 常见划分并注明『按 DSKP 推测』，不合并"}；每个小章节依次写：术语与定义 / 得分点清单 (写全，列表型至少 4 点，每点一句完整的话，关键词粗体) / 过程、比较或公式 / 易错点 / 「💯 给分对照」一行 (问法 → 分数 → 几个得分点)；最后给 5 行以内速记表和 5 道自测题 (写明分数，答案连评分要点放最后)。资料里没有的不要编。语言按系统提示里的【语言规则】(考试语言 + 「华文：」翻译与解释，不要合并或删减要点)，用 Markdown。`;
-      const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000);putNote(c.k,out);save();await sleep(1200)}
+      const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000);putNote(c.k,out);save();await sleep(rtPace())}
     catch(e){const m2=$("#bulkMsg");if(m2)m2.innerHTML=`<span style="color:var(--bad)">在「${esc(c.t)}」停下了：${esc(e.message)}</span>`;bulk.stop=true;bulk.err=true}}
   const err=bulk.err;bulk={on:false,stop:false};const keep=$("#bulkMsg")&&err?$("#bulkMsg").innerHTML:"";rNotes();if(keep&&$("#bulkMsg"))$("#bulkMsg").innerHTML=keep;if(!err)toast("批量生成完成")}
 async function genSubs(sid,k,btn){const c=findChap(sid,k),s=subj(sid);setBusy(btn,true,"生成中…");
@@ -2471,7 +2507,7 @@ function rChat(){
   <div class="controls"><label class="grow">范围<select id="chScope"><option value="">整科 (自动找相关章节)</option>${cs.map(c=>`<option value="${esc(c.k)}" ${S.scope[sid]===c.k?"selected":""}>${esc(c.t)}</option>`).join("")}</select></label>
    <label class="chk" style="color:var(--ink);font-size:14px"><input type="checkbox" id="chStrict" ${S.strict?"checked":""}> 只依据我的资料回答</label></div>
   <div class="fine muted" id="chInfo" style="margin-bottom:8px"><span class="tag blue">回答语言：${langLabel(sid)}</span> 回答会参考：章节要求、内置要点、AI 笔记，以及你在「资料」页勾选的上传文件。</div>
-  <div id="msgs">${h.length?h.map(m=>`<div class="msg ${m.r}">${m.r==="user"?esc(m.t).replace(/\n/g,"<br>")+(m.img?'<div class="fine muted">(附了一张图片)</div>':""):`<div class="md">${md(m.t)}</div>${m.src&&m.src.length?`<div class="fine muted" style="margin-top:6px">参考：${esc(m.src.join("、"))}</div>`:""}`}</div>`).join(""):`<div class="empty">例如：「讲一下判别式，再出 3 道练习」<br>「Kadar tindak balas 为什么升温变快？」<br>拍下不会的题，点下面的 📷 上传。</div>`}${chatBusy?`<div class="msg model muted"><span class="spin"></span>思考中…</div>`:""}${chatErr?`<div class="notice error">${esc(chatErr)}</div>`:""}</div>
+  <div id="msgs">${h.length?h.map(m=>`<div class="msg ${m.r}">${m.r==="user"?esc(m.t).replace(/\n/g,"<br>")+(m.img?'<div class="fine muted">(附了一张图片)</div>':""):`<div class="md">${md(m.t)}</div>${m.src&&m.src.length?`<div class="fine muted" style="margin-top:6px">参考：${esc(m.src.join("、"))}</div>`:""}${m.by?`<div class="fine muted" style="margin-top:4px">由 ${esc(m.by)} 回答</div>`:""}`}</div>`).join(""):`<div class="empty">例如：「讲一下判别式，再出 3 道练习」<br>「Kadar tindak balas 为什么升温变快？」<br>拍下不会的题，点下面的 📷 上传。</div>`}${chatBusy?`<div class="msg model muted"><span class="spin"></span>思考中…</div>`:""}${chatErr?`<div class="notice error">${esc(chatErr)}</div>`:""}</div>
   <div class="card" style="margin-top:10px">${chatImg?`<div class="fine" style="margin-bottom:6px">已附图片 <button class="btn small" id="chImgX">移除</button></div>`:""}
    <textarea id="chIn" placeholder="输入问题，Ctrl/⌘+Enter 发送" ${chatBusy?"disabled":""}></textarea>
    <div class="row" style="margin-top:8px"><label class="btn small">📷 上传题目图片<input type="file" id="chFile" accept="image/*" hidden></label><span class="spacer"></span><button class="btn pri" id="chSend" ${chatBusy?"disabled":""}>发送</button></div></div>`;
@@ -2490,7 +2526,7 @@ async function ask(text){
     const hist=h.slice(-14).map((m,i,a)=>({role:m.r==="user"?"user":"model",parts:[{text:m.t}]}));
     const lastParts=hist[hist.length-1].parts;if(img)lastParts.unshift({inline_data:{mime_type:"image/jpeg",data:img}});ctx.parts.forEach((p,i)=>lastParts.splice(i,0,p));
     const out=await gem(hist,ctx.system+(img?"\n学生附了题目图片：先准确读出题目，字迹看不清的地方要说明，再解答。":""),8192);
-    h.push({r:"model",t:out,src:ctx.used.concat(ctx.files)})}
+    h.push({r:"model",t:out,src:ctx.used.concat(ctx.files),by:aiLabel()})}
   catch(e){h.pop();chatErr=e.message}
   chatBusy=false;if(h.length>40)S.chat[sid]=h.slice(-40);save();if(S.tab==="chat"&&S.sub===sid)rChat()}
 
@@ -2698,7 +2734,7 @@ function rSet(){
     <h3>AI 回答语言</h3><div class="seg"><button data-lang="auto" aria-pressed="${(S.lang||"auto")==="auto"}">考试语言 + 华文翻译</button><button data-lang="exam" aria-pressed="${S.lang==="exam"}">只用考试语言</button><button data-lang="zh" aria-pressed="${S.lang==="zh"}">全部华文</button></div><p class="fine muted">国语、历史、道德用国语；英文和数学、理科、附加数学用英文；华文科目用华文。默认会在每段后面附「华文：」翻译和解释。</p><h3>外观</h3><div class="seg">${themes.map(t=>`<button data-th="${t[0]}" aria-pressed="${S.theme===t[0]}">${t[1]}</button>`).join("")}</div></div></div>
   <div class="card" style="margin-top:14px"><h3 style="margin-top:0">备用 AI 与生图</h3><p class="fine muted">Gemini 额度用完时自动切换。key 只保存在这个浏览器里，只发给对应的服务。备用模型读不到上传的 PDF 和图片，只用 app 内置笔记的文字。</p>
     <div class="controls"><label class="grow">主要使用<select id="pvMain">${["gemini",...Object.keys(PROVS)].map(p=>`<option value="${p}" ${(S.ai.provider||"gemini")===p?"selected":""}>${p==="gemini"?"Gemini":PROVS[p].name}</option>`).join("")}</select></label><label class="chk"><input type="checkbox" id="pvFb" ${S.ai.fallback!==false?"checked":""}> 额度用完自动切换</label><label class="chk"><input type="checkbox" id="pvAuto" ${S.ai.route!=="manual"?"checked":""}> 自动选择最合适的 AI</label></div><p class="fine muted">开启后，每次生成前会按任务类型、各家今天用了多少、最近有没有被限流来决定谁来做；要读你上传的 PDF 或图片时一定用 Gemini。${rtStat()}</p>
-    ${Object.keys(PROVS).map(p=>`<div style="margin-top:10px"><b>${PROVS[p].name}</b> <span class="fine muted">· 申请：<a href="https://${PROVS[p].get}" target="_blank" rel="noopener noreferrer">${PROVS[p].get}</a></span><input type="password" data-pk="${p}" placeholder="粘贴 API key" value="${esc(S.ai.alt[p].key)}" autocomplete="off"><input type="text" data-pm="${p}" value="${esc(S.ai.alt[p].model)}" style="margin-top:6px" autocomplete="off"></div>`).join("")}
+    ${Object.keys(PROVS).map(p=>`<div style="margin-top:10px"><b>${PROVS[p].name}</b> <span class="fine muted">· 申请：<a href="https://${PROVS[p].get}" target="_blank" rel="noopener noreferrer">${PROVS[p].get}</a></span><input type="password" data-pk="${p}" placeholder="粘贴 API key" value="${esc(S.ai.alt[p].key)}" autocomplete="off"><input type="text" data-pm="${p}" placeholder="模型名，可填多个，用逗号分隔，程序按任务挑" value="${esc(S.ai.alt[p].model)}" style="margin-top:6px" autocomplete="off"></div>`).join("")}
     <div style="margin-top:12px"><b>AI 生图模型</b> <span class="fine muted">· 用上面的 Gemini key。免费版不一定有图片额度；不能用时会自动改画示意图</span><input type="text" id="sImgM" value="${esc(S.ai.imgModel||"")}" style="margin-top:6px" autocomplete="off"></div>
     <div class="row" style="margin-top:10px"><button class="btn pri" id="pvSave">保存</button><span id="pvMsg" class="fine"></span></div><p class="fine muted">下面的模型名可以改：免费模型的名字常常变，如果提示「找不到模型」，到该服务的网站查最新名字再填进来。</p></div>
   <h3>我考的科目 & 信心</h3><p class="fine muted">信心 1 = 没把握，5 = 很稳。越没把握，越常排进每日重点。</p>
