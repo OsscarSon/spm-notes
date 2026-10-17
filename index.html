@@ -2540,6 +2540,10 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-18b",date:"2026-10-18",title:"新增壁纸功能",
+   items:[
+    "🖼️ 设置里多了「壁纸」一栏：可以选「自定义」(用自己的图片) 或「线条小狗」(5 张插画，每 10 秒自动换一张)。",
+    "默认不开壁纸；点一下选用，再点一下取消。自定义的图片只保存在你自己的浏览器里，不会上传。"]},
 {v:"2026-10-18",date:"2026-10-18",title:"可以装成 App 了",
    items:[
     "📲 铃铛右边多了一个安装按钮：点一下就能把「SPM备考」装到手机桌面，之后点图标直接进来，不用再开浏览器。",
@@ -3424,6 +3428,123 @@ window.__spm={S:()=>S,go};
     }).catch(function(){});
     navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl)announce();});
   }
+})();
+</script>
+<style id="wpCss">
+#wpLayer{position:fixed;inset:0;z-index:-1;display:none;pointer-events:none;overflow:hidden}
+#wpLayer.on{display:block}
+#wpLayer .wi{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 1.2s ease}
+#wpLayer .wi.show{opacity:1}
+#wpLayer::after{content:"";position:absolute;inset:0;background:var(--paper);opacity:.28}
+@media (prefers-reduced-motion:reduce){#wpLayer .wi{transition:none}}
+@media print{#wpLayer{display:none!important}}
+#wpCard .wthumbs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+#wpCard .wthumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+#wpCard .wprev{display:block;max-width:100%;max-height:140px;border-radius:12px;border:1px solid var(--line);margin:10px 0 8px}
+</style>
+<script>
+(function(){
+  var DOGS=["wallpapers/dog1.jpg","wallpapers/dog2.jpg","wallpapers/dog3.jpg","wallpapers/dog4.jpg","wallpapers/dog5.jpg"];
+  var KEY="spm-wp-mode",EVERY=10000;
+  var mode="",timer=null,idx=0,front=0,customURL=null;
+  try{mode=localStorage.getItem(KEY)||""}catch(e){}
+  if(mode!=="custom"&&mode!=="dogs")mode="";
+
+  function say(m){try{if(typeof toast==="function")toast(m)}catch(e){}}
+  function saveMode(){try{localStorage.setItem(KEY,mode)}catch(e){}}
+
+  /* ---- 自定义图片存在 IndexedDB (比 localStorage 大得多) ---- */
+  function db(){return new Promise(function(ok,no){try{var r=indexedDB.open("spm-wp",1);r.onupgradeneeded=function(){r.result.createObjectStore("kv")};r.onsuccess=function(){ok(r.result)};r.onerror=function(){no(r.error)}}catch(e){no(e)}})}
+  function dbGet(k){return db().then(function(d){return new Promise(function(ok,no){var q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=function(){ok(q.result||null)};q.onerror=function(){no(q.error)}})})}
+  function dbSet(k,v){return db().then(function(d){return new Promise(function(ok,no){var t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=ok;t.onerror=function(){no(t.error)}})})}
+  function shrink(file){return new Promise(function(ok,no){
+    var u=URL.createObjectURL(file),im=new Image();
+    im.onload=function(){var m=1600,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");
+      c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+      URL.revokeObjectURL(u);c.toBlob(function(b){b?ok(b):no(new Error("toBlob"))},"image/jpeg",.85)};
+    im.onerror=function(){URL.revokeObjectURL(u);no(new Error("bad image"))};im.src=u})}
+
+  /* ---- 壁纸图层 (两层交叉淡入淡出) ---- */
+  var layer=document.createElement("div");layer.id="wpLayer";layer.setAttribute("aria-hidden","true");
+  layer.innerHTML='<div class="wi"></div><div class="wi"></div>';
+  document.body.insertBefore(layer,document.body.firstChild);
+  var wis=layer.querySelectorAll(".wi");
+  function show(url){
+    var nxt=front?0:1;
+    wis[nxt].style.backgroundImage='url("'+url+'")';
+    wis[nxt].classList.add("show");wis[front].classList.remove("show");front=nxt;
+  }
+  function stop(){if(timer){clearInterval(timer);timer=null}}
+  function dogNext(){
+    idx=(idx+1)%DOGS.length;
+    var im=new Image();im.onload=function(){if(mode==="dogs")show(DOGS[idx])};im.src=DOGS[idx];
+  }
+  function apply(){
+    stop();
+    if(mode==="dogs"){
+      layer.classList.add("on");
+      var im=new Image();im.onload=function(){if(mode==="dogs")show(DOGS[idx])};im.src=DOGS[idx];
+      timer=setInterval(function(){if(!document.hidden)dogNext()},EVERY);
+    }else if(mode==="custom"){
+      dbGet("custom").then(function(b){
+        if(!b||mode!=="custom"){if(!b){mode="";saveMode();layer.classList.remove("on");fillCard()}return}
+        if(customURL)URL.revokeObjectURL(customURL);customURL=URL.createObjectURL(b);
+        layer.classList.add("on");show(customURL);fillCard();
+      }).catch(function(){mode="";saveMode();layer.classList.remove("on");fillCard()});
+    }else{
+      layer.classList.remove("on");wis[0].classList.remove("show");wis[1].classList.remove("show");
+    }
+  }
+
+  /* ---- 设置页里的「壁纸」栏 ---- */
+  var file=document.createElement("input");file.type="file";file.accept="image/*";file.style.display="none";document.body.appendChild(file);
+  file.onchange=function(){
+    var f=file.files&&file.files[0];file.value="";if(!f)return;
+    shrink(f).then(function(b){return dbSet("custom",b)}).then(function(){mode="custom";saveMode();apply();refreshBtns()})
+      .catch(function(){say("这张图片打不开，换一张试试")});
+  };
+  function card(){return document.getElementById("wpCard")}
+  function refreshBtns(){
+    var c=card();if(!c)return;
+    c.querySelectorAll("[data-wp=custom],[data-wp=dogs]").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-wp")===mode))});
+    fillCard();
+  }
+  function fillCard(){
+    var c=card();if(!c)return;var box=c.querySelector("#wpBody");if(!box)return;
+    if(mode==="dogs"){
+      box.innerHTML='<div class="wthumbs">'+DOGS.map(function(u){return '<img src="'+u+'" alt="" loading="lazy">'}).join("")+'</div><p class="fine muted" style="margin:6px 0 0">每 10 秒自动换一张，一共 5 张。插画 © MALTESE。</p>';
+    }else if(mode==="custom"){
+      box.innerHTML='<img class="wprev" id="wpPrev" alt="当前壁纸"><div class="controls"><button class="btn small" type="button" data-wp="pick">换一张图片</button></div><p class="fine muted" style="margin:6px 0 0">图片只保存在这台设备的浏览器里，不会上传到任何地方。</p>';
+      if(customURL)box.querySelector("#wpPrev").src=customURL;
+      else dbGet("custom").then(function(b){var p=document.getElementById("wpPrev");if(b&&p){customURL=URL.createObjectURL(b);p.src=customURL}});
+    }else box.innerHTML="";
+  }
+  function build(){
+    var c=document.createElement("div");c.className="card";c.id="wpCard";c.style.marginTop="14px";
+    c.innerHTML='<h3 style="margin-top:0">🖼️ 壁纸</h3><p class="fine muted">默认不用壁纸。点一下选用，再点一下取消。</p><div class="seg"><button type="button" data-wp="custom" aria-pressed="'+(mode==="custom")+'">自定义</button><button type="button" data-wp="dogs" aria-pressed="'+(mode==="dogs")+'">线条小狗</button></div><div id="wpBody"></div>';
+    c.addEventListener("click",function(e){
+      var b=e.target.closest("[data-wp]");if(!b)return;
+      var w=b.getAttribute("data-wp");
+      if(w==="pick"){file.click();return}
+      if(mode===w){mode="";saveMode();apply();refreshBtns();return}
+      if(w==="dogs"){mode="dogs";saveMode();apply();refreshBtns();return}
+      dbGet("custom").then(function(img){
+        if(img){mode="custom";saveMode();apply();refreshBtns()}else file.click();
+      }).catch(function(){file.click()});
+    });
+    return c;
+  }
+  var sheet=document.getElementById("sheet");
+  function inject(){
+    if(!sheet||card())return;
+    var h=sheet.querySelector("h2");
+    if(!h||h.textContent.trim()!=="设置")return;
+    var anchor=sheet.querySelector(".grid.g2")||h;
+    anchor.insertAdjacentElement("afterend",build());
+    fillCard();
+  }
+  if(sheet){new MutationObserver(inject).observe(sheet,{childList:true});inject()}
+  apply();
 })();
 </script>
 </body>
