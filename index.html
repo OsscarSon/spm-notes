@@ -1301,21 +1301,70 @@ function aiErr(status,data){const raw=(data&&data.error&&data.error.message)||""
   if(status===429){const m=raw.match(/retry in ([\d.]+)s/i);return "请求太频繁，或今天的免费额度用完了。"+(m?"约 "+Math.ceil(+m[1])+" 秒后可重试。":"等 1 分钟再试。")+"也可以换成 gemini-3.5-flash-lite。"}
   if(status>=500)return "Google 服务暂时繁忙 ("+status+")，稍后再试。";
   return "出错了 ("+status+")："+(raw||"未知错误")}
-async function gemCall(contents,system,maxTokens,modelOverride){
-  if(!gemOK())throw new Error("请先到「设置」填入 Gemini API key。");
-  const model=(modelOverride||S.ai.model||"").trim()||MODELS[0];
-  const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent?key="+encodeURIComponent(S.ai.key.trim());
-  const body={contents,generationConfig:{maxOutputTokens:maxTokens||8192}};if(system)body.systemInstruction={parts:[{text:system}]};
+/* ---- v2 传输层：JSON 模式 / 截断续写 / 退避重试 / 流式进度 (不改任何提示词) ---- */
+const CONT_MSG="你的上一段回答在中途被截断了。请从被截断的地方直接接着写，不要重复已经写过的内容，不要加开场白或总结，保持同样的格式。";
+let lastTrunc=false;
+const jit=ms=>ms+Math.floor(Math.random()*ms*0.4);
+function retryAfterSec(data,res){
+  const raw=String((data&&data.error&&(data.error.message||data.error))||"");
+  const m=raw.match(/(?:retry in|try again in)\s*([\d.]+)\s*(ms|s)?/i);
+  if(m){const v=+m[1];return m[2]&&m[2].toLowerCase()==="ms"?v/1000:v}
+  try{const h=res&&res.headers&&res.headers.get&&res.headers.get("retry-after");if(h&&!isNaN(+h))return +h}catch(e){}
+  return 0}
+function textOnly(contents){return contents.map(c=>({role:c.role,parts:(c.parts||[]).filter(p=>typeof p.text==="string")})).filter(c=>c.parts.length)}
+async function sseEach(res,fn){
+  if(!res.body||!res.body.getReader){(await res.text()).split(/\r?\n/).forEach(l=>{if(l.startsWith("data:"))fn(l.slice(5).trim())});return}
+  const rd=res.body.getReader(),dec=new TextDecoder();let buf="";
+  const flush=fin=>{let i;while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).replace(/\r$/,"");buf=buf.slice(i+1);if(line.startsWith("data:"))fn(line.slice(5).trim())}
+    if(fin&&buf.startsWith("data:")){fn(buf.slice(5).trim());buf=""}};
+  for(;;){const r=await rd.read();if(r.done)break;buf+=dec.decode(r.value,{stream:true});flush(false)}
+  buf+=dec.decode();flush(true)}
+async function readGemStream(res,onProgress){
+  let text="",fin="",blocked="";
+  await sseEach(res,s=>{if(!s||s==="[DONE]")return;let d;try{d=JSON.parse(s)}catch(e){return}
+    if(d.error){const er=new Error(aiErr(d.error.code||500,d));er.st=d.error.code||500;er.fb=true;throw er}
+    const c=d.candidates&&d.candidates[0];
+    if(!c){const br=d.promptFeedback&&d.promptFeedback.blockReason;if(br)blocked=br;return}
+    for(const p of(c.content&&c.content.parts)||[])if(!p.thought&&typeof p.text==="string")text+=p.text;
+    if(c.finishReason)fin=c.finishReason;
+    try{onProgress(text)}catch(e){}});
+  if(!text.trim())throw new Error(blocked?"请求被拦截了 ("+blocked+")，换个问法再试。":"模型没有返回文字"+(fin?" ("+fin+")":"")+"，请重试。");
+  return{text,fin}}
+async function gemOnce(model,contents,system,maxTokens,opts){
+  opts=opts||{};const stream=!!opts.onProgress;
+  const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":"+(stream?"streamGenerateContent?alt=sse&":"generateContent?")+"key="+encodeURIComponent(S.ai.key.trim());
+  let useJson=!!opts.json,neterr=0;
   for(let attempt=0;;attempt++){
+    const gc={maxOutputTokens:maxTokens||8192};if(useJson)gc.responseMimeType="application/json";
+    const body={contents,generationConfig:gc};if(system)body.systemInstruction={parts:[{text:system}]};
     let res;try{res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})}
-    catch(e){const er=new Error("网络请求失败。如果是在 claude.ai 里打开的预览版，那里不允许连接 Google；请用 GitHub Pages 或本地打开 index.html。其他情况请检查网络。");er.fb=true;throw er}
+    catch(e){if(neterr++<1){await sleep(jit(1200));continue}const er=new Error("网络请求失败。如果是在 claude.ai 里打开的预览版，那里不允许连接 Google；请用 GitHub Pages 或本地打开 index.html。其他情况请检查网络。");er.fb=true;throw er}
+    if(!res.ok){
+      let data=null;try{data=await res.json()}catch(e){}
+      const st=res.status,raw=(data&&data.error&&data.error.message)||"";
+      if(st===400&&useJson&&/mime|json mode|responseMimeType/i.test(raw)){useJson=false;attempt--;continue}
+      if((st===503||st===500)&&attempt<3){await sleep(jit(2000*Math.pow(2,attempt)));continue}
+      if(st===429&&attempt<2){const ra=retryAfterSec(data,res);if(ra>0&&ra<=8){await sleep(jit(ra*1000+500));continue}}
+      const er=new Error(aiErr(st,data));er.st=st;er.fb=(st===429||st>=500||st===401||st===403||st===404);throw er}
+    if(stream)return await readGemStream(res,opts.onProgress);
     let data=null;try{data=await res.json()}catch(e){}
-    if(!res.ok){if((res.status===503||res.status===500)&&attempt<2){await sleep(3000*(attempt+1));continue}{const er=new Error(aiErr(res.status,data));er.st=res.status;er.fb=(res.status===429||res.status>=500||res.status===401||res.status===403||res.status===404);throw er}}
     const cand=data&&data.candidates&&data.candidates[0];
     if(!cand){const br=data&&data.promptFeedback&&data.promptFeedback.blockReason;throw new Error(br?"请求被拦截了 ("+br+")，换个问法再试。":"模型没有返回内容，请重试。")}
     const text=((cand.content&&cand.content.parts)||[]).filter(p=>!p.thought&&typeof p.text==="string").map(p=>p.text).join("");
     if(!text.trim())throw new Error("模型没有返回文字"+(cand.finishReason?" ("+cand.finishReason+")":"")+"，请重试。");
-    lastAI={p:"gemini",m:model};return text}}
+    return{text,fin:cand.finishReason||""}}}
+async function gemCall(contents,system,maxTokens,modelOverride,opts){
+  if(!gemOK())throw new Error("请先到「设置」填入 Gemini API key。");
+  opts=opts||{};
+  const model=(modelOverride||S.ai.model||"").trim()||MODELS[0];
+  let r=await gemOnce(model,contents,system,maxTokens,opts),full=r.text,n=0;
+  const maxN=opts.json?0:2;   /* JSON 不续写 (拼接容易坏)，改由 parseJSON 抢救；纯文字 (笔记/问答) 最多续写 2 次 */
+  while(r.fin==="MAX_TOKENS"&&n<maxN){n++;
+    const c2=textOnly(contents).concat([{role:"model",parts:[{text:full}]},{role:"user",parts:[{text:CONT_MSG}]}]);
+    const base=full;
+    try{r=await gemOnce(model,c2,system,maxTokens,Object.assign({},opts,{onProgress:opts.onProgress?(t=>opts.onProgress(base+t)):null}))}catch(e){break}
+    full+=r.text}
+  lastTrunc=(r.fin==="MAX_TOKENS");lastAI={p:"gemini",m:model};return full}
 /* ---- 备用 AI：Groq / OpenRouter (OpenAI 格式) ---- */
 function toOAI(contents,stripped){
   const msgs=[];
@@ -1323,27 +1372,56 @@ function toOAI(contents,stripped){
     for(const p of c.parts||[]){if(typeof p.text==="string")t.push(p.text);else if(p.inline_data||p.file_data||p.inlineData||p.fileData)stripped.n++}
     msgs.push({role:c.role==="model"?"assistant":"user",content:t.join("\n")})}
   return msgs}
-async function altCall(p,contents,system,maxTokens,mo){
-  const P=PROVS[p],a=S.ai.alt[p],stripped={n:0};
+async function altOnce(p,msgs,maxTokens,mo,opts){
+  opts=opts||{};const P=PROVS[p],a=S.ai.alt[p];
+  const model=mo||(a.model||"").split(",")[0].trim()||P.model,stream=!!opts.onProgress;
+  let useJson=opts.json==="{",neterr=0;
+  for(let attempt=0;;attempt++){
+    const b={model,messages:msgs,max_tokens:maxTokens||8192};if(useJson)b.response_format={type:"json_object"};if(stream)b.stream=true;
+    let res;
+    try{res=await fetch(P.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+a.key.trim()},body:JSON.stringify(b)})}
+    catch(e){if(neterr++<1){await sleep(jit(1200));continue}const er=new Error(P.name+" 网络请求失败，请检查网络。");er.fb=true;throw er}
+    if(!res.ok){
+      let data=null;try{data=await res.json()}catch(e){}
+      const raw=(data&&data.error&&(data.error.message||data.error))||"";
+      if(res.status===400&&useJson){useJson=false;attempt--;continue}   /* 这个模型不支持 JSON 模式：去掉再试 */
+      if(res.status===429&&attempt<2){const ra=retryAfterSec(data,res);if(ra>0&&ra<=8){await sleep(jit(ra*1000+500));continue}}
+      if(res.status>=500&&attempt<1){await sleep(jit(2000));continue}
+      const er=new Error(P.name+" 出错 ("+res.status+")："+(typeof raw==="string"?raw:JSON.stringify(raw)).slice(0,160));
+      er.st=res.status;er.fb=(res.status===429||res.status>=500||res.status===401||res.status===402||res.status===403||res.status===404||res.status===413);throw er}
+    let text="",fin="",rmodel="";
+    if(stream){
+      await sseEach(res,s=>{if(!s||s==="[DONE]")return;let d;try{d=JSON.parse(s)}catch(e){return}
+        if(d.error){const er=new Error(P.name+" 出错："+String(d.error.message||JSON.stringify(d.error)).slice(0,160));er.st=d.error.code;er.fb=true;throw er}
+        if(typeof d.model==="string")rmodel=d.model;
+        const c=d.choices&&d.choices[0];if(!c)return;
+        const dl=c.delta&&c.delta.content;if(typeof dl==="string")text+=dl;else if(Array.isArray(dl))text+=dl.map(x=>x&&x.text||"").join("");
+        if(c.finish_reason)fin=c.finish_reason;
+        try{opts.onProgress(text)}catch(e){}})}
+    else{
+      let data=null;try{data=await res.json()}catch(e){}
+      const c=data&&data.choices&&data.choices[0];
+      text=c&&c.message&&c.message.content;if(Array.isArray(text))text=text.map(x=>x&&x.text||"").join("");
+      text=String(text||"");fin=(c&&c.finish_reason)||"";rmodel=data&&typeof data.model==="string"?data.model:""}
+    text=text.replace(/<think>[\s\S]*?<\/think>/g,"");if(!opts.cont&&fin!=="length")text=text.trim();
+    if(!text.trim())throw new Error(P.name+" 没有返回文字，请重试。");
+    return{text,fin,model:rmodel||model}}}
+async function altCall(p,contents,system,maxTokens,mo,opts){
+  opts=opts||{};const stripped={n:0};
   const msgs=toOAI(contents,stripped);
   const sys=(system||"")+(stripped.n?"\n【注意】这次学生附带的图片或 PDF 你看不到，只能依据上面的文字资料作答。需要看附件的地方，直接告诉学生「这个模型看不到附件」，不要猜。":"");
   if(sys)msgs.unshift({role:"system",content:sys});
-  let res;
-  try{res=await fetch(P.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+a.key.trim()},body:JSON.stringify({model:mo||(a.model||"").split(",")[0].trim()||P.model,messages:msgs,max_tokens:maxTokens||8192})})}
-  catch(e){const er=new Error(P.name+" 网络请求失败，请检查网络。");er.fb=true;throw er}
-  let data=null;try{data=await res.json()}catch(e){}
-  if(!res.ok){const raw=(data&&data.error&&(data.error.message||data.error))||"";
-    const er=new Error(P.name+" 出错 ("+res.status+")："+(typeof raw==="string"?raw:JSON.stringify(raw)).slice(0,160));
-    er.st=res.status;er.fb=(res.status===429||res.status>=500||res.status===401||res.status===402||res.status===403||res.status===404||res.status===413);throw er}
-  let text=data&&data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content;
-  if(Array.isArray(text))text=text.map(x=>x&&x.text||"").join("");
-  text=String(text||"").replace(/<think>[\s\S]*?<\/think>/g,"").trim();
-  if(!text)throw new Error(P.name+" 没有返回文字，请重试。");
-  lastAI={p,m:(data&&typeof data.model==="string"&&data.model)||mo||(a.model||"").split(",")[0].trim()||P.model};return text}
-async function gemTry(contents,system,maxTokens){
-  try{return await gemCall(contents,system,maxTokens)}
+  let r=await altOnce(p,msgs,maxTokens,mo,opts),full=r.text,n=0;
+  const maxN=opts.json?0:2;
+  while(r.fin==="length"&&n<maxN){n++;
+    const m2=msgs.concat([{role:"assistant",content:full},{role:"user",content:CONT_MSG}]);const base=full;
+    try{r=await altOnce(p,m2,maxTokens,mo,Object.assign({},opts,{cont:true,onProgress:opts.onProgress?(t=>opts.onProgress(base+t)):null}))}catch(e){break}
+    full+=r.text}
+  lastTrunc=(r.fin==="length");lastAI={p,m:r.model};return full}
+async function gemTry(contents,system,maxTokens,opts){
+  try{return await gemCall(contents,system,maxTokens,undefined,opts)}
   catch(e){if(e.st!==404)throw e;const cur=(S.ai.model||"").trim();
-    for(const m of MODELS){if(m===cur)continue;try{const o=await gemCall(contents,system,maxTokens,m);toast("原来的模型找不到，已改用 "+m);return o}catch(e2){if(e2.st!==404)throw e2}}
+    for(const m of MODELS){if(m===cur)continue;try{const o=await gemCall(contents,system,maxTokens,m,opts);toast("原来的模型找不到，已改用 "+m);return o}catch(e2){if(e2.st!==404)throw e2}}
     throw e}}
 /* ---- 自动选择 AI：三步。①先选哪一家 (Gemini / Groq / OpenRouter)；②再按任务轻重选这一家的哪类模型；③最后看额度选具体模型。全部用规则判断，不额外耗额度 ---- */
 let RT={};try{RT=JSON.parse(localStorage.getItem("spm-route")||"{}")}catch(e){}
@@ -1404,7 +1482,7 @@ function rtStat(){const ps=PORDER.filter(provOK);if(!ps.length)return"";
     const r=rtGet(p);return rtName(p)+" "+r.n+" 次"+(rtCool(p)?"（被限流，约 "+Math.max(1,Math.ceil((RT[p].cd-Date.now())/60000))+" 分钟后再用）":"")}).join(" · ")}
 let rtLast="";let lastAI=null;
 function aiLabel(){if(!lastAI)return"";return lastAI.p==="gemini"?lastAI.m:rtName(lastAI.p)+" · "+lastAI.m}
-async function gem(contents,system,maxTokens){
+async function gemRun(contents,system,maxTokens,opts){
   const T=rtTask(contents,system,maxTokens),auto=S.ai.route!=="manual";
   let order;
   if(auto){order=rtOrder(T);if(S.ai.fallback===false)order=order.slice(0,1)}
@@ -1413,13 +1491,13 @@ async function gem(contents,system,maxTokens){
   let last;
   for(let i=0;i<order.length;i++){const p=order[i];
     try{let out,used=p;
-      if(!auto)out=p==="gemini"?await gemTry(contents,system,maxTokens):await altCall(p,contents,system,maxTokens);
+      if(!auto)out=p==="gemini"?await gemTry(contents,system,maxTokens,opts):await altCall(p,contents,system,maxTokens,undefined,opts);
       else{
         const ms=p==="gemini"?rtGemModels(T):rtAltModels(p,T);
         if(!ms.length){const er=new Error(rtName(p)+" 的模型暂时都不能用。");er.fb=true;throw er}
         let le;
         for(const m of ms){
-          try{out=p==="gemini"?await gemCall(contents,system,maxTokens,m):await altCall(p,contents,system,maxTokens,m);used=m;break}
+          try{out=p==="gemini"?await gemCall(contents,system,maxTokens,m,opts):await altCall(p,contents,system,maxTokens,m,opts);used=m;break}
           catch(e){le=e;rtFailM(p==="gemini"?m:p+":"+m,e);if(!(e.st===429||e.st===404||e.st>=500))throw e}}
         if(out===undefined)throw le;
         rtOk(p,p==="gemini"?used:p+":"+used);
@@ -1428,9 +1506,28 @@ async function gem(contents,system,maxTokens){
       if(p!==rtLast&&(i>0||p!==(S.ai.provider||"gemini"))){toast((auto&&i===0?"自动选择了 ":"已自动切换到 ")+rtName(p))}rtLast=p;return out}
     catch(e){last=e;rtFail(p,e,T);if(!e.fb||i===order.length-1)break}}
   throw last}
+/* ---- 结果缓存：只给「同样输入就该得到同样结果」的请求用 (小章节目录、评分)；出题、笔记重新生成不缓存 ---- */
+const AIC={db:null,TTL:30*864e5,MAX:200,open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);if(!window.indexedDB)return rej(new Error("no idb"));const r=indexedDB.open("spm-aicache",1);r.onupgradeneeded=()=>r.result.createObjectStore("c",{keyPath:"k"});r.onsuccess=()=>{this.db=r.result;res(r.result)};r.onerror=()=>rej(r.error)})}};
+const INFLIGHT=new Map();
+function cacheKey(contents,system,maxTokens,opts){
+  for(const c of contents)for(const p of c.parts||[])if(typeof p.text!=="string")return null;   /* 带图片/PDF 的不缓存 */
+  return "c"+hash53(JSON.stringify([system||"",contents,maxTokens||0,opts.json||""]))}
+async function aiCacheGet(k){try{const db=await AIC.open();return await new Promise(res=>{const q=db.transaction("c").objectStore("c").get(k);q.onsuccess=()=>{const v=q.result;res(v&&Date.now()-v.t<AIC.TTL?v.v:null)};q.onerror=()=>res(null)})}catch(e){return null}}
+async function aiCachePut(k,v){try{const db=await AIC.open();const st=db.transaction("c","readwrite").objectStore("c");st.put({k,v,t:Date.now()});
+  const all=st.getAll();all.onsuccess=()=>{const a=all.result||[];if(a.length>AIC.MAX){a.sort((x,y)=>x.t-y.t).slice(0,a.length-AIC.MAX+20).forEach(x=>st.delete(x.k))}}}catch(e){}}
+async function gem(contents,system,maxTokens,opts){
+  opts=opts||{};
+  const ck=opts.cache?cacheKey(contents,system,maxTokens,opts):null;
+  if(!ck)return gemRun(contents,system,maxTokens,opts);
+  const hit=await aiCacheGet(ck);if(hit!=null)return hit;
+  if(INFLIGHT.has(ck))return INFLIGHT.get(ck);
+  const run=gemRun(contents,system,maxTokens,opts);INFLIGHT.set(ck,run);
+  try{const out=await run;aiCachePut(ck,out);return out}finally{INFLIGHT.delete(ck)}}
 function fixTex(t){return t.replace(/(?<!\\)\\(?=[()\[\]]|(?:frac|dfrac|sqrt|times|div|cdot|theta|pi|alpha|beta|gamma|delta|Delta|sigma|Sigma|mu|lambda|omega|Omega|sin|cos|tan|sec|cot|csc|log|ln|lim|sum|int|infty|leq|geq|neq|le|ge|ne|pm|mp|approx|to|rightarrow|leftarrow|Rightarrow|Leftrightarrow|left|right|text|mathrm|ce|vec|overline|bar|hat|cdots|ldots|circ|angle|perp|parallel|propto|therefore|because|binom|quad|qquad|mathbf|lt|gt)(?![A-Za-z]))/g,"\\\\")}
-function parseJSON(t,open){t=fixTex(t.replace(/```json|```/g,"").trim());const a=t.indexOf(open),b=t.lastIndexOf(open==="["?"]":"}");if(a<0||b<a)throw new Error("AI 返回的格式没解析成功，请再试一次。");
-  try{return JSON.parse(t.slice(a,b+1))}catch(e){throw new Error("AI 返回的格式没解析成功 (可能内容被截断)，请再试一次。")}}
+function parseJSON(t,open,salv){t=fixTex(t.replace(/```json|```/g,"").trim());const a=t.indexOf(open),b=t.lastIndexOf(open==="["?"]":"}");
+  if(a>=0&&b>a){try{return JSON.parse(t.slice(a,b+1))}catch(e){}}
+  if(a>=0&&salv){const s=salvageJSON(t.slice(a),salv);if(s!==undefined)return s}
+  throw new Error(a<0||b<a?"AI 返回的格式没解析成功，请再试一次。":"AI 返回的格式没解析成功 (可能内容被截断)，请再试一次。")}
 function sysPrompt(sid,extra){const s=subj(sid);
   return ["你是马来西亚 SPM (KSSM Form 4 / Form 5) 的备考助教，学生是说华语的华裔学生。",
    langRule(sid),
@@ -2159,12 +2256,25 @@ function findChap(sid,k){return chapsOf(sid).find(c=>c.k===k)}
 const FIGRULE="【作图规则】是否需要图由你自己判断：凡是看图比看文字更容易懂、或 SPM 常考看图作答的内容 (如生物的细胞、器官、系统结构图，食物链和各种循环图，实验装置图，化学仪器和分子结构，电路图、光线图、受力图，几何图形，函数图像，地理或历史示意图，流程图)，即使学生没要求也主动画出来，不要只用文字描述；一句话能讲清楚的就不画。生物结构图画简化的示意即可，每个部分用引线加文字标出名称，图后再用文字列出各部分的功能。用三个反引号代码块，有三种写法：\n(1) 函数图像：```plot 代码块，每行一项。例如 y = x^2 - 4x + 3 (可以多条)；可选 x: -2..6 和 y: -4..10 设定范围；points: (1,0) A; (3,0) B 标出点；x = 2 画竖虚线 (如对称轴)；title: 标题。\n(2) 其他示意图 (装置图、几何、电路)：```svg 代码块，写完整的 <svg viewBox=\"0 0 600 400\" xmlns=\"http://www.w3.org/2000/svg\">，不要填背景色，线条和文字用深色 (#222)，文字 font-size 14-16，每个部件都标上名称 (如「烧瓶」「冷凝管」)；不要用 script、image、style 或外部链接。画不准的细节宁可简化，并说明这是示意图。\n(3) 写实插图：```image 代码块，里面用一句英文写画面描述 (画什么、什么风格)。只在需要「看起来像真的」而且不需要精确文字标注时才用 (如器官外观、显微镜下的样子、地貌)；有标注的结构图一律用 svg。学生点一下按钮才会生成，所以不要滥用。\n代码块前后照常用文字讲解。";
 const MARKRULE=`【SPM 给分对照】SPM 按「得分点」给分：一个正确的关键点 (keyword / fact) 得 1 分，要解释的题再加 1 分解释。State / Nyatakan = 只写点，每点 1 分；Explain / Terangkan / Jelaskan = 一个点加一个解释算一组；Compare / Banding = 相同点和不同点都要有，各至少 3 点；Describe / Huraikan = 按步骤或特征逐点写；历史科 (Sejarah 1249) 的评分：Kertas 1 是 40 题选择题；Kertas 2 Bahagian A 共 4 题全答，每题 10 分，分成 (a) 2 分、(b) 4 分、(c) 4 分；Bahagian B 共 5 题答 3 题，每题 20 分，常见分成 (a)(b) 各约 6 分、(c) 8 分。评分表里每个正确的事实 (F) 或阐述 (H) 各 1 分，写「mana-mana N x 1m」，所以 6 分的问题至少要写 6 个得分点，笔记里每个小章节要列出 8 个以上 F/H 要点 (事实 + 阐述成组写)；(c) 8 分的 KBAT 按四个层级给分 (1–2、3–4、5–6、7–8)，要有清楚的知识、合适的证据、正确的推断，而且题目有两个任务时两个都要答 (只答一个最多 4 分，照抄原文只有 2 分)；数学科的评分表用 K (方法分)、N (答案分)、P 这类记号，写出每一步才拿得到方法分；道德科 = 价值 + 定义 + 情境 + 后果。所以笔记里每一个小节都要把课本中考试会问的「得分点」写全：凡是列表型内容 (功能、特点、原因、影响、步骤、例子、用途、优缺点) 要列出课本给出的全部要点，至少 4 点，不要只挑两三个；每个要点写成可以直接抄上答卷的完整句子，关键词用粗体；计算题写出方法步骤并标明哪一步拿方法分。每个小节最后用一行「💯 给分对照」写出：这一节常见的问法 → 分数 → 需要写几个得分点。`;
 function noteSystem(sid){return sysPrompt(sid,"你现在是 SPM 笔记整理老师：只整理考试用得上的内容，条理清晰，不要编造；但得分点一定要写全，宁可多列一点也不要漏。\n"+MARKRULE+"\n"+FIGRULE)}
+/* ---- JSON 抢救：被截断的 JSON 数组/对象，保留已经完整的题目 ---- */
+function salvageJSON(s,depth){const st=[];let inS=false,esc=false,cut=-1,stk=null;
+  for(let i=0;i<s.length;i++){const ch=s[i];
+    if(inS){if(esc)esc=false;else if(ch==="\\")esc=true;else if(ch==='"')inS=false;continue}
+    if(ch==='"'){inS=true;continue}
+    if(ch==="{"||ch==="[")st.push(ch);
+    else if(ch==="}"||ch==="]"){st.pop();if(st.length===depth){cut=i+1;stk=st.slice()}}}
+  if(cut<0)return undefined;
+  const closers=stk.slice().reverse().map(c=>c==="{"?"}":"]").join("");
+  try{return JSON.parse(s.slice(0,cut)+closers)}catch(e){return undefined}}
+/* ---- 生成进度 (流式)：只更新按钮/提示文字，不碰笔记内容 ---- */
+function progFn(label,show){let last=0;return t=>{const n=Date.now();if(n-last<250)return;last=n;try{show(label+" "+t.length+" 字")}catch(e){}}}
+function notePrompt(sid,c){const s=subj(sid);return `请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：\n1. 每个小章节单独成一节 (用二级标题)，${c.subs.length?"依据上面给出的小章节，一个都不要合并、不要省略，再小的小章节也要单独写":"如果你不能确定课本的小章节名称，先按 DSKP 常见划分列出并注明『按 DSKP 推测』，每个小章节单独成一节，不要合并"}。\n2. 每个小章节依次写：术语与定义 / 得分点清单 (课本里考试会问的要点要写全，列表型内容至少 4 点，每点一句完整的话，关键词粗体) / 过程、比较或公式 (需要时用表格) / 易错点 / 「💯 给分对照」一行 (常见问法 → 分数 → 需要几个得分点)。\n3. 最后给：5 行以内的速记表，和 5 道自测题，每题写明分数，答案连同评分要点放在最后。\n4. 若学生提供了章节要求或上传了资料，以它们为准，资料里没有的不要编。\n5. 语言按系统提示里的【语言规则】(考试语言 + 每个要点后的「华文：」翻译与解释，不要为了省篇幅把要点合并或删掉)；用 Markdown 小标题和列表。`}
 async function genNote(sid,k,btn){
   const c=findChap(sid,k),s=subj(sid);if(!c)return;setBusy(btn,true,"生成中…");
   try{const fp=await fileParts(sid);
-    const prompt=`请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：\n1. 每个小章节单独成一节 (用二级标题)，${c.subs.length?"依据上面给出的小章节，一个都不要合并、不要省略，再小的小章节也要单独写":"如果你不能确定课本的小章节名称，先按 DSKP 常见划分列出并注明『按 DSKP 推测』，每个小章节单独成一节，不要合并"}。\n2. 每个小章节依次写：术语与定义 / 得分点清单 (课本里考试会问的要点要写全，列表型内容至少 4 点，每点一句完整的话，关键词粗体) / 过程、比较或公式 (需要时用表格) / 易错点 / 「💯 给分对照」一行 (常见问法 → 分数 → 需要几个得分点)。\n3. 最后给：5 行以内的速记表，和 5 道自测题，每题写明分数，答案连同评分要点放在最后。\n4. 若学生提供了章节要求或上传了资料，以它们为准，资料里没有的不要编。\n5. 语言按系统提示里的【语言规则】(考试语言 + 每个要点后的「华文：」翻译与解释，不要为了省篇幅把要点合并或删掉)；用 Markdown 小标题和列表。`;
-    const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000);
-    putNote(k,out);save();toast(S.notes[k].hist.length?"已生成新版本，旧版本在「历史版本」里":"笔记已生成");if(S.tab==="notes"){S.openChap=k;rNotes()}}
+    const prompt=notePrompt(sid,c);
+    const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000,{onProgress:progFn("生成中…",s=>{if(btn&&btn.isConnected)btn.innerHTML='<span class="spin"></span>'+s})});
+    putNote(k,out);save();toast(lastTrunc?"笔记已生成，但内容很长，结尾可能不完整，可以再点一次重新生成":S.notes[k].hist.length?"已生成新版本，旧版本在「历史版本」里":"笔记已生成");if(S.tab==="notes"){S.openChap=k;rNotes()}}
   catch(e){toast(e.message.slice(0,80));setBusy(btn,false);const m=$("#bulkMsg");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}
 async function bulkGen(sid){
   const todo=chapsOf(sid).filter(c=>c.core&&!S.notes[c.k]);if(!todo.length){toast("这一科的章节都有笔记了");return}
@@ -2172,13 +2282,13 @@ async function bulkGen(sid){
   bulk={on:true,stop:false};rNotes();
   for(let i=0;i<todo.length&&!bulk.stop;i++){const c=todo[i];const m=$("#bulkMsg");if(m)m.innerHTML=`<span class="spin"></span>正在生成 ${i+1}/${todo.length}：${esc(c.t)}`;
     try{const fp=await fileParts(sid);const s=subj(sid);
-      const prompt=`请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：每个小章节单独成一节 (二级标题)，${c.subs.length?"依据给出的小章节，一个都不合并、不省略":"不确定课本小章节名称时按 DSKP 常见划分并注明『按 DSKP 推测』，不合并"}；每个小章节依次写：术语与定义 / 得分点清单 (写全，列表型至少 4 点，每点一句完整的话，关键词粗体) / 过程、比较或公式 / 易错点 / 「💯 给分对照」一行 (问法 → 分数 → 几个得分点)；最后给 5 行以内速记表和 5 道自测题 (写明分数，答案连评分要点放最后)。资料里没有的不要编。语言按系统提示里的【语言规则】(考试语言 + 「华文：」翻译与解释，不要合并或删减要点)，用 Markdown。`;
-      const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000);putNote(c.k,out);save();await sleep(rtPace())}
+      const prompt=notePrompt(sid,c);
+      const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000,{onProgress:progFn("",s=>{const e=$("#bulkMsg");if(e)e.innerHTML='<span class="spin"></span>正在生成 '+(i+1)+"/"+todo.length+"："+esc(c.t)+" · "+s})});putNote(c.k,out);save();await sleep(rtPace())}
     catch(e){const m2=$("#bulkMsg");if(m2)m2.innerHTML=`<span style="color:var(--bad)">在「${esc(c.t)}」停下了：${esc(e.message)}</span>`;bulk.stop=true;bulk.err=true}}
   const err=bulk.err;bulk={on:false,stop:false};const keep=$("#bulkMsg")&&err?$("#bulkMsg").innerHTML:"";rNotes();if(keep&&$("#bulkMsg"))$("#bulkMsg").innerHTML=keep;if(!err)toast("批量生成完成")}
 async function genSubs(sid,k,btn){const c=findChap(sid,k),s=subj(sid);setBusy(btn,true,"生成中…");
-  try{const out=await gem([{role:"user",parts:[{text:`列出 KSSM「${s.name}」的章节「${c.t}」按 DSKP / 课本通常的小章节标题 (如 1.1 …、1.2 …)。只输出 JSON 字符串数组，例如 ["1.1 …","1.2 …"]，不要其他文字。不确定的小章节名称，在末尾加『(推测)』。`}]}],sysPrompt(sid),2048);
-    const arr=parseJSON(out,"[").filter(x=>typeof x==="string").slice(0,20);if(!arr.length)throw new Error("没有得到小章节");S.subsAI[k]=arr;bust();save();rNotes()}
+  try{const out=await gem([{role:"user",parts:[{text:`列出 KSSM「${s.name}」的章节「${c.t}」按 DSKP / 课本通常的小章节标题 (如 1.1 …、1.2 …)。只输出 JSON 字符串数组，例如 ["1.1 …","1.2 …"]，不要其他文字。不确定的小章节名称，在末尾加『(推测)』。`}]}],sysPrompt(sid),2048,{json:"[",cache:true});
+    const arr=parseJSON(out,"[",1).filter(x=>typeof x==="string").slice(0,20);if(!arr.length)throw new Error("没有得到小章节");S.subsAI[k]=arr;bust();save();rNotes()}
   catch(e){toast(e.message.slice(0,80));setBusy(btn,false)}}
 
 /* ---- 闪卡 ---- */
@@ -2205,8 +2315,8 @@ function rFlash(){
   $("#fgGo").onclick=()=>genCards(sid,$("#fgC").value,+$("#fgN").value,$("#fgGo"));
 }
 async function genCards(sid,k,n,btn){const c=findChap(sid,k);setBusy(btn,true,"生成中…");
-  try{const fp=await fileParts(sid);const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」的章节「${c.t}」做 ${n} 张复习闪卡。\n${chapText(c,3500)}\n只输出 JSON 数组：[{"q":"问题","a":"简短答案","qz":"问题的华文翻译","az":"答案的华文翻译，加一句华文解释"}]。q 和 a 用考试语言 (见【语言规则】)，答案不超过 60 字；qz、az 用华文${wantZh(sid)?"":"，这次不需要，留空字符串"}。问题要考核心概念、公式、定义或易错点。不要编造资料里没有的内容。`}]}],sysPrompt(sid),4096);
-    const arr=parseJSON(out,"[").filter(x=>x&&x.q&&x.a);if(!arr.length)throw new Error("没有得到闪卡");arr.forEach((x,i)=>S.cards.push({id:"g"+Date.now()+i,s:sid,q:String(x.q),a:String(x.a),qz:x.qz?String(x.qz):"",az:x.az?String(x.az):""}));save();fq=[];toast(`已添加 ${arr.length} 张闪卡`);if(S.tab==="flash")rFlash();else setBusy(btn,false)}
+  try{const fp=await fileParts(sid);const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」的章节「${c.t}」做 ${n} 张复习闪卡。\n${chapText(c,3500)}\n只输出 JSON 数组：[{"q":"问题","a":"简短答案","qz":"问题的华文翻译","az":"答案的华文翻译，加一句华文解释"}]。q 和 a 用考试语言 (见【语言规则】)，答案不超过 60 字；qz、az 用华文${wantZh(sid)?"":"，这次不需要，留空字符串"}。问题要考核心概念、公式、定义或易错点。不要编造资料里没有的内容。`}]}],sysPrompt(sid),4096,{json:"["});
+    const arr=parseJSON(out,"[",1).filter(x=>x&&x.q&&x.a);if(!arr.length)throw new Error("没有得到闪卡");arr.forEach((x,i)=>S.cards.push({id:"g"+Date.now()+i,s:sid,q:String(x.q),a:String(x.a),qz:x.qz?String(x.qz):"",az:x.az?String(x.az):""}));save();fq=[];toast(`已添加 ${arr.length} 张闪卡`);if(S.tab==="flash")rFlash();else setBusy(btn,false)}
   catch(e){toast(e.message.slice(0,80));setBusy(btn,false)}}
 
 /* ---- 刷题 (选择题 + 错题本) ---- */
@@ -2241,8 +2351,8 @@ function rQuiz(){
         const nOpen=t==="open"?n:t==="mix"?Math.round(n/2):0,nMcq=n-nOpen;
         const spec=`${nMcq?`${nMcq} 道单选题 (4 个选项)`:""}${nMcq&&nOpen?" 和 ":""}${nOpen?`${nOpen} 道作答题 (${openHint(sid)})`:""}`;
         const fmt=`只输出 JSON 对象：{"items":[${nMcq?`{"t":"mcq","q":"题目","o":["A内容","B内容","C内容","D内容"],"a":0,"e":"解析","qz":"${z?"题目和选项的华文翻译":""}","ez":"${z?"解析的华文翻译与一句解释":""}"}`:""}${nMcq&&nOpen?",":""}${nOpen?`{"t":"open","q":"题目","m":3,"scheme":"评分要点 (逐点列出得分点，可接受的答案)","qz":"${z?"题目的华文翻译":""}","cz":"${z?"评分要点的华文翻译":""}"}`:""}]}。a 是正确选项序号 (0-3)；m 是该作答题的分值 (1-6，和难度匹配)。${t==="mix"?"两种题型交错排列。":""}`;
-        const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」出 ${spec}，共 ${n} 题。难度：${$("#qD").value}。\n${ctx}\n要求：贴近 KSSM 与 SPM 风格；每题有明确答案；解析写出关键步骤；不要编造资料里没有的内容；题目、选项、解析、评分要点用考试语言 (见【语言规则】)，${z?"qz、ez、cz 用华文":"不需要华文翻译，qz、ez、cz 留空字符串"}。\n${fmt}`}]}],sysPrompt(sid),12000);
-        let items;if(t==="mcq"){const o=parseJSON(out,"{");items=o.items||[]}else{items=(parseJSON(out,"{").items)||[]}
+        const out=await gem([{role:"user",parts:[...fp.parts,{text:`为 SPM「${subj(sid).name}」出 ${spec}，共 ${n} 题。难度：${$("#qD").value}。\n${ctx}\n要求：贴近 KSSM 与 SPM 风格；每题有明确答案；解析写出关键步骤；不要编造资料里没有的内容；题目、选项、解析、评分要点用考试语言 (见【语言规则】)，${z?"qz、ez、cz 用华文":"不需要华文翻译，qz、ez、cz 留空字符串"}。\n${fmt}`}]}],sysPrompt(sid),12000,{json:"{"});
+        let items;if(t==="mcq"){const o=parseJSON(out,"{",2);items=o.items||[]}else{items=(parseJSON(out,"{",2).items)||[]}
         const qs=items.map(x=>{if(!x||!x.q)return null;if(x.t==="open"&&nOpen)return{t:"open",q:String(x.q),m:Math.max(1,Math.min(10,Number(x.m)||2)),scheme:String(x.scheme||""),qz:x.qz||"",cz:x.cz||""};
           if(Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4)return{t:"mcq",q:String(x.q),o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||""};return null}).filter(Boolean);
         if(!qs.length)throw new Error("AI 返回的题目格式不对，请再试一次。");
@@ -2280,7 +2390,7 @@ function renderOpen(q){
     setBusy($("#oSub"),true,"批改中…");
     try{const content=[{text:`请批改这道 SPM「${subj(qz.sid).name}」作答题。\n题目：${q.q}\n满分：${q.m}\n评分要点：${q.scheme}\n学生作答：${ans||"(见照片)"}\n\n规则：只依据学生写的内容给分，不要替学生补全；分数 ≤ 满分，可给 0.5 分；comment 用华文 2-3 句 (学生需要看懂)，指出得分点、失分原因和怎样答才能拿满分，关键词、标准答案和值得背的句子用考试语言写出来 (华文科目全部用华文)。学生如附了手写照片，先读出内容再批改，字迹看不清要在评语中说明。\n只输出 JSON：{"score":数字,"comment":"评语"}`}];
       if(qz.img){content.push({text:"手写答案照片："});content.push({inline_data:{mime_type:"image/jpeg",data:qz.img}})}
-      const out=await gem([{role:"user",parts:content}],sysPrompt(qz.sid,"你现在是严格公正的 SPM 评卷员。"),2048);const o=parseJSON(out,"{");
+      const out=await gem([{role:"user",parts:content}],sysPrompt(qz.sid,"你现在是严格公正的 SPM 评卷员。"),2048,{json:"{",cache:true});const o=parseJSON(out,"{");
       finishOpen(q,{score:Math.max(0,Math.min(q.m,Number(o.score)||0)),comment:String(o.comment||"")},false,ans)}
     catch(e){setBusy($("#oSub"),false);$("#oMsg").innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}}
 function finishOpen(q,r,skipped,ans){
@@ -2426,20 +2536,28 @@ async function genExam(type,std,nCustom,diff,limitSel,zh){
     const cleanQ=(q,i,sec)=>({no:0,sec:sec||null,fig:normFig(q.fig),stem:q.stem||"",sz:q.sz||"",parts:q.parts.map(p=>({p:p.p||"",q:String(p.q||""),qz:p.qz||"",m:Number(p.m)||1,scheme:String(p.scheme||""),cz:p.cz||""}))});
     let qs=[],title="",instr="",secs=null;
     if(type.kind==="mcq"){const n=useSpec&&sp.n?sp.n:nCustom;
-      prog(`出 ${n} 道选择题…`);
-      const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`出 ${n} 道单选题 (4 个选项，每题 1 分)，覆盖面要广。只输出 JSON：{"title":"卷名","instructions":"说明","mcq":[{"q":"题目","o":["A","B","C","D"],"a":0,"e":"解析","qz":"${zh?"题目和选项的华文翻译":""}","ez":"${zh?"解析的华文翻译":""}"}]}${zh?"\nqz、ez 用华文，其余用考试语言。":""}`}]}],sysp,30000);
-      const o=parseJSON(out,"{");const m=(o.mcq||[]).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!m.length)throw new Error("AI 返回的题目格式不对，请再试一次。");
-      qs=m.map((x,i)=>({no:i+1,mcq:true,fig:normFig(x.fig),stem:x.q,o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||"",m:1}));title=o.title||"";instr=o.instructions||""}
+      const sizes=[];for(let left=n;left>0;){const c=left>24?20:left;sizes.push(c);left-=c}
+      const mAll=[],usedM=[];let gotMeta=false;
+      for(let ci=0;ci<sizes.length;ci++){const c=sizes[ci];
+        prog(sizes.length>1?`出 ${n} 道选择题：第 ${ci+1}/${sizes.length} 批…`:`出 ${n} 道选择题…`);
+        let part=null,perr=null;
+        for(let tryN=0;tryN<2&&!part;tryN++){try{
+          const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`出 ${c} 道单选题 (4 个选项，每题 1 分)，覆盖面要广。${usedM.length?`\n已经出过的题目 (不要重复，也不要考同一个知识点)：${usedM.join("；")}\n`:""}只输出 JSON：{"title":"卷名","instructions":"说明","mcq":[{"q":"题目","o":["A","B","C","D"],"a":0,"e":"解析","qz":"${zh?"题目和选项的华文翻译":""}","ez":"${zh?"解析的华文翻译":""}"}]}${zh?"\nqz、ez 用华文，其余用考试语言。":""}`}]}],sysp,sizes.length>1?16000:30000,{json:"{"});
+          const o=parseJSON(out,"{",2);const arr=(o.mcq||[]).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);if(!arr.length)throw new Error("AI 返回的题目格式不对，请再试一次。");part={o,arr}}catch(e){perr=e}}
+        if(!part){if(!mAll.length)throw perr;toast(`只生成了 ${mAll.length}/${n} 题：后面的批次失败了`);break}
+        if(!gotMeta){title=part.o.title||"";instr=part.o.instructions||"";gotMeta=true}
+        part.arr.forEach(x=>{mAll.push(x);usedM.push(String(x.q).slice(0,24))})}
+      qs=mAll.map((x,i)=>({no:i+1,mcq:true,fig:normFig(x.fig),stem:x.q,o:x.o,a:x.a,e:x.e||"",qz:x.qz||"",ez:x.ez||"",m:1}))}
     else if(useSpec&&sp.secs){secs=sp.secs.map(x=>({id:x.id,label:x.label,n:x.n,ans:x.ans,opt:x.ans<x.n,per:x.per||0,total:secTotal(x)}));const used=[];
       for(let si=0;si<sp.secs.length;si++){const sc=sp.secs[si];prog(`出卷中 ${si+1}/${sp.secs.length}：${sc.label}…`);let got=null,err=null;
         for(let tryN=0;tryN<2&&!got;tryN++){try{
-          const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`\n这是整份试卷的第 ${si+1}/${sp.secs.length} 部分：${sc.label}。\n要求：出 ${sc.n} 道大题；${sc.per?`每道大题满分都是 ${sc.per} 分`:`这一部分所有题目的分值加起来必须是 ${sc.total} 分`}；${sc.ans<sc.n?`学生只需选答 ${sc.ans} 题，所以每道题分值必须相同，而且要覆盖不同的章节；`:"全部必答；"}题型：${sc.hint}。${type.hint?"\n整卷风格：" + type.hint:""}\n已经出过的主题 (不要重复)：${used.join("；")||"无"}\n每道大题含若干小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme。小问分值加起来必须等于该大题满分。\n只输出 JSON：{"questions":[{"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}",${partFmt}}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}]}],sysp,16000);
+          const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`\n这是整份试卷的第 ${si+1}/${sp.secs.length} 部分：${sc.label}。\n要求：出 ${sc.n} 道大题；${sc.per?`每道大题满分都是 ${sc.per} 分`:`这一部分所有题目的分值加起来必须是 ${sc.total} 分`}；${sc.ans<sc.n?`学生只需选答 ${sc.ans} 题，所以每道题分值必须相同，而且要覆盖不同的章节；`:"全部必答；"}题型：${sc.hint}。${type.hint?"\n整卷风格：" + type.hint:""}\n已经出过的主题 (不要重复)：${used.join("；")||"无"}\n每道大题含若干小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme。小问分值加起来必须等于该大题满分。\n只输出 JSON：{"questions":[{"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}",${partFmt}}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}]}],sysp,16000,{json:"{"});
           const o=parseJSON(out,"{");const arr=(o.questions||[]).filter(q=>q&&Array.isArray(q.parts)&&q.parts.length);if(!arr.length)throw new Error("AI 返回的试卷格式不对");got=arr}catch(e){err=e}}
         if(!got)throw new Error(`${sc.label} 生成失败：${err?err.message:"未知错误"}。请再点一次生成。`);
         got.slice(0,sc.n).forEach((q,i)=>{const cq=cleanQ(q,i,sc.id);cq.opt=sc.ans<sc.n;used.push(String(q.stem||q.parts[0].q).slice(0,24));qs.push(cq)})}
       qs.forEach((q,i)=>q.no=i+1);title=s.name+" 模拟卷"}
     else{prog("出卷中，约 20-60 秒…");const n=nCustom;
-      const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`共 ${n} 道大题。${type.hint}\n${type.kind==="writing"?"每道题只有 1 个 part，m 为满分 (见上面说明)，scheme 写评分标准 (内容/语言/结构/词汇各档的要求和常见扣分点)。学生只需选 1 题作答。":"每道大题含 1-4 个小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme (逐点列出得分点，说明可接受的答案；计算题标明方法分 M 与答案分 A)。"}\n只输出 JSON：{"title":"卷名","instructions":"考生须知","questions":[{"no":1,"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}",${partFmt}}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}]}],sysp,24000);
+      const out=await gem([{role:"user",parts:[...fp.parts,{text:common+`共 ${n} 道大题。${type.hint}\n${type.kind==="writing"?"每道题只有 1 个 part，m 为满分 (见上面说明)，scheme 写评分标准 (内容/语言/结构/词汇各档的要求和常见扣分点)。学生只需选 1 题作答。":"每道大题含 1-4 个小问 (a)(b)(c)，每个小问给分值 m 和评分要点 scheme (逐点列出得分点，说明可接受的答案；计算题标明方法分 M 与答案分 A)。"}\n只输出 JSON：{"title":"卷名","instructions":"考生须知","questions":[{"no":1,"stem":"题干/情境 (没有就写空字符串)","sz":"${zh?"题干的华文翻译":""}",${partFmt}}]}${zh?"\nsz、qz、cz 用华文，其余用考试语言。":""}`}]}],sysp,24000,{json:"{"});
       const o=parseJSON(out,"{");qs=(o.questions||[]).filter(q=>q&&Array.isArray(q.parts)&&q.parts.length).map((q,i)=>{const cq=cleanQ(q,i);cq.no=q.no||i+1;return cq});if(!qs.length)throw new Error("AI 返回的试卷格式不对，请再试一次。");title=o.title||"";instr=o.instructions||""}
     EX={sid,type:type.id,kind:type.kind,label:type.label,title:title||s.name+" 模拟卷",instr:instr||(secs?"依历届结构出卷："+specText(sp):""),qs,secs,ans:{},pick:{},started:Date.now(),limit,imgs:{},result:null};exSave();rExam()}
   catch(e){setBusy(btn,false);if(msg)msg.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}
@@ -2486,7 +2604,7 @@ async function submitExam(){
     if(answered.length){const parts=[];let txt=`请按评分要点批改这份 SPM「${s.name}」模拟卷的作答。\n卷别：${e.label}\n规则：\n- 每个小问按 scheme 给分，分数 ≤ 该题满分，可给 0.5 分；\n- 只依据学生写的内容给分，不要替学生补全；\n- comment 用华文 2-4 句 (学生需要看懂)：指出得分点、失分原因，以及怎样答才能拿满分；关键词、标准答案和值得背的句子用考试语言写出来 (华文科目全部用华文)${["writing"].includes(e.kind)?"；作文要指出最主要的 3 个语言/结构问题":""}；\n- 学生的手写照片会随题目附在后面，先读出内容再批改；字迹无法辨认的地方要在评语中说明。\n只输出 JSON 数组：[{"id":"题号","score":数字,"comment":"评语"}]。\n\n`;
       answered.forEach(x=>{txt+=`### id=${x.id}\n题目：${x.q.stem?x.q.stem+"\n":""}${x.p.p} ${x.p.q}\n满分：${x.p.m}\n评分要点：${x.p.scheme}\n学生作答：${x.ans||"(见照片)"}\n\n`;parts.push(x)});
       const content=[{text:txt}];parts.forEach(x=>{if(x.img){content.push({text:`id=${x.id} 的手写答案照片：`});content.push({inline_data:{mime_type:"image/jpeg",data:x.img}})}});
-      const out=await gem([{role:"user",parts:content}],sysPrompt(e.sid,"你现在是严格公正的 SPM 评卷员。"),8192);const arr=parseJSON(out,"[");
+      const out=await gem([{role:"user",parts:content}],sysPrompt(e.sid,"你现在是严格公正的 SPM 评卷员。"),8192,{json:"[",cache:true});const arr=parseJSON(out,"[");
       arr.forEach(r=>{const x=answered.find(a=>a.id===String(r.id));if(x)res[x.id]={score:Math.max(0,Math.min(x.p.m,Number(r.score)||0)),max:x.p.m,comment:String(r.comment||"")}})}
     let total=0,max=0,added=0;
     open.forEach(x=>{if(!res[x.id]){if((e.kind==="writing"&&!e.secs)||x.q.opt){return}res[x.id]={score:0,max:x.p.m,comment:"未作答。"}}});
