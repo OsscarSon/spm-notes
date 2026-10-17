@@ -1,9 +1,9 @@
-// 改了网站内容后，把版本号 +1，用户下次打开就会拿到新版
-const CACHE = 'spm-v1';
+// 改了网站内容后，把版本号 +1 (spm-v3、v4...)，用户就会收到「有新版本」提示
+const CACHE = 'spm-v2';
 const PRECACHE = ['./', './index.html', './data/sej.js', './data/bio.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -13,20 +13,30 @@ self.addEventListener('activate', e => {
   );
 });
 
-// 先给缓存（秒开、可离线），同时后台更新缓存
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
-  e.respondWith(
-    caches.open(CACHE).then(async cache => {
-      const cached = await cache.match(req, { ignoreSearch: true });
-      const network = fetch(req).then(res => {
-        if (res && (res.ok || res.type === 'opaque')) cache.put(req, res.clone());
+
+  e.respondWith(caches.open(CACHE).then(async cache => {
+    const cached = await cache.match(req, { ignoreSearch: true });
+
+    // 自己网站的文件：有网就拿最新的，没网 / 很慢就用缓存
+    if (url.origin === self.location.origin) {
+      const net = fetch(req).then(res => {
+        if (res && res.ok) cache.put(req, res.clone());
         return res;
-      }).catch(() => cached);
-      return cached || network;
-    })
-  );
+      });
+      if (!cached) return net;
+      return Promise.race([net, new Promise((_, rej) => setTimeout(rej, 4000))]).catch(() => cached);
+    }
+
+    // 公式库等外部文件：先用缓存，后台更新
+    const net = fetch(req).then(res => {
+      if (res && (res.ok || res.type === 'opaque')) cache.put(req, res.clone());
+      return res;
+    }).catch(() => cached);
+    return cached || net;
+  }));
 });
