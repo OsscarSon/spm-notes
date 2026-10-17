@@ -1,5 +1,5 @@
-// 改了网站内容后，把版本号 +1 (spm-v3、v4...)，用户就会收到「有新版本」提示
-const CACHE = 'spm-v3';
+// 改了网站内容后，把版本号 +1 (spm-v4、v5...)，用户就会收到「有新版本」提示
+const CACHE = 'spm-v4';
 const PRECACHE = ['./', './index.html', './data/sej.js', './data/bio.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {

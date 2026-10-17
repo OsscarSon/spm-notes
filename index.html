@@ -3433,6 +3433,7 @@ window.__spm={S:()=>S,go};
 <style id="wpCss">
 #wpLayer{position:fixed;inset:0;z-index:-1;display:none;pointer-events:none;overflow:hidden}
 #wpLayer.on{display:block}
+body.wp-on .aurora{display:none}
 #wpLayer .wi{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 1.2s ease}
 #wpLayer .wi.show{opacity:1}
 #wpLayer::after{content:"";position:absolute;inset:0;background:var(--paper);opacity:.28}
@@ -3457,6 +3458,7 @@ window.__spm={S:()=>S,go};
   function db(){return new Promise(function(ok,no){try{var r=indexedDB.open("spm-wp",1);r.onupgradeneeded=function(){r.result.createObjectStore("kv")};r.onsuccess=function(){ok(r.result)};r.onerror=function(){no(r.error)}}catch(e){no(e)}})}
   function dbGet(k){return db().then(function(d){return new Promise(function(ok,no){var q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=function(){ok(q.result||null)};q.onerror=function(){no(q.error)}})})}
   function dbSet(k,v){return db().then(function(d){return new Promise(function(ok,no){var t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=ok;t.onerror=function(){no(t.error)}})})}
+  function dbDel(k){return db().then(function(d){return new Promise(function(ok,no){var t=d.transaction("kv","readwrite");t.objectStore("kv").delete(k);t.oncomplete=ok;t.onerror=function(){no(t.error)}})})}
   function shrink(file){return new Promise(function(ok,no){
     var u=URL.createObjectURL(file),im=new Image();
     im.onload=function(){var m=1600,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");
@@ -3467,7 +3469,8 @@ window.__spm={S:()=>S,go};
   /* ---- 壁纸图层 (两层交叉淡入淡出) ---- */
   var layer=document.createElement("div");layer.id="wpLayer";layer.setAttribute("aria-hidden","true");
   layer.innerHTML='<div class="wi"></div><div class="wi"></div>';
-  document.body.insertBefore(layer,document.body.firstChild);
+  var au=document.querySelector(".aurora");if(au)au.insertAdjacentElement("afterend",layer);else document.body.insertBefore(layer,document.body.firstChild);
+  function setOn(v){layer.classList.toggle("on",v);document.body.classList.toggle("wp-on",v)}
   var wis=layer.querySelectorAll(".wi");
   function show(url){
     var nxt=front?0:1;
@@ -3482,17 +3485,17 @@ window.__spm={S:()=>S,go};
   function apply(){
     stop();
     if(mode==="dogs"){
-      layer.classList.add("on");
+      setOn(true);
       var im=new Image();im.onload=function(){if(mode==="dogs")show(DOGS[idx])};im.src=DOGS[idx];
       timer=setInterval(function(){if(!document.hidden)dogNext()},EVERY);
     }else if(mode==="custom"){
       dbGet("custom").then(function(b){
-        if(!b||mode!=="custom"){if(!b){mode="";saveMode();layer.classList.remove("on");fillCard()}return}
+        if(!b||mode!=="custom"){if(!b){mode="";saveMode();setOn(false);fillCard()}return}
         if(customURL)URL.revokeObjectURL(customURL);customURL=URL.createObjectURL(b);
-        layer.classList.add("on");show(customURL);fillCard();
-      }).catch(function(){mode="";saveMode();layer.classList.remove("on");fillCard()});
+        setOn(true);show(customURL);fillCard();
+      }).catch(function(){mode="";saveMode();setOn(false);fillCard()});
     }else{
-      layer.classList.remove("on");wis[0].classList.remove("show");wis[1].classList.remove("show");
+      setOn(false);wis[0].classList.remove("show");wis[1].classList.remove("show");
     }
   }
 
@@ -3514,7 +3517,7 @@ window.__spm={S:()=>S,go};
     if(mode==="dogs"){
       box.innerHTML='<div class="wthumbs">'+DOGS.map(function(u){return '<img src="'+u+'" alt="" loading="lazy">'}).join("")+'</div><p class="fine muted" style="margin:6px 0 0">每 10 秒自动换一张，一共 5 张。插画 © MALTESE。</p>';
     }else if(mode==="custom"){
-      box.innerHTML='<img class="wprev" id="wpPrev" alt="当前壁纸"><div class="controls"><button class="btn small" type="button" data-wp="pick">换一张图片</button></div><p class="fine muted" style="margin:6px 0 0">图片只保存在这台设备的浏览器里，不会上传到任何地方。</p>';
+      box.innerHTML='<img class="wprev" id="wpPrev" alt="当前壁纸"><div class="controls"><button class="btn small" type="button" data-wp="pick">换一张图片</button><button class="btn small" type="button" data-wp="del">删除图片</button></div><p class="fine muted" style="margin:6px 0 0">图片只保存在这台设备的浏览器里，不会上传到任何地方。</p>';
       if(customURL)box.querySelector("#wpPrev").src=customURL;
       else dbGet("custom").then(function(b){var p=document.getElementById("wpPrev");if(b&&p){customURL=URL.createObjectURL(b);p.src=customURL}});
     }else box.innerHTML="";
@@ -3526,6 +3529,7 @@ window.__spm={S:()=>S,go};
       var b=e.target.closest("[data-wp]");if(!b)return;
       var w=b.getAttribute("data-wp");
       if(w==="pick"){file.click();return}
+      if(w==="del"){dbDel("custom").catch(function(){}).then(function(){if(customURL){URL.revokeObjectURL(customURL);customURL=null}mode="";saveMode();apply();refreshBtns();say("已删除自定义图片")});return}
       if(mode===w){mode="";saveMode();apply();refreshBtns();return}
       if(w==="dogs"){mode="dogs";saveMode();apply();refreshBtns();return}
       dbGet("custom").then(function(img){
