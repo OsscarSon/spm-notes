@@ -407,7 +407,8 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
 
 <script src="data/sej.js?v=2026-10-17c"></script>
 <script src="data/bio.js?v=2026-10-17c"></script>
-<script src="data/kim.js?v=2026-10-18i"></script>
+<script src="data/kim.js?v=2026-10-18k"></script>
+<script src="data/mat.js?v=2026-10-18m"></script>
 <script>
 /* 小宠物：自成一体（IIFE + try/catch）。只读写自己的 localStorage 键 spm-pet，不读不改考前助手的任何数据、函数或元素。 */
 (function () {
@@ -1814,156 +1815,6 @@ const PPTS={
 /* 扩充页：术语、时间线、人物、易错点、考试问法、自测 */
 typeof PPTS_X!=="undefined"&&Object.keys(PPTS_X).forEach(k=>{PPTS[k]=(PPTS[k]||[]).concat(PPTS_X[k])});
 /* ===== 内置 PPT：数学 Matematik (T4 + T5) ===== */
-const PPTS_MAT={
-"mat|T4-1":[
-["Quadratic Functions and Equations","二次函数与二次方程",[["General form: f(x) = ax² + bx + c, where a ≠ 0.","标准形式，a 不能为 0"],["The highest power of the variable is 2; the graph is a parabola.","最高次数是 2，图像是抛物线"],["a > 0: opens upwards (minimum point). a < 0: opens downwards (maximum point).","a>0 开口向上有最小值；a<0 开口向下有最大值"],["The y-intercept is c (when x = 0).","y 轴截距是 c"]],"华文：二次函数 = 最高次数为 2 的函数；先看 a 的正负判断开口方向。"],
-["Solving Quadratic Equations","解二次方程",[["Factorisation: write as (px + q)(rx + s) = 0, then each bracket = 0.","因式分解，每个括号等于 0"],["Quadratic formula: x = [−b ± √(b² − 4ac)] / 2a.","求根公式"],["Completing the square: a(x + p)² + q = 0.","配方法"],["Sum of roots = −b/a; product of roots = c/a.","两根之和 \\(= -\\frac{b}{a}\\)；两根之积 \\(= \\frac{c}{a}\\)"],["Form an equation from roots α, β: x² − (α + β)x + αβ = 0.","由两根建立方程"]],"华文：先试因式分解，分解不了再用公式；一定要先把方程整理成 \\(= 0\\) 的形式。","Tip: write the equation in the form ax² + bx + c = 0 before solving."],
-["Types of Roots (Discriminant)","根的类型（判别式）",[["b² − 4ac > 0: two different real roots.","两个不相等的实根"],["b² − 4ac = 0: two equal real roots (the graph touches the x-axis).","两个相等的实根，图像与 x 轴相切"],["b² − 4ac < 0: no real roots (the graph does not meet the x-axis).","无实根，图像不与 x 轴相交"],["Condition for real roots: b² − 4ac ≥ 0.","有实根的条件：判别式 \\(\\ge 0\\)"]],"华文：题目问「有两个不同的根」就令判别式 > 0，「相等根」就令 \\(= 0\\)。"],
-["Graph and Axis of Symmetry","图像与对称轴",[["Axis of symmetry: x = −b/2a.","对称轴"],["Completed-square form f(x) = a(x − p)² + q gives the vertex (p, q).","顶点式给出顶点 (p, q)"],["Roots are the x-intercepts, where f(x) = 0.","根就是图像与 x 轴的交点"],["To sketch: find the y-intercept, the roots, and the vertex.","画草图：找 y 截距、根、顶点"]],"华文：顶点的 x 坐标 = 对称轴；最大/最小值 = 顶点的 y 坐标。"],
-["Worked Example","例题",[["Solve 2x² − 5x − 3 = 0.","解方程"],["Factorise: (2x + 1)(x − 3) = 0.","因式分解"],["\\(So x = -\\frac{1}{2} or x = 3\\).","得 \\(x = -\\frac{1}{2}\\) 或 3"],["Check: sum of roots = 5/2 = −b/a. ✓","检验：两根之和 \\(= \\frac{5}{2} = -\\frac{b}{a}\\)"]],"华文：用「两根之和 / 之积」可以快速检验答案对不对。"],
-["Common Mistakes","常见错误",[["Forgetting to make the right-hand side 0 before factorising.","忘了先把右边变成 0"],["Writing only one root when the equation has two.","只写一个根"],["Sign errors when substituting negative b into the formula.","代入负的 b 时符号出错"],["Mixing up the discriminant condition: equal roots → = 0, no roots → < 0.","判别式条件混淆"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Find the range of k for which the equation has two real roots. → set b² − 4ac > 0 and solve the inequality.","求 k 的范围，令判别式 > 0"],["Given the roots, form the quadratic equation. → x² − (sum)x + product = 0.","已知根求方程"],["Sketch the graph and state the axis of symmetry.","画图并写出对称轴"]],"","Show every step; method marks (M) are given even when the final answer is wrong."],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Discriminant of x² − 6x + 9 = 0? J: 0, so two equal real roots (x = 3).","问：判别式？答：0，两个相等根"],["S: Sum and product of roots of x² − 7x + 10 = 0? J: Sum = 7, product = 10 (roots 2 and 5).","问：两根之和与积？答：和 7，积 10"],["S: Axis of symmetry of y = x² − 4x + 1? J: x = 2.","问：对称轴？答：\\(x = 2\\)"]],"",""]
-],
-"mat|T4-2":[
-["Number Bases","数的进制",[["Base 10 uses digits 0–9; base 2 uses 0 and 1; base 5 uses 0–4; base 8 uses 0–7.","不同进制可用的数字"],["Place value: in 1101₂ the places are 2³, 2², 2¹, 2⁰ (starting from the right with power 0).","位值从右边的 0 次方开始"],["A subscript shows the base, e.g. 45₁₀ and 101101₂.","右下角小数字表示进制"]],"华文：进制就是「逢几进一」，二进制逢二进一。"],
-["Converting Between Bases","进制转换",[["Base n → base 10: expand using place values.","其他进制 → 十进制：按位值展开相加"],["Base 10 → base n: divide repeatedly by n and record remainders.","十进制 → 其他：连续除以 n，记下余数"],["Read the remainders from the LAST to the FIRST (bottom to top).","余数从下往上读"],["Between two non-decimal bases: convert to base 10 first.","两个非十进制之间：先转成十进制"]],"华文：口诀：除 n 取余，倒着读。","Tip: always show the division steps."],
-["Worked Example","例题",[["Convert 45₁₀ to base 2: 45 = 32 + 8 + 4 + 1.","把 45 转成二进制"],["\\(So 45_{10} = 101101_{2}\\).","结果 \\(101101_{2}\\)"],["Convert 1101₂ to base 10: 1×8 + 1×4 + 0×2 + 1×1 = 13.","\\(1101_{2} = 13\\)"],["\\(Add 1011_{2} + 110_{2} = 10001_{2} (11 + 6 = 17)\\).","二进制加法，逢二进一"]],"华文：二进制加法：\\(1+1 = 10\\)，写 0 进 1。"],
-["Common Mistakes","常见错误",[["Reading the remainders from top to bottom.","余数读反了方向"],["Starting the power from 1 instead of 0.","位值从 1 次方开始算"],["Forgetting to carry in binary addition (1 + 1 = 10₂).","二进制加法忘了进位"],["Not writing the base subscript in the final answer.","答案忘了写进制下标"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Convert a number from base 10 to base 2/5/8 and back.","十进制与其他进制互转"],["Add or subtract numbers in base 2.","二进制加减法"],["Find the value of x in an equation such as 2x₅ = 17₁₀.","求未知进制或数值"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Convert 13₁₀ to base 2. J: 1101₂.","问：13 转二进制？答：\\(1101_{2}\\)"],["S: Convert 110₂ to base 10. J: 6.","问：\\(110_{2}\\) 是多少？答：6"],["\\(S: 11_{2} + 1_{2} = ? J: 100_{2}\\).","问：\\(11_{2} + 1_{2}\\)？答：\\(100_{2}\\)"]],"",""]
-],
-"mat|T4-3":[
-["Statements","命题",[["A statement is a sentence that is either true or false, but not both.","命题：非真即假的句子"],["Questions, commands and opinions are NOT statements.","疑问句、命令句、意见不是命题"],["Negation (~p) changes the truth value of p.","否定 ~p 改变真假"],["Quantifiers: all, every, some, several.","量词：所有、有些"]],"华文：判断一句话是不是命题，只要看它能不能说「对」或「错」。"],
-["Compound Statements","复合命题",[["'p and q' is true only when BOTH are true.","「且」两个都真才真"],["'p or q' is true when at least one is true.","「或」至少一个真就真"],["Implication 'If p, then q'; 'p if and only if q' means both directions hold.","蕴涵；当且仅当表示双向成立"],["Negation of 'All' → 'Some ... not'. Negation of 'Some' → 'No/None'.","「所有」的否定是「有些不」"]],"华文：「所有」和「有些」的否定很容易错，要特别记。"],
-["Converse, Inverse, Contrapositive","逆命题、否命题、逆否命题",[["Implication: If p, then q.","原命题"],["Converse: If q, then p.","逆命题"],["Inverse: If ~p, then ~q.","否命题"],["Contrapositive: If ~q, then ~p. It has the same truth value as the original implication.","逆否命题与原命题真假相同"]],"华文：只有「逆否命题」和原命题一定同真同假。"],
-["Arguments","论证",[["Deductive: general → specific. The conclusion is certain if the premises are true.","演绎：由一般到特殊，结论必然"],["Form I: All A are B; C is A; therefore C is B.","形式一"],["Form II: If p then q; p is true; therefore q is true.","形式二"],["Form III: If p then q; ~q; therefore ~p.","形式三"],["Inductive: specific → general. The conclusion is probable, not certain.","归纳：由特殊到一般，结论只是可能"]],"华文：演绎 = 必然正确；归纳 = 可能正确。"],
-["Common Mistakes","常见错误",[["Thinking the converse is always true.","以为逆命题一定为真"],["Writing the negation of 'All' as 'None'.","把「所有」的否定写成「没有」"],["Calling a statement 'true' without checking a counter-example.","没找反例就说命题为真"],["Mixing up deduction and induction.","演绎和归纳混淆"]],"",""],
-["Exam Question Patterns","考试常见问法",[["State whether the sentence is a statement; give the negation.","判断是否为命题并写否定"],["Write the converse, inverse and contrapositive and state their truth values.","写出逆、否、逆否并判断真假"],["Complete the argument / state the type of argument.","补全论证或判断论证类型"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Is 'x + 3 = 7' a statement? J: No — it is true only for certain x, so its truth is not fixed. (It becomes a statement once x is given.)","问：是命题吗？答：不是，x 没确定，真假不固定"],["S: Negation of 'All squares are rectangles'? J: Some squares are not rectangles.","问：否定？答：有些正方形不是长方形"],["S: Which statement is equivalent to 'If p then q'? J: The contrapositive: If ~q then ~p.","问：和原命题等价的是？答：逆否命题"]],"",""]
-],
-"mat|T4-4":[
-["Intersection and Union","交集与并集",[["A ∩ B: elements in BOTH A and B.","交集：同时属于 A 和 B"],["A ∪ B: elements in A or B or both.","并集：属于 A 或 B"],["A′ (complement): elements in the universal set ξ but not in A.","补集：在全集中但不在 A 里"],["\\(n(A \\cup B) = n(A) + n(B) - n(A \\cap B)\\).","并集个数公式"]],"华文：交集 = 共有的；并集 = 全部加起来但共有的只算一次。"],
-["Combined Operations","综合运算",[["Work from the brackets outward: (A ∪ B)′, A′ ∩ B, A ∩ (B ∪ C)′.","先算括号里的"],["Venn diagram: fill the intersection FIRST, then the 'only A' and 'only B' parts, then the outside of the circles.","Venn 图：先填交集，再填各自独有，最后填圈外"],["Shade regions to show the result of an operation.","涂色表示运算结果"]],"华文：Venn 图的填写顺序决定对错。","Tip: always count the total to check it equals n(ξ)."],
-["Worked Example","例题",[["\\(\\xi = \\{1, 2, \\ldots, 10\\}\\), A = even numbers, B = multiples of 3.","全集 1–10，A 偶数，B 是 3 的倍数"],["\\(A \\cap B = {6}; A \\cup B = {2, 3, 4, 6, 8, 9, 10}\\).","交集 {6}，并集 7 个元素"],["\\((A \\cup B)' = {1, 5, 7}, so n[(A \\cup B)'] = 3\\).","并集的补集 {1,5,7}"]],"华文：补集 = 全集里剩下的。"],
-["Common Mistakes","常见错误",[["Counting the intersection twice in n(A ∪ B).","并集计数时交集算了两次"],["Confusing A′ ∩ B with (A ∩ B)′.","\\(A'\\cap B\\) 与 \\((A\\cap B)'\\) 混淆"],["Forgetting the elements outside the circles.","忘了圈外的元素"],["Using the wrong symbol (∈ is for elements; ⊂ is for sets).","符号用错：∈ 用于元素，⊂ 用于集合"]],"",""],
-["Exam Question Patterns","考试常见问法",[["List the elements of A ∩ B′ / (A ∪ B)′.","列出集合元素"],["Shade the region on a Venn diagram.","Venn 图涂色"],["Word problems: find how many students like both subjects, using n(A ∪ B).","应用题，用并集公式求人数"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: n(A) = 8, n(B) = 5, n(A ∩ B) = 2. Find n(A ∪ B). J: 8 + 5 − 2 = 11.","问：\\(n(A\\cup B)\\)？答：11"],["S: What does A′ mean? J: Elements in ξ that are not in A.","问：\\(A'\\) 是什么？答：全集中不在 A 的元素"],["S: Which part of a Venn diagram do you fill first? J: The intersection.","问：先填哪一部分？答：交集"]],"",""]
-],
-"mat|T4-5":[
-["Graph Terms","图的基本术语",[["Vertex (node) = point; edge = line joining two vertices.","顶点和边"],["Degree of a vertex = number of edges connected to it. A loop counts as 2.","度数：与顶点相连的边数；环算 2"],["Sum of all degrees = 2 × number of edges.","度数总和 \\(= 2 \\times\\) 边数"],["Simple graph: no loops and no multiple edges between the same two vertices.","简单图：无环、无重边"]],"华文：握手定理：所有顶点度数相加 = 边数的两倍。"],
-["Types of Graphs","图的种类",[["Directed graph: edges have a direction (arrows).","有向图"],["Weighted graph: each edge has a value (distance, cost, time).","加权图"],["Tree: connected and has no cycle; n vertices → n − 1 edges.","树：连通且无圈，n 个点有 n−1 条边"],["Path: a sequence of edges from one vertex to another. Shortest path = smallest total weight.","最短路径 = 总权重最小"]],"华文：树的判断：连通 + 没有圈。"],
-["Worked Example","例题",[["Weights: A–B 4, A–C 2, C–B 1, B–D 5, C–D 8.","边的权重"],["\\(A\\to C\\to B\\to D = 2 + 1 + 5 = 8; A\\to C\\to D = 10; A\\to B\\to D = 9\\).","列出所有路径并相加"],["Shortest path from A to D is A–C–B–D with total 8.","最短路径总长 8"]],"华文：列出所有可能路径，逐条相加再比较，别漏路径。"],
-["Common Mistakes","常见错误",[["Counting a loop as degree 1.","环的度数写成 1"],["Choosing the path with fewest edges instead of smallest total weight.","选边数最少而不是总权重最小"],["Saying a graph with a cycle is a tree.","有圈却说是树"],["Forgetting to give the total weight in the answer.","忘了写出总权重"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Draw a graph from a table of connections / identify the type of graph.","由表格画图 / 判断图的类型"],["State the degree of each vertex; verify sum = 2 × edges.","写出每个点的度数"],["Find the shortest path and its total weight.","求最短路径与总长"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: A tree has 7 vertices. How many edges? J: 6.","问：树有 7 个顶点，几条边？答：6"],["S: A graph has 5 edges. Sum of degrees? J: 10.","问：度数总和？答：10"],["S: Define a weighted graph. J: A graph whose edges carry values such as distance or cost.","问：加权图？答：边带有数值的图"]],"",""]
-],
-"mat|T4-6":[
-["Linear Inequalities in Two Variables","二元一次不等式",[["Forms: y > mx + c, y ≤ mx + c, ax + by ≥ c.","常见形式"],["Solid line (—) for ≤ or ≥ (the line is included).","实线：含等号"],["Dashed line (- - -) for < or > (the line is NOT included).","虚线：不含等号"]],"华文：实线 = 包含；虚线 = 不包含。"],
-["Shading the Region","确定阴影区域",[["Step 1: draw the boundary line.","先画边界线"],["Step 2: pick a test point NOT on the line, e.g. (0, 0).","取一个不在线上的测试点"],["Step 3: substitute. If it satisfies the inequality, shade that side; if not, shade the other side.","代入检验，成立就涂这一侧"],["For several inequalities, shade (or leave unshaded) the common region.","多个不等式取公共区域"]],"华文：测试点最好选 (0,0)，但线经过原点时要换点。","Tip: if the line passes through the origin, use another point such as (1, 0)."],
-["Worked Example","例题",[["Graph y ≥ 2x − 1.","画 \\(y \\ge 2x - 1\\)"],["Boundary y = 2x − 1 passes through (0, −1) with gradient 2; solid line.","边界线实线，过 (0,−1)，斜率 2"],["Test (0, 0): 0 ≥ −1 is true → shade the side containing the origin.","测试 (0,0) 成立，涂含原点的一侧"]],"华文：写出代入检验的过程能拿到方法分。"],
-["Common Mistakes","常见错误",[["Using a solid line for < or >.","< 或 > 却画实线"],["Choosing a test point that lies on the line.","测试点落在边界线上"],["Shading the wrong region because the inequality was not rearranged.","没整理不等式就涂错区域"],["Forgetting to label the lines and the required region R.","忘了标注直线和区域 R"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Write the inequalities that define the shaded region.","由图写出不等式"],["Draw and shade the region satisfying three inequalities.","画出满足三个不等式的区域"],["Word problem: a constraint such as x + y ≤ 20 and x ≥ 2y.","应用题：列不等式"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Which line type for y < 3x + 2? J: Dashed.","问：y < 3x + 2 用什么线？答：虚线"],["S: For y ≥ x − 4, is (0, 0) in the region? J: Yes, 0 ≥ −4 is true.","问：(0,0) 在区域内吗？答：在，\\(0 \\ge -4\\) 成立"],["S: Why use a test point? J: To decide which side of the line to shade.","问：测试点的作用？答：决定涂哪一侧"]],"",""]
-],
-"mat|T4-7":[
-["Distance–Time Graphs","距离–时间图",[["Gradient = speed = distance ÷ time.","斜率 = 速度"],["Horizontal line: the object is stationary.","水平线：静止"],["Straight sloping line: constant speed; steeper = faster.","斜线：匀速，越陡越快"],["Line going down: returning towards the starting point.","向下：往回走"]],"华文：看图先看每一段的斜率。"],
-["Speed–Time Graphs","速度–时间图",[["Gradient = acceleration = change in speed ÷ time.","斜率 = 加速度"],["Horizontal line: constant speed (zero acceleration).","水平线：匀速"],["Negative gradient: deceleration (retardation).","负斜率：减速"],["Area under the graph = distance travelled.","图线下面积 = 路程"]],"华文：面积用三角形、梯形公式分段算。"],
-["Worked Example","例题",[["Speed rises from 0 to 8 m/s in 4 s, then stays at 8 m/s for 6 s.","4 秒内加速到 8 m/s，再匀速 6 秒"],["Acceleration = 8 ÷ 4 = 2 m/s².","加速度 \\(2 \\frac{m}{s^{2}}\\)"],["Distance = ½ × 4 × 8 + 6 × 8 = 16 + 48 = 64 m.","路程 64 m"],["Average speed = 64 ÷ 10 = 6.4 m/s.","平均速度 6.4 m/s"]],"华文：平均速度 = 总路程 ÷ 总时间，不是速度的平均。"],
-["Common Mistakes","常见错误",[["Using area for a distance–time graph (use gradient).","距离-时间图用了面积"],["Forgetting units (m/s, m/s²).","忘了单位"],["Calculating average speed as (u + v)/2 when the motion is not uniform.","非匀变速也用 (u+v)/2"],["Reading the time of each stage wrongly.","读错每一段的时间"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Find the speed during a stage / the time the object is stationary.","求某阶段速度或静止时间"],["Find the distance travelled using the area.","用面积求路程"],["Given the total distance, find an unknown speed or time.","已知总路程求未知量"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: What does the area under a speed–time graph represent? J: Distance travelled.","问：面积代表？答：路程"],["S: A horizontal line on a distance–time graph means? J: The object is stationary.","问：水平线？答：静止"],["S: Gradient of a speed–time graph? J: Acceleration.","问：斜率？答：加速度"]],"",""]
-],
-"mat|T4-8":[
-["Measures of Dispersion","离散程度的度量",[["Range = largest value − smallest value.","极差"],["Quartiles Q1, Q2 (median), Q3 divide ordered data into four equal parts.","四分位数"],["Interquartile range = Q3 − Q1.","四分位距"],["Displays: dot plot, stem-and-leaf plot, box plot.","点图、茎叶图、箱形图"]],"华文：四分位距只看中间 50% 的数据，不受极端值影响。"],
-["Variance and Standard Deviation","方差与标准差",[["Mean x̄ = Σx / N.","平均数"],["Variance σ² = Σ(x − x̄)² / N = Σx² / N − x̄².","方差"],["Standard deviation σ = √variance.","标准差"],["Smaller σ → data closer to the mean (more consistent).","σ 越小越集中"]],"华文：用 \\(\\sum x^{2}/N - \\bar{x}^{2}\\) 比较省时间，但不要忘记最后开根号。"],
-["Effects of Changing the Data","数据变化的影响",[["Add a constant k to every value: mean changes, but range, IQR and σ stay the same.","每个数加 k：离散程度不变"],["Multiply every value by k: range, IQR and σ are multiplied by |k|; variance by k².","每个数乘 k：极差、标准差乘 |k|，方差乘 \\(k^{2}\\)"]],"华文：加减只平移，不改变散布；乘除才会改变散布。"],
-["Worked Example","例题",[["Data: 2, 4, 4, 6, 9. Mean = 25 ÷ 5 = 5. Range = 7.","求平均数与极差"],["\\(\\sum x^{2} = 4 + 16 + 16 + 36 + 81 = 153\\).","平方和"],["Variance = 153/5 − 5² = 30.6 − 25 = 5.6.","方差"],["Standard deviation = √5.6 ≈ 2.37.","标准差"]],"华文：这里分母是 N，不是 N − 1。"],
-["Common Mistakes","常见错误",[["Not arranging the data in order before finding quartiles.","求四分位数前没排序"],["Forgetting the square root when asked for standard deviation.","忘了开根号"],["Writing that adding k changes the standard deviation.","说加 k 会改变标准差"],["Drawing a box plot without the correct scale.","箱形图没画比例尺"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Find the median, Q1, Q3 and IQR; draw a box plot.","求中位数、四分位数并画箱形图"],["Calculate the variance and standard deviation.","计算方差和标准差"],["Compare two sets of data using dispersion and mean.","用离散程度比较两组数据"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: IQR formula? J: Q3 − Q1.","问：四分位距公式？答：Q3 − Q1"],["S: Each value is multiplied by 3. What happens to the standard deviation? J: It is multiplied by 3.","问：每个数乘 3，标准差？答：乘 3"],["S: Each value increases by 5. Effect on range? J: No change.","问：每个数加 5，极差？答：不变"]],"",""]
-],
-"mat|T4-9":[
-["Combined Events","组合事件",[["Independent events: one does not affect the other. P(A ∩ B) = P(A) × P(B).","独立事件：概率相乘"],["Mutually exclusive: cannot happen together. P(A ∪ B) = P(A) + P(B).","互斥事件：概率相加"],["General: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).","一般公式"],["'and' → multiply; 'or' → add.","「且」相乘；「或」相加"]],"华文：先判断是独立还是互斥，再选公式。"],
-["Dependent Events and Tree Diagrams","相关事件与树状图",[["Without replacement: the second probability changes.","不放回：第二次概率会变"],["Multiply along the branches; add the end results that satisfy the question.","沿分支相乘，符合条件的结果相加"],["'At least one' = 1 − P(none).","「至少一个」\\(= 1 -\\) 一个都没有"]],"华文：「至少」类问题用补集最快。"],
-["Worked Example","例题",[["Bag: 4 red, 6 blue; two balls drawn without replacement.","4 红 6 蓝，不放回取两次"],["P(both red) = 4/10 × 3/9 = 2/15.","两次都红"],["P(at least one red) = 1 − (6/10 × 5/9) = 1 − 1/3 = 2/3.","至少一红 \\(= \\frac{2}{3}\\)"]],"华文：不放回时分母要减 1。"],
-["Common Mistakes","常见错误",[["Using the same denominator for 'without replacement'.","不放回却用同一个分母"],["Adding probabilities that should be multiplied.","该乘的却加"],["Forgetting that probabilities lie between 0 and 1.","忘了概率在 0 到 1 之间"],["Not simplifying fractions in the final answer.","答案没约分"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Find P(A ∩ B) / P(A ∪ B) for independent or exclusive events.","求交事件或并事件概率"],["Draw a tree diagram and find a combined probability.","画树状图求概率"],["Find the probability of 'at least one'.","求至少一个的概率"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: P(A) = 0.4, P(B) = 0.5, independent. P(A ∩ B)? J: 0.2.","问：\\(P(A\\cap B)\\)？答：0.2"],["S: Mutually exclusive, P(A) = 0.3, P(B) = 0.2. P(A ∪ B)? J: 0.5.","问：\\(P(A\\cup B)\\)？答：0.5"],["S: Shortcut for 'at least one'? J: 1 − P(none).","问：至少一个的快捷方法？答：1 − P(一个都没有)"]],"",""]
-],
-"mat|T4-10":[
-["Financial Goals","财务目标",[["SMART goals: Specific, Measurable, Achievable, Realistic, Time-bound.","SMART 目标"],["Short-term, medium-term and long-term goals depend on the time needed.","按时间分短、中、长期目标"],["A good plan balances income, expenses and savings.","好计划要平衡收入、支出和储蓄"]],"华文：目标要具体、可衡量、可达成、实际、有时限。"],
-["Cash Flow","现金流",[["Cash flow = income − expenses.","现金流 = 收入 − 支出"],["Income > expenses: surplus. Income < expenses: deficit.","收入大于支出为盈余，反之为赤字"],["Fixed expenses (rent, loan) vs variable expenses (food, entertainment).","固定支出与非固定支出"],["Deficit solutions: increase income or reduce expenses.","赤字对策：增加收入或减少支出"]],"华文：看到赤字，答案通常是「增加收入」和「减少非必要支出」。"],
-["Financial Planning Steps","理财步骤",[["1) Set goals.  2) Assess the current situation.","设定目标；了解现况"],["3) Make a plan.  4) Carry it out.","制订并执行计划"],["5) Review and adjust.","检讨与调整"]],"华文：每一步都要能举一个例子。"],
-["Worked Example","例题",[["Monthly income RM4 000; fixed expenses RM2 200; variable expenses RM1 450.","月收入 4000，固定 2200，非固定 1450"],["Total expenses = RM3 650. Cash flow = 4 000 − 3 650 = RM350 surplus.","总支出 3650，盈余 350"],["Suggest: save part of the surplus towards a goal.","建议把盈余存起来"]],"华文：先算总支出，再算现金流。"],
-["Common Mistakes","常见错误",[["Mixing up surplus and deficit.","盈余与赤字混淆"],["Setting a goal without a time limit or amount.","目标没有时限或金额"],["Listing only expenses and forgetting savings.","只列支出忘了储蓄"],["Leaving out the unit RM.","漏写 RM"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: What does the 'S' in SMART stand for? J: Specific.","问：SMART 的 S？答：Specific"],["S: Income RM3 000, expenses RM3 400. Surplus or deficit? J: Deficit of RM400.","问：盈余还是赤字？答：赤字 RM400"],["S: Give one way to overcome a deficit. J: Increase income / reduce expenses.","问：解决赤字的一个方法？答：增加收入或减少支出"]],"",""]
-],
-"mat|T5-1":[
-["Direct and Inverse Variation","正变与反变",[["Direct: y ∝ x ⇒ y = kx (y/x is constant).","正变：\\(y = kx\\)"],["Inverse: y ∝ 1/x ⇒ y = k/x (xy is constant).","反变：\\(y = \\frac{k}{x}\\)"],["Powers: y ∝ x², y ∝ √x, y ∝ 1/x².","可带次方"],["k is the constant of variation.","k 为变分常数"]],"华文：「与…成正比」写 \\(y = kx\\)；「与…成反比」写 \\(y = \\frac{k}{x}\\)。"],
-["Joint Variation","联合变",[["Combine variables: y ∝ xz/w ⇒ y = kxz/w.","把变量合在一起"],["Steps: write the relation → find k from given values → use k to find the unknown.","写关系 → 求 k → 求答案"]],"华文：永远三步：关系式、求 k、代回求答案。","Tip: write y = k × (expression) before substituting."],
-["Worked Example","例题",[["P ∝ Q/R². P = 12 when Q = 6, R = 2.","P 与 Q 成正比、与 \\(R^{2}\\) 成反比"],["\\(12 = k \\times \\frac{6}{4} \\Rightarrow k = 8\\).","求 \\(k = 8\\)"],["When Q = 9, R = 3: P = 8 × 9/9 = 8.","求 \\(P = 8\\)"]],"华文：k 求出来后要写在关系式里再代入。"],
-["Common Mistakes","常见错误",[["Writing y = x/k instead of y = kx.","把 k 放错位置"],["Forgetting to square when the question says x².","忘了平方"],["Not showing the value of k.","没写出 k 的值"],["Mixing direct and inverse words.","正变反变搞混"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Given y ∝ x² and a pair of values, find y for another x.","已知比例关系求另一个值"],["Express the relation between three variables, then find a value.","三个变量的关系"],["Graph questions: identify the type of variation from a graph.","由图判断变分类型"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: y varies inversely as x; y = 6 when x = 4. Find y when x = 8. J: 3.","问：\\(x = 8\\) 时 y？答：3"],["S: y ∝ x²; y = 18 when x = 3. Find y when x = 5. J: 50.","问：\\(x = 5\\) 时 y？答：50"],["S: Write 'm varies directly as n and inversely as p'. J: m = kn/p.","问：关系式？答：\\(m = \\frac{kn}{p}\\)"]],"",""]
-],
-"mat|T5-2":[
-["Matrices","矩阵",[["Order = rows × columns (m × n).","阶数：行 × 列"],["Equal matrices: same order and equal corresponding elements.","相等矩阵"],["Special matrices: row, column, square, zero, identity I.","特殊矩阵"],["Identity matrix I: AI = IA = A.","单位矩阵"]],"华文：矩阵的阶数永远是「行 × 列」。"],
-["Basic Operations","基本运算",[["Add/subtract: only for matrices of the SAME order.","加减要同阶"],["Scalar multiplication: multiply every element.","数乘：每个元素都乘"],["Multiplication AB: columns of A = rows of B; the result has order (rows of A) × (columns of B).","乘法：A 的列数 \\(= B\\) 的行数"],["In general AB ≠ BA.","一般 \\(AB \\ne BA\\)"]],"华文：乘法是「行乘列」，先检查能不能乘。"],
-["Inverse Matrix (2 × 2)","逆矩阵",[["\\(For A = \\begin{pmatrix}a & b\\\\c & d\\end{pmatrix}, \\det A = ad - bc\\).","行列式"],["A⁻¹ = 1/(ad − bc) × [d −b; −c a], provided ad − bc ≠ 0.","逆矩阵公式"],["\\(AA^{-1} = A^{-1}A = I\\).","与逆矩阵相乘得单位矩阵"],["If ad − bc = 0, the inverse does not exist.","行列式为 0 无逆矩阵"]],"华文：对角线互换，另两项变号，再除以行列式。"],
-["Simultaneous Equations","解联立方程",[["Write as AX = B.","写成 \\(AX = B\\)"],["X = A⁻¹B (multiply A⁻¹ on the LEFT).","\\(X = A^{-1}B\\)，逆矩阵在左边"],["Example: 2x + y = 5, x + y = 3 → A = [2 1; 1 1], det A = 1.","例：\\(2x+y=5\\)，\\(x+y=3\\)"],["\\(A^{-1} = \\begin{pmatrix}1 & -1\\\\-1 & 2\\end{pmatrix}, so X = \\begin{pmatrix}2\\\\1\\end{pmatrix} \\Rightarrow x = 2, y = 1\\).","结果 \\(x=2\\)，\\(y=1\\)"]],"华文：检验：\\(2(2)+1 = 5 ✓\\)；\\(2+1 = 3 ✓\\)。","Tip: the question usually says 'using matrix method' — you must show A⁻¹."],
-["Common Mistakes","常见错误",[["Multiplying A⁻¹ on the right (X = BA⁻¹).","逆矩阵乘在右边"],["Sign errors when finding ad − bc.","行列式符号出错"],["Adding matrices of different orders.","不同阶的矩阵相加"],["Forgetting the 1/det factor.","漏了 1/行列式"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Inverse of [2 1; 5 3]? J: [3 −1; −5 2] (det = 1).","问：逆矩阵？答：[3 −1; −5 2]"],["S: Order of a matrix with 2 rows and 3 columns? J: 2 × 3.","问：阶数？答：\\(2 \\times 3\\)"],["S: When does A⁻¹ not exist? J: When ad − bc = 0.","问：何时无逆矩阵？答：行列式为 0"]],"",""]
-],
-"mat|T5-3":[
-["Insurance Terms","保险术语",[["Insurer: the company; policyholder (insured): the buyer of the policy.","保险公司与投保人"],["Premium: the payment made for the insurance.","保费"],["Coverage / sum insured, benefit, deductible.","保额、赔偿、自负额"],["Risk: possibility of loss; insurance spreads the risk across many people.","风险与风险分担"]],"华文：保险的原理：很多人付小钱，少数遇险的人得到赔偿。"],
-["Types of Insurance","保险种类",[["Life insurance: pays when the insured dies or reaches a set age.","人寿保险"],["General insurance: motor, fire, medical, travel, etc.","一般保险：汽车、火险、医疗、旅游"],["Deductible: the amount the insured pays first.","自负额：投保人先自付的部分"]],"华文：区分人寿和一般保险。"],
-["Co-insurance Clause","共保条款",[["Fire insurance: if insured amount < 80% of property value, compensation is reduced.","保额不足财产价值 80% 要按比例赔"],["Compensation = [insured amount ÷ (80% × value)] × loss − deductible.","赔偿公式"],["If insured amount ≥ 80% of value, compensation = loss − deductible (up to the sum insured).","保额够就全赔"]],"华文：具体公式的写法请以你课本为准。","Tip: the formula is usually given or must be memorised — check your textbook."],
-["Worked Example","例题",[["House value RM400 000, insured RM240 000, loss RM100 000, deductible RM1 000.","房子价值 40 万，保额 24 万，损失 10 万，自负额 1000"],["80% × 400 000 = 320 000. Since 240 000 < 320 000, co-insurance applies.","80% 价值 32 万，保额不足"],["Compensation = (240 000/320 000) × 100 000 − 1 000 = 75 000 − 1 000 = RM74 000.","赔偿 74 000"]],"华文：先判断是否低于 80%，再选公式。"],
-["Exam Question Patterns","考试常见问法",[["Calculate compensation with the co-insurance clause.","共保条款赔偿计算"],["Calculate the premium using a given rate table.","用费率表算保费"],["Explain why people need insurance.","说明投保的必要性"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: What is a premium? J: The amount paid to the insurer for the policy.","问：保费？答：向保险公司支付的费用"],["S: When does the co-insurance clause apply? J: When the insured amount is less than the required percentage (80%) of the property value.","问：何时用共保条款？答：保额低于价值的 80%"],["S: What is a deductible? J: The part of the loss paid by the insured first.","问：自负额？答：投保人先自付的损失"]],"",""]
-],
-"mat|T5-4":[
-["Income Tax Basics","所得税基础",[["Aggregate income = total of all income from every source.","总收入"],["Chargeable income = aggregate income − reliefs.","应课税收入 = 总收入 − 扣除额"],["Income tax is calculated from the chargeable income using a tax table.","按税率表计算"],["Reliefs reduce the income that is taxed.","扣除额减少应课税收入"]],"华文：先扣除额，再算税。"],
-["Calculating Income Tax","计算所得税",[["Find the band: tax = tax on previous bands + rate × (chargeable income − band start).","找到所在税阶，累计税 + 税率 × 超出部分"],["Rebate / zakat is subtracted from the tax payable.","税务回扣、天课从应缴税中扣除"],["Employers deduct monthly tax instalments (PCB) from salary.","雇主每月代扣 PCB"]],"华文：考试会给税率表，要会读表。","Tip: the tax table is given in the exam — practise reading it."],
-["Worked Example (sample table)","例题（示例税率表）",[["Sample table: first RM20 000 → RM150 cumulative; next RM15 000 at 3%.","示例税率表（非真实税率）"],["Chargeable income RM35 000: tax = 150 + 3% × 15 000 = 150 + 450 = RM600.","应缴税 600"],["Less rebate RM400 → tax payable RM200.","扣回扣后应缴 200"]],"华文：这只是示例数字，实际请用考试给的税率表。"],
-["Other Taxes","其他税项",[["Property tax: assessment and quit rent.","房地产税：门牌税、地税"],["Road tax; sales and service tax.","路税、销售与服务税"],["Tax helps the government fund public services.","税收用于公共服务"]],"华文：知道各种税的名字和用途。"],
-["Common Mistakes","常见错误",[["Calculating tax on the aggregate income instead of the chargeable income.","用总收入而不是应课税收入算税"],["Using the wrong band.","用错税阶"],["Forgetting to deduct rebate or zakat.","忘了扣回扣"],["Mixing up cumulative tax and tax for one band only.","累计税与单阶税混淆"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Formula for chargeable income? J: Aggregate income − reliefs.","问：应课税收入公式？答：总收入 − 扣除额"],["S: What does PCB mean? J: Monthly tax deduction (Potongan Cukai Bulanan) from salary.","问：PCB？答：每月代扣税"],["S: Name two types of tax. J: Income tax and property tax (also road tax, sales and service tax).","问：两种税？答：所得税、房地产税"]],"",""]
-],
-"mat|T5-5":[
-["Congruency","全等",[["Congruent shapes have the same size and shape.","全等：大小形状相同"],["Triangle tests: SSS, SAS, ASA/AAS, RHS.","三角形全等判定"],["Isometry (translation, reflection, rotation) keeps the shape congruent.","等距变换保持全等"]],"华文：全等判定要写出对应的边与角。"],
-["Enlargement","放大",[["Scale factor k = image length ÷ object length.","比例因子"],["k > 1: enlargement; 0 < k < 1: reduction; k < 0: image on the opposite side of the centre (inverted).","k>1 放大；0<k<1 缩小；k<0 在中心另一侧并倒置"],["Area of image = k² × area of object.","面积比 \\(= k^{2}\\)"],["Centre of enlargement: draw lines from the centre through corresponding points.","放大中心"]],"华文：长度乘 k，面积乘 \\(k^{2}\\)。"],
-["Combined Transformations","组合变换",[["VW means do W first, then V.","VW：先做 W，再做 V"],["Describe each transformation fully: translation (vector), reflection (axis), rotation (centre, angle, direction), enlargement (centre, k).","每种变换要写完整信息"],["Tessellation: shapes fit together with no gaps or overlaps.","镶嵌：无缝隙无重叠"]],"华文：「VW」要从右往左读。"],
-["Worked Example","例题",[["Object area 12 cm²; scale factor 3.","面积 12，\\(k = 3\\)"],["Image area = 12 × 3² = 108 cm².","像面积 108"],["Image length 5 cm → object length 5 ÷ 3 cm.","由像求原长"]],"华文：面积用 \\(k^{2}\\)，体积用 \\(k^{3}\\)。"],
-["Common Mistakes","常见错误",[["Using k instead of k² for area.","面积用了 k"],["Applying the transformations in the wrong order.","变换顺序错"],["Describing a rotation without centre or angle.","旋转漏写中心或角度"],["Forgetting that k < 0 inverts the image.","忘了 k 为负时像是倒置的"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Which are the congruency tests for triangles? J: SSS, SAS, ASA/AAS, RHS.","问：全等判定？答：SSS、SAS、ASA/AAS、RHS"],["S: Scale factor 2; object area 5 cm². Image area? J: 20 cm².","问：像面积？答：\\(20 cm^{2}\\)"],["S: What does VW mean? J: W first, then V.","问：VW？答：先 W 再 V"]],"",""]
-],
-"mat|T5-6":[
-["Trigonometric Ratios (0°–360°)","三角比 \\((0^{\\circ}–360^{\\circ})\\)",[["Use a reference angle (acute angle with the x-axis).","参考角"],["Signs by quadrant (ASTC): Q1 All +, Q2 Sin +, Q3 Tan +, Q4 Cos +.","象限符号"],["Special values: sin 30° = 1/2, cos 60° = 1/2, tan 45° = 1.","特殊角"],["\\(\\tan \\theta = \\sin \\theta \\div \\cos \\theta\\).","\\(\\tan = \\sin /\\cos\\)"]],"华文：先找参考角，再按象限加符号。"],
-["Solving for θ","求角度",[["\\(\\sin \\theta = 0.5, 0^{\\circ} \\le \\theta \\le 360^{\\circ}: \\theta = 30^{\\circ}, 150^{\\circ}\\).","\\(\\sin \\theta =0.5\\)：\\(30^{\\circ}, 150^{\\circ}\\)"],["\\(\\cos \\theta = -\\sqrt{3}/2: \\theta = 150^{\\circ}, 210^{\\circ}\\).","\\(\\cos \\theta =-\\sqrt{3}/2\\)：\\(150^{\\circ}, 210^{\\circ}\\)"],["\\(\\tan \\theta = -1: \\theta = 135^{\\circ}, 315^{\\circ}\\).","\\(\\tan \\theta =-1\\)：\\(135^{\\circ}, 315^{\\circ}\\)"],["Calculator gives only one value — use quadrants to find the other.","计算器只给一个，另一个要自己推"]],"华文：每题通常有两个答案。"],
-["Graphs of Trigonometric Functions","三角函数图像",[["y = sin x and y = cos x: period 360°, amplitude 1.","sin、cos：周期 \\(360^{\\circ}\\)，振幅 1"],["y = tan x: period 180°, with asymptotes.","tan：周期 \\(180^{\\circ}\\)，有渐近线"],["y = a sin bx + c: amplitude |a|, period 360°/b.","振幅 |a|，周期 \\(360^{\\circ}/b\\)"],["Example: y = 3 sin 2x has amplitude 3 and period 180°.","\\(y=3\\sin 2x\\)：振幅 3，周期 \\(180^{\\circ}\\)"]],"华文：画图时先标出最高点、最低点和零点。"],
-["Common Mistakes","常见错误",[["Giving only the calculator value.","只写计算器结果"],["Wrong sign in the quadrant.","象限符号错"],["Using the wrong period for tan.","tan 的周期写成 \\(360^{\\circ}\\)"],["Not labelling the axes and key points on the graph.","没标坐标和关键点"]],"",""],
-["Exam Question Patterns","考试常见问法",[["Find all θ in 0° ≤ θ ≤ 360° satisfying a trig equation.","在范围内求所有 θ"],["Sketch y = a sin bx and state amplitude/period.","画图并写振幅周期"],["Find the number of solutions from a graph.","由图求解的个数"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["\\(S: \\cos 120^{\\circ} = ? J: -\\frac{1}{2}\\).","问：\\(\\cos 120^{\\circ}\\)？答：\\(-\\frac{1}{2}\\)"],["S: In which quadrants is sin positive? J: Quadrants 1 and 2.","问：sin 为正的象限？答：第一、二象限"],["S: Period of y = sin 2x? J: 180°.","问：周期？答：\\(180^{\\circ}\\)"]],"",""]
-],
-"mat|T5-7":[
-["Grouped Data","分组数据",[["Class interval, frequency, midpoint = (lower + upper limit) ÷ 2.","组距、频数、组中值"],["Class boundaries lie halfway between adjacent classes (e.g. 0–9 and 10–19 → 9.5).","组边界"],["Cumulative frequency adds up the frequencies.","累积频数"]],"华文：画 ogive 用「上边界」。"],
-["Mean, Variance, Standard Deviation","平均数、方差、标准差",[["Mean x̄ = Σfx ÷ Σf (x = midpoint).","平均数"],["Variance σ² = Σfx²/Σf − x̄².","方差"],["σ = √variance.","标准差"]],"华文：x 一律用组中值。"],
-["Ogive, Median and Quartiles","累积频数曲线与中位数",[["Plot cumulative frequency against upper boundary; join smoothly.","用上边界画点，平滑连线"],["Median at N/2; Q1 at N/4; Q3 at 3N/4.","中位数在 N/2，Q1 在 N/4，Q3 在 3N/4"],["\\(IQR = Q3 - Q1\\).","四分位距"]],"华文：从纵轴读到曲线再下到横轴。"],
-["Worked Example","例题",[["Classes 0–9 (f = 2), 10–19 (f = 3), 20–29 (f = 5). Midpoints 4.5, 14.5, 24.5.","三组数据"],["\\(\\sum fx = 9 + 43.5 + 122.5 = 175; \\sum f = 10\\).","求 \\(\\sum fx\\)"],["Mean = 175 ÷ 10 = 17.5.","平均数 17.5"]],"华文：先列表再计算，条理清楚。"],
-["Common Mistakes","常见错误",[["Using class limits instead of upper boundaries for the ogive.","ogive 用了组限"],["Using the class interval instead of the midpoint.","用了组距而不是组中值"],["Reading the median from N instead of N/2.","中位数位置读成 N"],["Forgetting to plot the starting point (lower boundary, 0).","忘了起点"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: Midpoint of the class 10–19? J: 14.5.","问：10–19 的组中值？答：14.5"],["S: Median is read at which cumulative frequency? J: N/2.","问：中位数读哪里？答：N/2"],["S: Ogive is plotted against? J: Upper boundary.","问：ogive 的横轴？答：上边界"]],"",""]
-],
-"mat|T5-8":[
-["Mathematical Modelling","数学建模",[["A mathematical model uses equations or graphs to represent a real situation.","用数学表示现实问题"],["Steps: identify the problem → make assumptions & define variables → formulate the model → solve → test and interpret → refine → report.","建模步骤"],["Assumptions simplify the situation; state them clearly.","要写明假设"]],"华文：建模题重点是「步骤要完整」。"],
-["Report Structure","报告结构",[["Title and introduction.","标题与引言"],["Problem-solving method and findings.","解题方法与结果"],["Conclusion and reflection (limitations, improvements).","结论与反思"]],"华文：反思要写出模型的局限与改进。"],
-["Worked Example","例题",[["Plan A: RM30 fixed + RM0.10 per minute. Plan B: RM10 fixed + RM0.20 per minute.","两个手机计划"],["Model: A = 30 + 0.1m, B = 10 + 0.2m, where m = minutes.","建立模型"],["Equal when 30 + 0.1m = 10 + 0.2m ⇒ m = 200 min, cost RM50.","200 分钟时费用相同，RM50"],["Below 200 min Plan B is cheaper; above 200 min Plan A is cheaper.","少于 200 分钟 B 便宜，多于则 A 便宜"]],"华文：最后要给出结论和建议。"],
-["Common Mistakes","常见错误",[["Skipping the assumptions and variables.","没写假设与变量"],["Not interpreting the answer in the context.","答案没结合情境解释"],["No conclusion or reflection.","没有结论与反思"],["Not checking whether the model fits the data.","没检验模型是否合理"]],"",""],
-["Uji Diri","自测：先想答案，再点击对照",[["S: First step of mathematical modelling? J: Identify and define the problem.","问：第一步？答：识别并界定问题"],["S: Why state assumptions? J: To simplify the real situation so it can be modelled.","问：为什么写假设？答：简化现实以便建模"],["S: What should the final report include? J: Introduction, method/findings, conclusion and reflection.","问：报告包含？答：引言、方法与结果、结论与反思"]],"",""]
-]
-};
-Object.keys(PPTS_MAT).forEach(k=>{PPTS[k]=(PPTS[k]||[]).concat(PPTS_MAT[k])});
 /* ===== 内置 PPT：科学 Sains (T4 + T5) ===== */
 /* ===== 内置 PPT：科学 Sains (T4 + T5)，章节范围已按 KSSM 大纲 (Pandai) 核对 ===== */
 const PPTS_SAINS={
@@ -2137,6 +1988,8 @@ const PPTS_FIZIK={"fiz|T4-1":[["Physical Quantities and SI Units","物理量与�
 Object.keys(PPTS_FIZIK).forEach(k=>{PPTS[k]=(PPTS[k]||[]).concat(PPTS_FIZIK[k])});
 
 typeof PPTS_KIM!=="undefined"&&Object.keys(PPTS_KIM).forEach(k=>{PPTS[k]=(PPTS[k]||[]).concat(PPTS_KIM[k])});
+/* 数学 Matematik 内置 PPT：按SPM给分格式(K/N/P)，data/mat.js */
+typeof PPTS_MATX!=="undefined"&&Object.keys(PPTS_MATX).forEach(k=>{PPTS[k]=PPTS_MATX[k]});
 /* 生物 Biologi 内置 PPT */
 typeof PPTS_BIO!=="undefined"&&Object.keys(PPTS_BIO).forEach(k=>{PPTS[k]=(PPTS[k]||[]).concat(PPTS_BIO[k])});
 /* 生物 Biologi 内置 PPT */
@@ -2144,7 +1997,7 @@ typeof PPTS_BIO2!=="undefined"&&Object.keys(PPTS_BIO2).forEach(k=>{PPTS[k]=(PPTS
 /* Biologi：按SPM得分点重做的章节、插入页、小章节编号 */
 typeof PPTS_REPL!=="undefined"&&Object.keys(PPTS_REPL).forEach(k=>{PPTS[k]=PPTS_REPL[k]});
 typeof PPTS_INS!=="undefined"&&Object.keys(PPTS_INS).forEach(k=>{const e=PPTS_INS[k];if(PPTS[k])PPTS[k].splice(e[0],0,...e[1])});
-const DATA_MISSING=[["历史 data/sej.js",typeof PPTS_X],["生物 data/bio.js",typeof PPTS_BIO],["化学 data/kim.js",typeof PPTS_KIM]].filter(x=>x[1]==="undefined").map(x=>x[0]);
+const DATA_MISSING=[["历史 data/sej.js",typeof PPTS_X],["生物 data/bio.js",typeof PPTS_BIO],["化学 data/kim.js",typeof PPTS_KIM],["数学 data/mat.js",typeof PPTS_MATX]].filter(x=>x[1]==="undefined").map(x=>x[0]);
 const BIO_SUB={"bio|T4-1":["1.1","1.1","1.2","1.2","1.2","1.3","1.3","1.4","1.4"],"bio|T4-2":["2.1","2.1","2.1","2.1","2.1","2.2","2.2","2.3","2.3","2.3","2.4"],"bio|T4-3":["3.1","3.2","3.2","3.2","3.3","3.3","3.3","3.3","3.4"],"bio|T4-4":["4.1","4.1","4.2","4.2","4.3","4.3","4.4","4.4","4.5","4.2–4.5"],"bio|T4-5":["5.1","5.1","5.2","5.2","5.2","5.2","5.3"],"bio|T4-6":["6.1","6.2","6.2","6.2","6.2","6.3","6.3","6.4"],"bio|T4-7":["7.1","7.1","7.2","7.2","7.3","7.3","7.3"],"bio|T4-8":["8.1","8.1","8.2","8.3","8.3","8.4","8.4"],"bio|T4-9":["9.1","9.2","9.2","9.2","9.3","9.4","9.5","9.6","9.6","9.7"],"bio|T4-10":["10.1","10.2","10.2","10.3","10.4","10.5","10.6","10.7","10.8"],"bio|T4-11":["11.1","11.1","11.1","11.2","11.2","11.3","11.3","11.4"],"bio|T4-12":["12.1","12.2","12.3","12.3","12.4","12.5","12.6","12.6","12.7"],"bio|T4-13":["13.1","13.1","13.1","13.2","13.2","13.2","13.2","13.2","13.2","13.3","13.3"],"bio|T4-14":["14.1","14.2","14.2","14.2","14.2","14.2","14.3","14.3","14.1","14.4","14.4"],"bio|T4-15":["15.1","15.1","15.2","15.2","15.2","15.3","15.3","15.4","15.4","15.5","15.6","15.6","15.7","15.3"],"bio|T5-1":["1.1","1.1","1.1","1.1","1.2","1.2","1.2","1.2","1.3","1.3","1.3"],"bio|T5-2":["2.1","2.1","2.2","2.2","2.3","2.3","2.3","2.4","2.4","2.4","2.5"],"bio|T5-3":["3.1","3.1","3.1","3.1","3.1","3.2","3.2","3.2","3.3","3.3","3.3","3.3"],"bio|T5-4":["4.1","4.1","4.1","4.2","4.2","4.2","4.2","4.3","4.3","4.3","4.1","4.4","4.4","4.2"],"bio|T5-5":["5.1","5.1","5.1","5.1","5.1","5.1","5.1","5.2","5.2","5.2","5.2","5.3","5.3","5.1"],"bio|T5-6":["6.1","6.1","6.1","6.2","6.2","6.3","6.3","6.3","6.4","6.4","6.4","6.5","6.3"],"bio|T5-7":["7.1","7.1","7.1","7.1","7.1","7.1","7.1","7.1"],"bio|T5-8":["8.1","8.1","8.1","8.1","8.1","8.1","8.1","8.2","8.3","8.3","8.3"],"bio|T5-9":["9.1","9.2","9.2","9.2","9.2","9.2","9.2","9.2","9.2","9.3","9.3"],"bio|T5-10":["10.1","10.1","10.1","10.1","10.1","10.1","10.2","10.2","10.3","10.3"],"bio|T5-11":["11.1","11.2","11.2","11.2","11.2","11.2","11.3","11.3","11.3","11.3","11.3"],"bio|T5-12":["12.1","12.1","12.1","12.1","12.2","12.2","12.2","12.3","12.3","12.3","12.3"],"bio|T5-13":["13.1","13.1","13.1","13.1","13.1","13.1","13.1","13.1","13.2","13.3","13.3"]};
 Object.keys(BIO_SUB).forEach(k=>{const d=PPTS[k];if(!d)return;BIO_SUB[k].forEach((lab,i)=>{if(lab&&d[i]&&!/^\d/.test(d[i][0]))d[i][0]=lab+" "+d[i][0]})});
 
@@ -2540,7 +2393,15 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
-{v:"2026-10-18i",date:"2026-10-18",title:"化学科笔记完善中 (T4-1 到 T4-5，T4-6 前半)",
+{v:"2026-10-18m",date:"2026-10-18",title:"数学科笔记按 SPM 给分格式重做 (T4 + T5 共 18 章)",
+   items:[
+    "➗ 数学 18 章内置笔记全部重做，每章 15–22 页，按小节 (1.1、1.2 …) 一节一节写，包含关键术语、公式速记、例题、答题方法、常见错误和自测。",
+    "🎯 按 SPM 数学的给分方式写：例题和示例题逐步标上 K1 (方法分)、N1 (答案分)、P1 (理解/推理分)，告诉你每一步值几分、哪里会丢分。",
+    "📝 T4-1 开头加了 SPM 数学试卷格式 (Kertas 1、Kertas 2 的 A/B/C 部分)、K/N/P 给分方式和指示词 (Hitung、Tunjukkan bahawa、Seterusnya …)。",
+    "🧮 每章有 2 页「示例题与评分」(Contoh Soalan dan Skema)，数字都用程序重新算过；示例题是自编的练习题，不是真题。保险、税务、理财章里的费率和税率表是示例数字。",
+    "📁 数学的内置笔记数据已经拆到 data/mat.js；更新时记得把 data 文件夹一起上传。",
+    "⚠️ K/N/P 的写法是 SPM 评分常见约定，请对照学校 trial 卷的评分表。"]},
+{v:"2026-10-18k",date:"2026-10-18",title:"化学科笔记完善中 (T4-1 到 T4-7)",
    items:[
     "🧪 化学 T4-1：加了 SPM 化学试卷格式 (Kertas 1、2、3) 和给分方式，补齐 1.1、1.2、1.3 各小节，并加上 A 部分示例题和实验卷 (Kertas 3) 评分示例，从 7 页增加到 19 页。",
     "🧪 化学 T4-2：补齐 2.1 到 2.4 各小节 (三态粒子比较、扩散、加热曲线、原子模型的科学家贡献、电子排布例题、同位素计算、放射性同位素用途)，加上 A、B 部分示例题，从 8 页增加到 21 页。",
@@ -2548,6 +2409,8 @@ const CHANGELOG=[
     "🧪 化学 T4-4：补周期表发展的科学家、元素位置例题、同族同周期趋势、第18族用途、碱金属与水和卤素与铁丝/置换的观察、第3周期趋势与氧化物、过渡元素性质与催化剂，加上示例题，从 9 页增加到 24 页。",
     "🧪 化学 T4-5：补稳定电子排布例题、离子化合物形成步骤与性质、共价分子形成与性质、氢键、配位键、金属键，以及导电性、熔点、溶解性实验，加上示例题，从 9 页增加到 21 页。",
     "🧪 化学 T4-6 (6.1 到 6.6)：补水的作用实验、酸碱电离与碱度、pH 例题与指示剂、强弱酸碱的比较实验与解释、酸碱反应实验、浓度稀释例题、配制标准溶液和稀释的步骤，加上示例题；后半 (6.7 到 6.11) 下一次再补。",
+    "🧪 化学 T4-6 后半 (6.7 到 6.11)：补中和反应应用、滴定步骤与计算、盐的溶解性、结晶水例题、制盐方法选择与步骤、碳酸盐与硝酸盐的热分解、阴离子检验步骤、鉴定未知盐例题，加上 A、B 部分示例题；这一章现在 40 页。",
+    "🧪 化学 T4-7：补速率图解读、速率计算例题、大小/浓度/温度/催化剂四个实验、碰撞理论答题模板、速率因素的应用，加上示例题，从 9 页增加到 19 页。",
     "📁 化学的内置笔记数据已经拆到 data/kim.js；更新时记得把 data 文件夹一起上传。",
     "⚠️ 示例题是自编的练习题，不是真题；日期、人名和数字请对照课本。"]},
 {v:"2026-10-18c",date:"2026-10-18",title:"壁纸支持多张图片",
