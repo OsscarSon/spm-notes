@@ -1,0 +1,105 @@
+{
+ "seasons": [
+  {
+   "id": "spring",
+   "daysLeftMin": 29,
+   "daysLeftMax": 999,
+   "name": "春",
+   "emoji": "🌱",
+   "hint": "种新章节，读笔记"
+  },
+  {
+   "id": "summer",
+   "daysLeftMin": 15,
+   "daysLeftMax": 28,
+   "name": "夏",
+   "emoji": "☀️",
+   "hint": "多做题，勤浇水"
+  },
+  {
+   "id": "autumn",
+   "daysLeftMin": 8,
+   "daysLeftMax": 14,
+   "name": "秋",
+   "emoji": "🍂",
+   "hint": "做模拟卷，收成"
+  },
+  {
+   "id": "winter",
+   "daysLeftMin": 1,
+   "daysLeftMax": 7,
+   "name": "冬",
+   "emoji": "❄️",
+   "hint": "冲刺：错题与闪卡；作物每天可长2格"
+  },
+  {
+   "id": "harvest",
+   "daysLeftMin": 0,
+   "daysLeftMax": 0,
+   "name": "丰收节",
+   "emoji": "🎉",
+   "hint": "考试日，加油"
+  }
+ ],
+ "examSource": "EXAM.writtenStart 与 JWP[科目].d（index.html）。若考试日已过 → 假期模式，不再显示倒数。",
+ "exam_day": {
+  "default": "今天是{subject}考试日。你已经种下很多章节，深呼吸，慢慢写，加油！",
+  "bm": "Semoga berjaya! 加油，国语文章放轻松写。",
+  "mat": "每一步都有分，写出步骤，别空着。",
+  "sej": "事实+阐述，每个点都是分。",
+  "bio": "术语要准，点要够。"
+ },
+ "festivals": [
+  {
+   "id": "deepavali",
+   "name": "屠妖节",
+   "approx": "2026-11-08",
+   "verify": true,
+   "deco": "彩灯、花环",
+   "greeting": "祝大家屠妖节快乐！"
+  },
+  {
+   "id": "merdeka",
+   "name": "独立日",
+   "approx": "08-31",
+   "deco": "彩旗",
+   "greeting": "Selamat Hari Merdeka！"
+  },
+  {
+   "id": "cny",
+   "name": "农历新年",
+   "approx": "每年不同",
+   "verify": true,
+   "deco": "灯笼",
+   "greeting": "新年快乐，学业进步！"
+  },
+  {
+   "id": "hari_raya",
+   "name": "开斋节",
+   "approx": "每年不同",
+   "verify": true,
+   "deco": "灯笼、竹笼",
+   "greeting": "Selamat Hari Raya！"
+  },
+  {
+   "id": "mid_autumn",
+   "name": "中秋节",
+   "approx": "每年不同",
+   "verify": true,
+   "deco": "灯笼、月饼摊",
+   "greeting": "中秋快乐！"
+  },
+  {
+   "id": "christmas",
+   "name": "圣诞节",
+   "approx": "12-25",
+   "deco": "彩灯",
+   "greeting": "Merry Christmas！"
+  }
+ ],
+ "festivalRules": [
+  "只做装饰与祝福，不做宗教说教",
+  "日期上线前对照官方日历",
+  "节日不影响任何学习数值"
+ ]
+}

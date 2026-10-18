@@ -1,0 +1,98 @@
+{
+ "cart": {
+  "name": "Pak Kereta",
+  "zhName": "货车叔叔",
+  "emoji": "🚚",
+  "days": [
+   "wed",
+   "sat"
+  ],
+  "leaves": "本地 24:00",
+  "seedBy": "日期",
+  "itemCount": 5,
+  "priceMarkup": [
+   1.2,
+   1.6
+  ]
+ },
+ "pool": [
+  {
+   "id": "windmill",
+   "type": "deco",
+   "base": 120
+  },
+  {
+   "id": "lamp",
+   "type": "deco",
+   "base": 50
+  },
+  {
+   "id": "flag",
+   "type": "deco",
+   "base": 25
+  },
+  {
+   "id": "wallpaper",
+   "type": "deco",
+   "base": 60
+  },
+  {
+   "id": "rug",
+   "type": "deco",
+   "base": 45
+  },
+  {
+   "id": "lantern",
+   "type": "deco",
+   "base": 30
+  },
+  {
+   "id": "hat",
+   "type": "outfit",
+   "base": 40
+  },
+  {
+   "id": "collar",
+   "type": "outfit",
+   "base": 35
+  },
+  {
+   "id": "rainbow_coconut_seedling",
+   "type": "seed",
+   "base": 90
+  },
+  {
+   "id": "golden_pumpkin_fragment",
+   "type": "seed",
+   "base": 120
+  },
+  {
+   "id": "recipe_nasi_lemak",
+   "type": "recipe",
+   "base": 80
+  },
+  {
+   "id": "recipe_fruit_salad",
+   "type": "recipe",
+   "base": 70
+  },
+  {
+   "id": "hint_ticket",
+   "type": "special",
+   "base": 60,
+   "maxPerDay": 1
+  }
+ ],
+ "neverSell": [
+  "水",
+  "草料",
+  "任何直接让作物长大或加速的东西"
+ ],
+ "barter": {
+  "enabled": true,
+  "rule": "答对 3 道弱科题换 1 件商品（不花⭐）",
+  "triesPerDay": 2,
+  "fail": "不扣任何东西"
+ },
+ "copy": "不使用倒计时焦虑文案（如『最后5分钟』）"
+}

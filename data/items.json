@@ -1,0 +1,281 @@
+{
+ "_说明": "price=商店价/参考卖价；礼物不能卖。",
+ "items": [
+  {
+   "id": "egg",
+   "name": "鸡蛋",
+   "emoji": "🥚",
+   "type": "animal",
+   "price": 8
+  },
+  {
+   "id": "milk",
+   "name": "牛奶",
+   "emoji": "🥛",
+   "type": "animal",
+   "price": 12
+  },
+  {
+   "id": "wool",
+   "name": "羊毛",
+   "emoji": "🧶",
+   "type": "animal",
+   "price": 25
+  },
+  {
+   "id": "honey",
+   "name": "蜂蜜",
+   "emoji": "🍯",
+   "type": "animal",
+   "price": 20
+  },
+  {
+   "id": "hint_ticket",
+   "name": "提示券",
+   "emoji": "🔎",
+   "type": "special",
+   "price": 0
+  },
+  {
+   "id": "hay",
+   "name": "草料",
+   "emoji": "🌾",
+   "type": "feed",
+   "price": 0
+  },
+  {
+   "id": "fish_small",
+   "name": "小鱼",
+   "emoji": "🐟",
+   "type": "fish",
+   "price": 10
+  },
+  {
+   "id": "fish_rare",
+   "name": "稀有鱼",
+   "emoji": "🐠",
+   "type": "fish",
+   "price": 30
+  },
+  {
+   "id": "fish_big",
+   "name": "大鱼",
+   "emoji": "🐡",
+   "type": "fish",
+   "price": 45
+  },
+  {
+   "id": "ore_copper",
+   "name": "铜矿",
+   "emoji": "🟠",
+   "type": "ore",
+   "price": 8
+  },
+  {
+   "id": "ore_silver",
+   "name": "银矿",
+   "emoji": "⚪",
+   "type": "ore",
+   "price": 18
+  },
+  {
+   "id": "ore_gold",
+   "name": "金矿",
+   "emoji": "🟡",
+   "type": "ore",
+   "price": 35
+  },
+  {
+   "id": "gem",
+   "name": "紫水晶",
+   "emoji": "💎",
+   "type": "ore",
+   "price": 60
+  },
+  {
+   "id": "flower_pot",
+   "name": "花盆",
+   "emoji": "🪴",
+   "type": "deco",
+   "price": 30
+  },
+  {
+   "id": "fence",
+   "name": "栅栏",
+   "emoji": "🚧",
+   "type": "deco",
+   "price": 5
+  },
+  {
+   "id": "bench",
+   "name": "长椅",
+   "emoji": "🪑",
+   "type": "deco",
+   "price": 40
+  },
+  {
+   "id": "lamp",
+   "name": "路灯",
+   "emoji": "💡",
+   "type": "deco",
+   "price": 50
+  },
+  {
+   "id": "windmill",
+   "name": "风车",
+   "emoji": "🌬️",
+   "type": "deco",
+   "price": 120
+  },
+  {
+   "id": "flag",
+   "name": "彩旗",
+   "emoji": "🚩",
+   "type": "deco",
+   "price": 25
+  },
+  {
+   "id": "lantern",
+   "name": "灯笼",
+   "emoji": "🏮",
+   "type": "deco",
+   "price": 30
+  },
+  {
+   "id": "rug",
+   "name": "地毯",
+   "emoji": "🟥",
+   "type": "deco",
+   "price": 45
+  },
+  {
+   "id": "wallpaper",
+   "name": "墙纸",
+   "emoji": "🖼️",
+   "type": "deco",
+   "price": 60
+  },
+  {
+   "id": "hat",
+   "name": "小帽子",
+   "emoji": "🎩",
+   "type": "outfit",
+   "price": 40
+  },
+  {
+   "id": "collar",
+   "name": "小狗项圈",
+   "emoji": "📿",
+   "type": "outfit",
+   "price": 35
+  },
+  {
+   "id": "mushroom",
+   "name": "蘑菇",
+   "emoji": "🍄",
+   "type": "forage",
+   "price": 8
+  },
+  {
+   "id": "wild_berry",
+   "name": "野果",
+   "emoji": "🍓",
+   "type": "forage",
+   "price": 8
+  },
+  {
+   "id": "flower",
+   "name": "野花",
+   "emoji": "🌸",
+   "type": "forage",
+   "price": 6
+  },
+  {
+   "id": "herb",
+   "name": "香草",
+   "emoji": "🍃",
+   "type": "forage",
+   "price": 6
+  },
+  {
+   "id": "wood",
+   "name": "木块",
+   "emoji": "🪵",
+   "type": "forage",
+   "price": 4
+  },
+  {
+   "id": "secret_note",
+   "name": "神秘笔记",
+   "emoji": "📜",
+   "type": "special",
+   "price": 0
+  },
+  {
+   "id": "mystery_seed",
+   "name": "神秘种子",
+   "emoji": "🌱",
+   "type": "special",
+   "price": 0
+  }
+ ],
+ "recipes": [
+  {
+   "id": "omelette",
+   "name": "蛋卷",
+   "emoji": "🍳",
+   "needs": {
+    "egg": 2
+   },
+   "effect": "当天第一次答题水量×1.2(每天1次)",
+   "sell": 30
+  },
+  {
+   "id": "fish_porridge",
+   "name": "鱼粥",
+   "emoji": "🍲",
+   "needs": {
+    "fish_small": 1,
+    "hay": 0,
+    "any_crop": 1
+   },
+   "effect": "送礼好感×2",
+   "sell": 35
+  },
+  {
+   "id": "nasi_lemak",
+   "name": "椰浆饭",
+   "emoji": "🍛",
+   "needs": {
+    "egg": 1,
+    "chili": 1,
+    "rainbow_coconut_or_any_crop": 1
+   },
+   "effect": "送礼好感×2；全NPC多数喜欢",
+   "sell": 50
+  },
+  {
+   "id": "fruit_salad",
+   "name": "水果沙拉",
+   "emoji": "🥗",
+   "needs": {
+    "blueberry": 1,
+    "banana": 1,
+    "pineapple": 1
+   },
+   "effect": "当天第一次答题水量×1.2",
+   "sell": 55
+  },
+  {
+   "id": "honey_tea",
+   "name": "蜂蜜茶",
+   "emoji": "🍵",
+   "needs": {
+    "honey": 1
+   },
+   "effect": "提神：当天提示券+0（装饰性）",
+   "sell": 28
+  }
+ ],
+ "cooking_note": "食材名里的 any_crop 表示任意作物；具体匹配规则由实现决定。"
+}

@@ -1,0 +1,59 @@
+{
+ "spawn": {
+  "perDay": "4 + floor(foragingLevel/5)，最多10",
+  "where": "草地/路边/树下的可走格子",
+  "avoid": [
+   "农田",
+   "围栏",
+   "房屋入口",
+   "NPC站位",
+   "彼此重叠"
+  ],
+  "resetAt": "本地零点",
+  "leftover": "当天未采消失，不堆积不惩罚"
+ },
+ "question": {
+  "source": "闪卡，优先最弱科与 S.box 低的卡；AI 阶段可替换",
+  "correct": "得采集物+5XP",
+  "wrong": "蔫了：无物品，1XP，该卡按原逻辑进错题"
+ },
+ "items": [
+  {
+   "id": "mushroom",
+   "name": "蘑菇",
+   "emoji": "🍄",
+   "sell": 8
+  },
+  {
+   "id": "wild_berry",
+   "name": "野果",
+   "emoji": "🍓",
+   "sell": 8
+  },
+  {
+   "id": "flower",
+   "name": "野花",
+   "emoji": "🌸",
+   "sell": 6
+  },
+  {
+   "id": "herb",
+   "name": "香草",
+   "emoji": "🍃",
+   "sell": 6
+  },
+  {
+   "id": "wood",
+   "name": "木块",
+   "emoji": "🪵",
+   "sell": 4
+  }
+ ],
+ "secretNote": {
+  "emoji": "📜",
+  "baseChance": 0.04,
+  "perForagingLevel": 0.005,
+  "content": "从玩家未掌握章节随机取一条 PPTS 的 tip，去掉前缀 Tip:；禁止现编",
+  "collectBadgeAt": 10
+ }
+}

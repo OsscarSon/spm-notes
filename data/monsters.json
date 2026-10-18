@@ -1,0 +1,113 @@
+{
+ "_说明": "每条错题=一只怪物，外观只是装饰。回合制，只看答题。",
+ "player": {
+  "hearts": 3,
+  "perCombatLevel": {
+   "5": 1,
+   "15": 1,
+   "25": 1
+  }
+ },
+ "families": [
+  {
+   "subject": "bm",
+   "name": "错字史莱姆",
+   "emoji": "🟦"
+  },
+  {
+   "subject": "bi",
+   "name": "语法幽灵",
+   "emoji": "👻"
+  },
+  {
+   "subject": "sej",
+   "name": "年份蝙蝠",
+   "emoji": "🦇"
+  },
+  {
+   "subject": "mat",
+   "name": "符号蜘蛛",
+   "emoji": "🕷️"
+  },
+  {
+   "subject": "sains",
+   "name": "细胞虫",
+   "emoji": "🦠"
+  },
+  {
+   "subject": "bio",
+   "name": "细胞虫",
+   "emoji": "🦠"
+  },
+  {
+   "subject": "kim",
+   "name": "酸液怪",
+   "emoji": "🧪"
+  },
+  {
+   "subject": "fiz",
+   "name": "电火花",
+   "emoji": "⚡"
+  },
+  {
+   "subject": "moral",
+   "name": "诱惑影子",
+   "emoji": "🌑"
+  },
+  {
+   "subject": "am",
+   "name": "积分幽魂",
+   "emoji": "♾️"
+  },
+  {
+   "subject": "bc",
+   "name": "错别字妖",
+   "emoji": "🖋️"
+  }
+ ],
+ "hp": {
+  "rule": "按该科近7天正确率",
+  "rows": [
+   {
+    "acc_lt": 0.5,
+    "hp": 3
+   },
+   {
+    "acc_lt": 0.75,
+    "hp": 2
+   },
+   {
+    "acc_gte": 0.75,
+    "hp": 1
+   }
+  ]
+ },
+ "battle": [
+  "第1题=错题本身",
+  "后续题=同章节/同科目变体题（AI 阶段由AI出）",
+  "答对-1HP；答错玩家-1❤️",
+  "HP归零击败；第一题对且零失误→调用错题本现有“已掌握”逻辑"
+ ],
+ "floor": {
+  "monsters": "3–5",
+  "bossEvery": 5,
+  "boss": {
+   "name": "考试 Boss",
+   "questions": 3,
+   "passAt": 2,
+   "reward": [
+    "稀有装饰",
+    "hint_ticket"
+   ]
+  }
+ },
+ "drops": [
+  "ore_copper",
+  "ore_silver",
+  "ore_gold",
+  "gem",
+  "mushroom"
+ ],
+ "dailyRewardedBattles": 10,
+ "emptyWrongPool": "今天很安全：复习小测5题，纯玩"
+}

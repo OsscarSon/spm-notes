@@ -1,0 +1,77 @@
+{
+ "_说明": "图鉴条目 = 网站闪卡(CARDS/CARDS2)。状态只读 S.box；已收集(box>=3曾达到)写在游戏存档 collected，永不丢失。",
+ "source": [
+  "CARDS",
+  "CARDS2"
+ ],
+ "states": [
+  {
+   "id": "unseen",
+   "stars": 0,
+   "rule": "S.box[id] 为空"
+  },
+  {
+   "id": "seen",
+   "stars": 1,
+   "rule": "答过但 box=0"
+  },
+  {
+   "id": "known",
+   "stars": 2,
+   "rule": "box 1–2"
+  },
+  {
+   "id": "mastered",
+   "stars": 3,
+   "rule": "box>=3，永久记入 collected"
+  }
+ ],
+ "tiers": [
+  {
+   "count": 5,
+   "reward": {
+    "stars": 10,
+    "item": "术语册封面"
+   }
+  },
+  {
+   "count": 15,
+   "reward": {
+    "friendship": 1,
+    "deco": "small"
+   }
+  },
+  {
+   "count": 30,
+   "reward": {
+    "perk": "该科收成 +5% ⭐（一次性）"
+   }
+  },
+  {
+   "count": 60,
+   "reward": {
+    "title": "该科小达人"
+   }
+  },
+  {
+   "count": 100,
+   "reward": {
+    "badge": "该科徽章",
+    "deco": "rare"
+   }
+  },
+  {
+   "count": 200,
+   "reward": {
+    "graduationCard": "金色封面"
+   }
+  }
+ ],
+ "allSubjectsTiers": [
+  30,
+  60,
+  100,
+  200
+ ],
+ "optionalLater": "Key Terms 幻灯片页作为额外条目（需建 id 与映射）"
+}
