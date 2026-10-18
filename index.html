@@ -334,7 +334,7 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
 <div class="shell">
   <header class="top no-print">
     <div class="title"><h1>SPM 备考本</h1><p>课本、笔记、模拟卷和 AI 助教，都按 KSSM 整理</p></div>
-    <div class="right"><div class="chip-days" id="daysChip"></div><button class="btn line" id="btnBell" aria-label="更新提醒" title="更新提醒"><span class="bellico">🔔</span><i class="bdot"></i></button><button class="btn line" id="btnSet">设置</button></div>
+    <div class="right"><div class="chip-days" id="daysChip"></div><span class="online-chip no-print" id="onlineChip" role="button" tabindex="0"></span><button class="btn line" id="btnBell" aria-label="更新提醒" title="更新提醒"><span class="bellico">🔔</span><i class="bdot"></i></button><button class="btn line" id="btnSet">设置</button></div>
   </header>
   <nav class="subjects no-print" id="subjects" aria-label="科目"></nav>
   <nav class="tabs no-print" id="tabs" role="tablist" aria-label="功能"></nav>
@@ -1553,16 +1553,16 @@ const busy={};
 function setBusy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.l=btn.innerHTML;btn.innerHTML='<span class="spin"></span>'+(label||"处理中…")}else if(btn.dataset.l){btn.innerHTML=btn.dataset.l}}
 
 /* ---- 导航 ---- */
-const TABS=[["today","今日"],["notes","笔记"],["flash","闪卡"],["drill","刷题"],["exam","模拟卷"],["chat","问答"],["res","资料"]];
+const TABS=[["today","今日"],["notes","笔记"],["flash","闪卡"],["drill","刷题"],["exam","模拟卷"],["chat","问答"],["res","资料"],["game","小镇"]];
 let exTimer=null;
 function renderNav(){
   $("#subjects").innerHTML=mySubjects().map(s=>`<button data-sub="${s.id}" aria-pressed="${s.id===S.sub&&S.tab!=="today"&&S.tab!=="set"}"><span class="sd" style="background:${s.color}"></span>${esc(s.name)}<span class="cnt">${prog(s.id).p}%</span></button>`).join("");
   $("#tabs").innerHTML=TABS.map(t=>`<button class="tab ${S.tab===t[0]?"active":""}" role="tab" data-tab="${t[0]}" aria-selected="${S.tab===t[0]}">${t[1]}</button>`).join("");
   const left=dd(today(),S.exam);$("#daysChip").innerHTML=left>0?`距笔试 <b>${left}</b> 天`:left===0?`<b>今天开考</b>`:`已开考 <b>${-left}</b> 天`;
-  $("#subjects").style.display=(S.tab==="today"||S.tab==="set")?"none":"";}
+  $("#subjects").style.display=(S.tab==="today"||S.tab==="set"||S.tab==="game")?"none":"";}
 function go(tab,sub){if(sub&&S.my.includes(sub))S.sub=sub;else if(sub&&!S.my.includes(sub)){S.my.push(sub);S.sub=sub}S.tab=tab;save();render();window.scrollTo(0,0);try{history.replaceState(null,"","#"+tab)}catch(e){}}
-function render(){if(exTimer&&S.tab!=="exam"){clearInterval(exTimer);exTimer=null}if(S.tab!=="drill"){TTSX.stop();if(LS)LS.playing=false}renderNav();
-  ({today:rToday,notes:rNotes,flash:rFlash,drill:rDrill,exam:rExam,chat:rChat,res:rRes,set:rSet})[S.tab]()}
+function render(){if(exTimer&&S.tab!=="exam"){clearInterval(exTimer);exTimer=null}if(S.tab!=="drill"){TTSX.stop();if(LS)LS.playing=false}if(S.tab!=="game")gStop();renderNav();
+  ({today:rToday,notes:rNotes,flash:rFlash,drill:rDrill,exam:rExam,chat:rChat,res:rRes,game:rGame,set:rSet})[S.tab]()}
 function needKey(){return aiOK()?"":`<div class="notice warn"><b>先设置 API key</b><p>AI 功能（生成笔记、出题、模拟卷、问答）要用你自己的 API key (Gemini，或设置里的备用 AI)，Gemini 免费申请：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>。</p><p class="fine muted">第一次用？到「设置」最上面有新手指南，几步就能开始。</p><button class="btn pri small" data-act="goset">去设置</button></div>`}
 
 /* ---- SPM 2026 官方时间表 (JWP 18 Ogos 2026，据 LP 公布整理) ---- */
@@ -2392,7 +2392,497 @@ ${e.text.trim()||"(见照片)"}
 
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
+/* ===================== 实时在线人数 (Supabase Realtime Presence) =====================
+   用法：到 supabase.com 建一个免费项目，把 Project URL 和 publishable key 填到下面两个引号里。
+   两个都留空 = 不启用 (不会连任何外部服务，也不会显示在线人数)。
+   只统计人数：每台设备一个随机编号，不记录姓名、笔记、答案等任何个人信息。 */
+const ONLINE_CFG={url:"",key:""};
+const ONLINE_ON=!!(ONLINE_CFG.url&&ONLINE_CFG.key);
+const ONL={sb:null,ch:null,n:0,st:"off",err:"",lastConn:0,fail:0,timer:null,hideT:null,lib:null,debug:false};
+try{if(/[?&]online-debug=1/.test(location.search))localStorage.setItem("spm-online-debug","1");if(/[?&]online-debug=0/.test(location.search))localStorage.removeItem("spm-online-debug");ONL.debug=localStorage.getItem("spm-online-debug")==="1"}catch(e){}
+(function(){if(document.getElementById("onlineCss"))return;const s=document.createElement("style");s.id="onlineCss";
+  s.textContent=".online-chip{display:none;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--ink);white-space:nowrap;cursor:pointer;-webkit-user-select:none;user-select:none}.online-chip.on{display:inline-flex}.online-chip i{width:8px;height:8px;border-radius:50%;background:#2fb36b;display:inline-block}.online-chip.err i{background:var(--bad,#c23b32)}.online-chip.wait i{background:#d9a21b}";
+  document.head.appendChild(s)})();
+function onlineDid(){let d="";try{d=localStorage.getItem("spm-did")||"";if(!d){d=((window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()).replace(/-/g,"").slice(0,16);localStorage.setItem("spm-did",d)}}catch(e){}return d||("d"+Math.random().toString(36).slice(2,12))}
+function onlineChip(cls,html,title){const c=$("#onlineChip");if(!c)return;c.className="online-chip no-print on"+(cls?" "+cls:"");c.innerHTML="<i></i>"+html;c.title=title||""}
+function onlineShow(n){ONL.n=n;ONL.fail=0;onlineChip("",'<b id="onlineN">'+n+"</b>","现在有 "+n+" 位同学在线")}
+function onlineHide(){const c=$("#onlineChip");if(!c)return;if(ONL.debug){const wait=ONL.st==="connecting";onlineChip(wait?"wait":"err",wait?"连接中…":"在线人数：未连上"+(ONL.err?" ("+esc(String(ONL.err).slice(0,60))+")":""),ONL.err||"")}else c.classList.remove("on")}
+function onlineLoadLib(){if(ONL.lib)return ONL.lib;
+  ONL.lib=new Promise((res,rej)=>{
+    if(window.supabase&&window.supabase.createClient)return res(window.supabase);
+    const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.109.0";s.async=true;
+    const to=setTimeout(()=>rej(new Error("加载超时")),15000);
+    s.onload=()=>{clearTimeout(to);window.supabase&&window.supabase.createClient?res(window.supabase):rej(new Error("库加载了但不能用"))};
+    s.onerror=()=>{clearTimeout(to);rej(new Error("加载 supabase 库失败 (网络问题或被拦截)"))};
+    document.head.appendChild(s)});
+  ONL.lib.catch(()=>{ONL.lib=null});return ONL.lib}
+function onlineDrop(retry){const ch=ONL.ch;ONL.ch=null;
+  if(ch&&ONL.sb){try{const p=ch.untrack&&ch.untrack();if(p&&p.catch)p.catch(()=>{})}catch(e){}try{const p=ONL.sb.removeChannel(ch);if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+  if(!retry)ONL.st="off";onlineHide();
+  if(retry){ONL.fail++;clearTimeout(ONL.timer);ONL.timer=setTimeout(onlineConnect,Math.min(15*60e3,30e3*Math.pow(2,ONL.fail-1)))}}
+async function onlineConnect(){
+  if(!ONLINE_ON||ONL.ch||document.hidden||navigator.onLine===false)return;
+  const wait=15000-(Date.now()-ONL.lastConn);
+  if(wait>0){clearTimeout(ONL.timer);ONL.timer=setTimeout(onlineConnect,wait);return}
+  ONL.lastConn=Date.now();ONL.st="connecting";ONL.err="";onlineHide();
+  try{
+    const lib=await onlineLoadLib();
+    if(document.hidden||ONL.ch){ONL.st="off";return}
+    if(!ONL.sb)ONL.sb=lib.createClient(ONLINE_CFG.url,ONLINE_CFG.key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:2}}});
+    const ch=ONL.sb.channel("spm-online",{config:{presence:{key:onlineDid()}}});
+    ONL.ch=ch;
+    ch.on("presence",{event:"sync"},()=>{if(ONL.ch!==ch)return;try{onlineShow(Math.max(1,Object.keys(ch.presenceState()).length))}catch(e){}});
+    ch.subscribe(async(status,err)=>{
+      if(ONL.ch!==ch)return;
+      if(status==="SUBSCRIBED"){ONL.st="ok";ONL.err="";try{await ch.track({v:1})}catch(e){ONL.err=e&&e.message||"track 失败"}}
+      else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){ONL.st="error";ONL.err=(err&&err.message)||status;try{console.warn("[在线人数]",status,err)}catch(e){}onlineDrop(true)}
+      else if(status==="CLOSED"){if(ONL.st==="ok"){ONL.st="closed";onlineHide()}}});
+  }catch(e){ONL.st="error";ONL.err=e&&e.message||String(e);try{console.warn("[在线人数]",e)}catch(x){}ONL.ch=null;onlineDrop(true)}}
+function onlinePing(){try{const k="spm-online-ping",last=+localStorage.getItem(k)||0;if(Date.now()-last<20*36e5)return;localStorage.setItem(k,String(Date.now()));
+  fetch(ONLINE_CFG.url.replace(/\/+$/,"")+"/rest/v1/",{headers:{apikey:ONLINE_CFG.key}}).catch(()=>{})}catch(e){}}
+function initOnline(){
+  const c=$("#onlineChip");
+  if(c){c.onclick=()=>toast(ONL.st==="ok"?"现在有 "+ONL.n+" 位同学在线 (只统计人数，不记录任何个人信息)":"在线人数还没连上"+(ONL.err?"："+ONL.err:"")+"。可以在网址后面加 ?online-debug=1 看详细状态")};
+  document.addEventListener("visibilitychange",()=>{clearTimeout(ONL.hideT);if(document.hidden)ONL.hideT=setTimeout(()=>onlineDrop(false),20000);else onlineConnect()});
+  window.addEventListener("pagehide",()=>onlineDrop(false));
+  window.addEventListener("pageshow",()=>onlineConnect());
+  window.addEventListener("online",()=>onlineConnect());
+  window.addEventListener("offline",()=>onlineDrop(false));
+  onlinePing();onlineConnect()}
+if(ONLINE_ON){if(document.readyState==="complete")setTimeout(initOnline,1200);else window.addEventListener("load",()=>setTimeout(initOnline,1200))}
+
+/* ===================== 知识小镇：可爱的 2D 探索 + 学习小游戏 ===================== */
+const G_STEP=170;
+const G_EMO={bm:"🐯",bi:"🦉",bc:"🐼",sej:"🐘",mat:"🦊",am:"🦝",sains:"🐙",fiz:"🐧",kim:"🐸",bio:"🦋",moral:"🐰"};
+const G_PROP={bm:"✒️",bi:"📖",bc:"🏮",sej:"🏺",mat:"📐",am:"📐",sains:"🔬",fiz:"🔭",kim:"🧪",bio:"🌱",moral:"🕊️"};
+const G_PETE={dog:"🐶",cat:"🐱",rabbit:"🐰",panda:"🐼",bear:"🐻"};
+const G_TREE=[0,12,36,80];
+const G_FONT='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const GM={on:false,raf:0,cv:null,ctx:null,A:null,room:null,pl:null,keys:{},order:[],path:[],after:null,paused:false,fade:null,parts:[],near:null,cam:{ox:0,oy:0},last:0,t:0,bound:false,bump:false,trail:[],dlgActs:{}};
+function gHash(a,b){let h=Math.imul(a|0,374761393)^Math.imul(b|0,668265263);h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967295}
+function gRGB(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]}
+function gMix(a,b,t){const A=gRGB(a),B=gRGB(b);return"#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join("")}
+function gShade(c,t){return t<0?gMix(c,"#000000",-t):gMix(c,"#ffffff",t)}
+function GS(){
+  if(!S.game||S.game.v!==1)S.game={v:1,stars:6,total:0,unlocked:[],visited:{},shelf:{},day:"",quest:{},done:{},intro:false,room:"hub",x:12,y:10};
+  const g=S.game;
+  if(!g.unlocked.length){const mine=mySubjects().map(s=>s.id);g.unlocked=[mine.includes(S.sub)?S.sub:(mine[0]||"bm")]}
+  return g}
+function gCost(g){return 6+2*Math.max(0,g.unlocked.length-1)}
+function gStage(g){let s=0;G_TREE.forEach((n,i)=>{if(g.total>=n)s=i});return s}
+
+/* ---- 画面素材：全部用程序画出来 (不用图片文件)，按屏幕大小缓存 ---- */
+function gAssets(u){
+  const ts=16*u,A={u,ts,_h:{},_s:{},_t:{},_w:{}};
+  const mkc=(w,h)=>{const c=document.createElement("canvas");c.width=Math.round(w*u);c.height=Math.round(h*u);const x=c.getContext("2d");x.imageSmoothingEnabled=false;return[c,x]};
+  const R=(x,c,X,Y,W,H)=>{x.fillStyle=c;const l=Math.round(X*u),t=Math.round(Y*u);x.fillRect(l,t,Math.max(1,Math.round((X+W)*u)-l),Math.max(1,Math.round((Y+H)*u)-t))};
+  const disc=(x,c,cx,cy,r)=>{for(let dy=-r;dy<=r;dy+=.5){const w=Math.sqrt(Math.max(0,r*r-dy*dy));R(x,c,cx-w,cy+dy,w*2,.5)}};
+  const mk=(w,h,fn)=>{const[c,x]=mkc(w,h);fn(x);return c};
+  const star=(x,cx,cy,c)=>{R(x,c,cx-.5,cy-2,1,4);R(x,c,cx-2,cy-.5,4,1);R(x,c,cx-1,cy-1,2,2)};
+  A.R=R;A.disc=disc;A.mk=mk;A.star=star;
+  /* 地面 */
+  A.grass=[0,1,2,3].map(v=>mk(16,16,x=>{R(x,v%2?"#9fd46f":"#a8da78",0,0,16,16);
+    for(let i=0;i<5;i++){const hx=Math.floor(gHash(v*7+i,3)*13),hy=Math.floor(gHash(v*5+i,9)*13);R(x,"#8cc45f",hx,hy,1,2);R(x,"#b9e48a",hx+1,hy,1,1)}
+    if(v===2){R(x,"#ffd3e0",4,5,2,2);R(x,"#ff8fb3",4.5,5.5,1,1);R(x,"#ffd3e0",11,10,2,2);R(x,"#ff8fb3",11.5,10.5,1,1)}
+    if(v===3){R(x,"#fff3b0",9,4,2,2);R(x,"#ffc93c",9.5,4.5,1,1);R(x,"#fff",3,11,2,2);R(x,"#ffd24a",3.5,11.5,1,1)}}));
+  A.path=[0,1].map(v=>mk(16,16,x=>{R(x,"#ecdcb4",0,0,16,16);
+    [[1,1,6,5],[8,1,7,4],[1,7,5,6],[7,6,8,5],[2,13,6,3],[10,12,5,4]].forEach((s,i)=>{const o=(v+i)%2;R(x,"#d8c390",s[0]+o*.5,s[1],s[2],s[3]);R(x,"#f3e6c4",s[0]+o*.5,s[1],s[2]-1,1)})}));
+  A.wood=[0,1].map(v=>mk(16,16,x=>{R(x,"#ebcb9a",0,0,16,16);for(let r=0;r<4;r++){R(x,"#d4ad77",0,r*4+3,16,1);const off=(r*5+v*7)%12+2;R(x,"#d4ad77",off,r*4,1,3)}
+    R(x,"#f4dcb3",2,1,3,1);R(x,"#e0bb86",9,9,2,1)}));
+  A.hedge=mk(16,16,x=>{R(x,"#4f9c55",0,0,16,16);for(let i=0;i<7;i++){const hx=gHash(i,4)*13,hy=gHash(i,8)*13;disc(x,i%2?"#62b565":"#43904b",hx+1.5,hy+1.5,2.5)}R(x,"#7ccb7a",3,3,2,1);R(x,"#7ccb7a",10,8,2,1)});
+  A.sideWall=mk(16,16,x=>{R(x,"#c99a62",0,0,16,16);R(x,"#b2824f",0,0,2,16);R(x,"#dcb27b",2,0,1,16);R(x,"#b2824f",8,0,1,16)});
+  A.mat=mk(16,16,x=>{R(x,"#ebcb9a",0,0,16,16);R(x,"#c9645a",2,2,12,12);R(x,"#e8887c",3,3,10,10);R(x,"#f4b0a6",5,5,6,6);R(x,"#c9645a",7,7,2,2)});
+  A.themed=col=>A._t[col]||(A._t[col]={
+    rug:mk(16,16,x=>{R(x,gShade(col,.1),0,0,16,16);R(x,gShade(col,-.18),0,0,2,16);R(x,gShade(col,-.18),14,0,2,16);R(x,gShade(col,.55),2,0,1,16);R(x,gShade(col,.55),13,0,1,16);R(x,gShade(col,.35),7,3,2,2);R(x,gShade(col,.35),7,11,2,2)}),
+    wallT:mk(16,16,x=>{const b=gMix(col,"#fbefd6",.82);R(x,b,0,0,16,16);R(x,gMix(col,"#fbefd6",.7),0,0,16,2);for(let i=0;i<4;i++)R(x,gMix(col,"#fbefd6",.7),i*4+1,2,1,14)}),
+    wallB:mk(16,16,x=>{const b=gMix(col,"#fbefd6",.82);R(x,b,0,0,16,16);for(let i=0;i<4;i++)R(x,gMix(col,"#fbefd6",.7),i*4+1,0,1,10);R(x,"#c99a62",0,10,16,6);R(x,"#dcb27b",0,10,16,1);R(x,"#a97a45",0,15,16,1)})});
+  /* 房子 (每个科目一间，颜色取科目色) */
+  A.house=col=>A._h[col]||(A._h[col]=mk(48,48,x=>{
+    const roof=col,rD=gShade(col,-.24),rL=gShade(col,.2);
+    R(x,"rgba(0,0,0,.14)",3,44,42,3);
+    R(x,"#7a5a3a",4,19,40,26);R(x,"#fbefd6",5,20,38,24);R(x,"#eadfc2",5,20,38,1);R(x,"#cfc0a0",5,39,38,5);
+    for(let i=0;i<8;i++)R(x,"#bfae8d",6+i*5,40,2,1);
+    R(x,"#b0644a",33,3,5,9);R(x,"#8f4c38",33,3,5,1);R(x,"#d9d9d9",32,2,7,1.5);
+    for(let y=5;y<22;y++){const hw=11+(y-5)*.75,k=(y-5)%4;R(x,k===3?rD:(k===0?rL:roof),24-hw,y,hw*2,1)}
+    R(x,rD,.5,21,47,2);R(x,roof,.5,21,47,1);
+    R(x,"#6e4524",19,26,10,18);R(x,"#b9783f",20,27,8,17);R(x,"#c98a4d",20,27,3.5,17);R(x,"#a86a38",24,27,.7,17);R(x,"#e8c14a",25.5,37,1.5,1.5);R(x,"#d4b78a",18,44,12,1.5);
+    [8,34].forEach(X=>{const Y=27;R(x,"#6e4524",X-1,Y-1,10,10);R(x,"#bfe6ff",X,Y,8,8);R(x,"#e8f7ff",X,Y,3,3);R(x,"#6e4524",X+3.5,Y,1,8);R(x,"#6e4524",X,Y+3.5,8,1);R(x,col,X-3,Y-1,2,10);R(x,col,X+9,Y-1,2,10);R(x,"#7a5230",X-1,Y+9,10,2);R(x,"#ff9db8",X,Y+8,2,1.5);R(x,"#ffe27a",X+3,Y+8,2,1.5);R(x,"#ff9db8",X+6,Y+8,2,1.5)});
+    R(x,"#6e4524",17,21,14,6);R(x,"#e8c283",18,22,12,4)}));
+  /* 书架 (2×2 格)，不同编号书的颜色不同 */
+  const PAL=["#e76f51","#f4a261","#e9c46a","#2a9d8f","#6a8caf","#9b72aa","#ef8fb0","#7bc47f","#5aa9e6"];
+  A.shelf=seed=>A._s[seed]||(A._s[seed]=mk(32,32,x=>{
+    R(x,"rgba(0,0,0,.14)",1,30,31,2);R(x,"#5e3b1f",0,0,32,31);R(x,"#b97a42",1,1,30,29);R(x,"#d9a066",1,1,30,2);
+    R(x,"#6b4528",3,3,26,8);R(x,"#6b4528",3,13,26,8);
+    for(let row=0;row<2;row++){let px=3.5,i=0;const y0=row?13:3;while(px<27){const w=2+Math.floor(gHash(seed*13+row,i)*2.2),h=4+Math.floor(gHash(seed*7+row,i+50)*4);const c=PAL[Math.floor(gHash(seed+row*3,i+9)*PAL.length)];R(x,c,px,y0+8-h,w,h);R(x,"rgba(255,255,255,.28)",px,y0+8-h,.8,h);px+=w+.2;i++}}
+    R(x,"#d9a066",3,11,26,2);R(x,"#d9a066",3,21,26,1.5);
+    R(x,"#a86a38",3,22.5,12.5,6.5);R(x,"#a86a38",16.5,22.5,12.5,6.5);R(x,"#c98a50",4,23.5,10.5,4.5);R(x,"#c98a50",17.5,23.5,10.5,4.5);R(x,"#e8c14a",9,25,1.2,1.5);R(x,"#e8c14a",21.8,25,1.2,1.5)}));
+  /* 树 */
+  A.tree=v=>A._w["t"+v]||(A._w["t"+v]=mk(32,32,x=>{const c1=v?"#f2a7c3":"#4f9c55",c2=v?"#f8c4d8":"#62b565",c3=v?"#fde3ee":"#7ccb7a";
+    R(x,"rgba(0,0,0,.14)",6,28,20,3);R(x,"#7a5230",13,19,6,11);R(x,"#946239",14,19,2,11);disc(x,c1,16,13,10);disc(x,c2,14,11,8);disc(x,c3,12,9,4.5);if(v){[[8,12],[20,9],[22,16],[13,17]].forEach(p=>R(x,"#fff",p[0],p[1],1.5,1.5))}}));
+  A.kt=s=>A._w["k"+s]||(A._w["k"+s]=s===0?mk(16,32,x=>{R(x,"rgba(0,0,0,.14)",3,29,10,2);R(x,"#946239",7,20,2,10);disc(x,"#62b565",8,17,4.5);disc(x,"#7ccb7a",6,14.5,3);disc(x,"#7ccb7a",11,15,2.5)})
+    :s===1?mk(32,48,x=>{R(x,"rgba(0,0,0,.14)",7,44,18,3);R(x,"#7a5230",13,28,6,18);R(x,"#946239",14,28,2,18);disc(x,"#4f9c55",16,22,11);disc(x,"#62b565",11,18,7.5);disc(x,"#62b565",21,18,7.5);disc(x,"#7ccb7a",16,12,8)})
+    :s===2?mk(64,64,x=>{R(x,"rgba(0,0,0,.14)",14,60,36,3.5);R(x,"#7a5230",27,34,10,28);R(x,"#946239",29,34,3,28);R(x,"#7a5230",22,56,6,6);R(x,"#7a5230",36,56,6,6);disc(x,"#4f9c55",32,28,17);disc(x,"#62b565",20,24,12);disc(x,"#62b565",44,24,12);disc(x,"#7ccb7a",32,16,12);disc(x,"#8fdc8c",26,12,5)})
+    :mk(80,80,x=>{R(x,"rgba(0,0,0,.14)",16,76,48,4);R(x,"#7a5230",33,42,14,36);R(x,"#946239",36,42,4,36);R(x,"#7a5230",26,68,8,8);R(x,"#7a5230",46,68,8,8);disc(x,"#4f9c55",40,34,22);disc(x,"#62b565",24,30,15);disc(x,"#62b565",56,30,15);disc(x,"#7ccb7a",40,20,15);disc(x,"#8fdc8c",32,14,6);
+      [[22,24],[34,12],[50,16],[58,30],[44,34],[28,38],[40,26],[16,34]].forEach((p,i)=>star(x,p[0],p[1],i%2?"#ffe45e":"#ffcf33"));[[30,22],[48,26],[20,30],[54,38]].forEach(p=>R(x,"#ffd3e0",p[0],p[1],1.5,1.5))}));
+  A.board=mk(32,26,x=>{R(x,"rgba(0,0,0,.14)",2,23,28,3);R(x,"#6e4524",4,10,3,14);R(x,"#6e4524",25,10,3,14);R(x,"#5e3b1f",1,1,30,16);R(x,"#c58b4e",2,2,28,14);R(x,"#fff7e6",4,4,8,7);R(x,"#ffd8e0",14,4,6,6);R(x,"#d6f0ff",22,5,6,8);R(x,"#e8c14a",7,3,1.5,1.5);R(x,"#d6454b",17,3,1.5,1.5);R(x,"#fff7e6",13,11,8,4)});
+  A.lamp=mk(16,32,x=>{R(x,"rgba(0,0,0,.14)",3,29,10,2);R(x,"#5a4a3a",7,10,2,19);R(x,"#5a4a3a",5,28,6,2);R(x,"#5a4a3a",4,3,8,1.5);R(x,"#ffe9a8",5,4.5,6,6);R(x,"#fff6cf",6,5.5,3,3);R(x,"#5a4a3a",4,10.5,8,1.5)});
+  A.win=mk(32,32,x=>{R(x,"#8a5f33",3,4,26,17);R(x,"#bfe6ff",5,6,22,13);R(x,"#e8f7ff",5,6,8,5);R(x,"#8a5f33",15.5,6,1.5,13);R(x,"#8a5f33",5,12,22,1.5);R(x,"#fff",19,8,5,2);R(x,"#fff",21,7,3,1.5);R(x,"#6e4524",2,20,28,2)});
+  /* 小主角：4 个方向 × 3 帧 (站着 / 两个走路姿势) */
+  const skin="#f6c7a0",hair="#6b4535",shirt="#6cc3b0",shirt2="#4fa896",pants="#4a5a9a",shoe="#5a3a2a";
+  A.pl=[0,1,2,3].map(d=>[0,1,2].map(f=>mk(16,16,x=>{
+    R(x,"rgba(0,0,0,.15)",4,14.2,8,1.6);
+    const l=f===1?-1:0,r=f===2?-1:0;
+    R(x,pants,5,12+l,2.5,2.4-l);R(x,pants,8.5,12+r,2.5,2.4-r);R(x,shoe,4.8,14+l,3,1.4);R(x,shoe,8.3,14+r,3,1.4);
+    R(x,shirt,4,8.6,8,4.2);R(x,shirt2,4,12,8,.8);R(x,"#fff",7,8.6,2,1);
+    const ay=(f?-.5:0);R(x,skin,3,9.5+ay,1.4,3);R(x,skin,11.6,9.5-ay,1.4,3);
+    R(x,skin,4.5,2.6,7,6.2);R(x,skin,4,3.4,8,4.6);
+    if(d===1){R(x,hair,4,1.4,8,6.6);R(x,hair,3.5,2.6,9,4.4)}
+    else{R(x,hair,4,1.2,8,3.3);R(x,hair,3.6,2.4,.9,3);R(x,hair,11.5,2.4,.9,3);
+      if(d===0){R(x,hair,5,4.4,2.4,1);R(x,hair,9,4.4,1.2,1);R(x,"#2b2b3a",5.8,6,1,1.8);R(x,"#2b2b3a",9.2,6,1,1.8);R(x,"#f4a3a3",4.6,7.6,1.2,.9);R(x,"#f4a3a3",10.2,7.6,1.2,.9)}
+      if(d===2){R(x,hair,8.5,3.6,3.5,4.4);R(x,"#2b2b3a",5.2,6,1,1.8);R(x,"#f4a3a3",4.4,7.6,1.2,.9)}
+      if(d===3){R(x,hair,4,3.6,3.5,4.4);R(x,"#2b2b3a",9.8,6,1,1.8);R(x,"#f4a3a3",10.4,7.6,1.2,.9)}}
+    R(x,"#ffb0c4",10.5,1,2,1.4)})));
+  return A}
+
+/* ---- 地图：小镇 (室外) 和每科一座图书馆 (室内) ---- */
+function gSlots(){return mySubjects().slice(0,12)}
+const G_SLOTS=[[0,0],[1,1],[2,0],[3,1],[4,0],[5,1],[0,1],[1,0],[2,1],[3,0],[4,1],[5,0]];
+function gHouseOf(sid){const i=gSlots().findIndex(s=>s.id===sid);if(i<0)return null;const c=G_SLOTS[i];return{x:1+4*c[0],y:c[1]?6:1,i}}
+function gNewRoom(id,W,H,name,theme){const r={id,W,H,name,theme,ground:[],bl:[],ob:[],objs:[],decals:[]};for(let y=0;y<H;y++){r.ground.push(new Array(W).fill("g0"));r.bl.push(new Array(W).fill(false));r.ob.push(new Array(W).fill(null))}return r}
+function gAdd(r,o){r.objs.push(o);for(let yy=o.y;yy<o.y+(o.h||1);yy++)for(let xx=o.x;xx<o.x+(o.w||1);xx++){if(yy<0||xx<0||yy>=r.H||xx>=r.W)continue;if(o.block!==false)r.bl[yy][xx]=true;if(o.act)r.ob[yy][xx]=o}return o}
+function gBuildHub(){
+  const g=GS(),W=25,H=17,r=gNewRoom("hub",W,H,"知识小镇","#8fcf7e");
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const edge=x===0||y===0||x===W-1||y===H-1;
+    r.ground[y][x]=edge?"hedge":(gHash(x,y)<.1?"g2":gHash(x+9,y+3)<.1?"g3":"g"+((x+y)%2));
+    if(edge)r.bl[y][x]=true}
+  const P=(x,y)=>{if(x>0&&y>0&&x<W-1&&y<H-1)r.ground[y][x]="p"+((x+y)%2)};
+  for(let x=1;x<W-1;x++){P(x,4);P(x,5);P(x,9);P(x,10)}
+  for(let y=4;y<=10;y++)[4,8,12,16,20].forEach(x=>P(x,y));
+  for(let y=11;y<H-1;y++)for(let x=7;x<=17;x++)P(x,y);
+  gSlots().forEach((s,i)=>{const h=gHouseOf(s.id);gAdd(r,{t:"house",x:h.x,y:h.y,w:3,h:3,by:h.y+3,sid:s.id,act:true,door:{x:h.x+1,y:h.y+2}})});
+  [[2,12,1],[22,12,1],[2,15,0],[22,15,0],[5,12,0],[19,12,0]].forEach(p=>gAdd(r,{t:"tree",x:p[0],y:p[1],w:2,h:2,by:p[1]+2,v:p[2],cx:p[0]}));
+  gAdd(r,{t:"kt",x:12,y:14,w:1,h:1,by:15,act:true});
+  const st=gStage(g);if(st>=2){r.bl[14][11]=true;r.bl[14][13]=true}
+  gAdd(r,{t:"board",x:8,y:12,w:2,h:1,by:13,act:true});
+  gAdd(r,{t:"lamp",x:7,y:11,w:1,h:1,by:12});gAdd(r,{t:"lamp",x:17,y:11,w:1,h:1,by:12});
+  gAdd(r,{t:"npc",x:15,y:13,e:"🦉",by:14,act:true,who:"owl"});
+  return r}
+function gBuildRoom(sid){
+  const s=subj(sid),cs=chapsOf(sid),n=cs.length,rows=Math.max(1,Math.ceil(n/3)),W=15,H=3+4*rows+1,col=s.color||"#7a8ad8";
+  const r=gNewRoom(sid,W,H,s.name,col);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    r.ground[y][x]=y===0?"wallT":y===1?"wallB":(x===0||x===W-1)?"side":y===H-1?"wallB":"w"+((x+y)%2);
+    if(y<2||x===0||x===W-1||y===H-1)r.bl[y][x]=true}
+  for(let y=2;y<H-1;y++){r.ground[y][8]="rug";r.ground[y][9]="rug"}
+  r.ground[H-1][7]="mat";r.bl[H-1][7]=false;r.exit={x:7,y:H-1};
+  r.decals.push({t:"win",x:3,y:0},{t:"win",x:10,y:0});
+  cs.forEach((c,i)=>{const col2=i%3,row=Math.floor(i/3),x=2+4*col2,y=3+4*row;gAdd(r,{t:"shelf",x,y,w:2,h:2,by:y+2,chap:c,idx:i,sid,act:true,seed:i%9})});
+  gAdd(r,{t:"npc",x:7,y:2,e:G_EMO[sid]||"🐱",by:3,act:true,who:"room",sid});
+  gAdd(r,{t:"emo",x:1,y:2,e:"🪴",by:3});gAdd(r,{t:"emo",x:13,y:2,e:"🪴",by:3});
+  gAdd(r,{t:"emo",x:5,y:2,e:G_PROP[sid]||"📚",by:3});gAdd(r,{t:"emo",x:10,y:2,e:"🕯️",by:3});
+  gAdd(r,{t:"emo",x:1,y:H-2,e:"🪴",by:H-1});gAdd(r,{t:"emo",x:13,y:H-2,e:"🪴",by:H-1});
+  return r}
+function gLoadRoom(id,x,y,dir){
+  const g=GS();let r=id==="hub"?gBuildHub():gBuildRoom(id);
+  GM.room=r;g.room=id;
+  const pl=GM.pl=GM.pl||{};
+  const sx=x===undefined?(g.x||12):x,sy=y===undefined?(g.y||10):y;
+  Object.assign(pl,{x:sx,y:sy,rx:sx,ry:sy,fx:sx,fy:sy,tx:sx,ty:sy,dir:dir===undefined?0:dir,moving:false,t:0,walk:0});
+  if(r.bl[pl.y]&&r.bl[pl.y][pl.x]){const f=gNearestFree(r,pl.x,pl.y);if(f){pl.x=pl.rx=pl.fx=pl.tx=f.x;pl.y=pl.ry=pl.fy=pl.ty=f.y}}
+  GM.trail=[{x:pl.x,y:pl.y},{x:pl.x,y:pl.y},{x:pl.x,y:pl.y}];GM.path=[];GM.after=null;GM.keys={};GM.order=[];GM.near=null;
+  gHud()}
+function gNearestFree(r,x,y){for(let d=1;d<8;d++)for(let dy=-d;dy<=d;dy++)for(let dx=-d;dx<=d;dx++){const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<r.W&&yy<r.H&&!r.bl[yy][xx])return{x:xx,y:yy}}return null}
+
+/* ---- 走路、碰撞、点哪走哪 ---- */
+const G_DIRS=[[0,1],[0,-1],[-1,0],[1,0]];
+function gPathTo(goalFn,limit){
+  const r=GM.room,pl=GM.pl,W=r.W,H=r.H,key=(x,y)=>y*W+x,prev=new Map([[key(pl.x,pl.y),null]]),q=[[pl.x,pl.y]];
+  while(q.length){const[cx,cy]=q.shift();
+    if((cx!==pl.x||cy!==pl.y)&&goalFn(cx,cy)){const out=[];let k=key(cx,cy);while(prev.get(k)){const p=prev.get(k);out.unshift({x:k%W,y:Math.floor(k/W)});k=key(p[0],p[1])}return out}
+    for(const[dx,dy]of G_DIRS){const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=W||ny>=H||r.bl[ny][nx]||prev.has(key(nx,ny)))continue;prev.set(key(nx,ny),[cx,cy]);q.push([nx,ny])}}
+  return null}
+function gTryMove(d){
+  const r=GM.room,pl=GM.pl,nx=pl.x+G_DIRS[d][0],ny=pl.y+G_DIRS[d][1];pl.dir=d;
+  if(nx<0||ny<0||nx>=r.W||ny>=r.H||r.bl[ny][nx]){
+    const o=(nx>=0&&ny>=0&&nx<r.W&&ny<r.H)?r.ob[ny][nx]:null;
+    if(o&&!GM.bump){GM.bump=true;GM.keys={};GM.order=[];GM.path=[];GM.after=null;gInteract(o)}
+    return false}
+  pl.fx=pl.x;pl.fy=pl.y;pl.tx=nx;pl.ty=ny;pl.moving=true;pl.t=0;return true}
+function gDecide(){
+  if(GM.paused||GM.fade||GM.pl.moving)return;
+  const pl=GM.pl;let d=-1;
+  for(let i=GM.order.length-1;i>=0;i--){if(GM.keys[GM.order[i]]){d=GM.order[i];break}}
+  if(d>=0){GM.path=[];GM.after=null}
+  else if(GM.path.length){const n=GM.path[0],dx=n.x-pl.x,dy=n.y-pl.y;d=G_DIRS.findIndex(v=>v[0]===dx&&v[1]===dy);if(d<0){GM.path=[];GM.after=null}}
+  if(d>=0){const ok=gTryMove(d);if(ok&&GM.path.length&&!Object.values(GM.keys).some(Boolean))GM.path.shift();else if(!ok){GM.path=[]}}
+  else if(GM.after){const o=GM.after;GM.after=null;const fx=o.x,fy=o.y;let best=-1;
+    for(let i=0;i<4;i++){const nx=pl.x+G_DIRS[i][0],ny=pl.y+G_DIRS[i][1];if(GM.room.ob[ny]&&GM.room.ob[ny][nx]===o){best=i;break}}
+    if(best>=0)pl.dir=best;gInteract(o)}}
+function gArrive(){
+  const pl=GM.pl,r=GM.room;pl.x=pl.tx;pl.y=pl.ty;pl.rx=pl.x;pl.ry=pl.y;pl.moving=false;
+  GM.trail.unshift({x:pl.x,y:pl.y});GM.trail.length=4;
+  if(r.exit&&pl.x===r.exit.x&&pl.y===r.exit.y){const h=gHouseOf(r.id)||{x:11,y:1};gGoRoom("hub",h.x+1,h.y+3,0);return}
+  gDecide()}
+function gGoRoom(id,x,y,dir,cb){
+  if(GM.fade)return;GM.fade={t:0,out:true,cb:()=>{gLoadRoom(id,x,y,dir);if(cb)cb()}};GM.keys={};GM.order=[];GM.path=[]}
+function gSavePos(){try{const g=GS();if(GM.pl&&GM.room){g.room=GM.room.id;g.x=GM.pl.x;g.y=GM.pl.y}save()}catch(e){}}
+
+/* ---- 学习玩法：收集星星、开发新房子、书架小测验 ---- */
+function gGain(n,why){const g=GS();g.stars+=n;g.total+=n;
+  const pl=GM.pl;if(pl)for(let i=0;i<Math.min(8,n+2);i++)GM.parts.push({e:"⭐",x:pl.rx+.5+(Math.random()-.5)*.8,y:pl.ry,vx:(Math.random()-.5)*.002,vy:-.0022-Math.random()*.001,t:0,life:1100});
+  gHud();return n}
+function gHud(){const g=GS(),a=$("#gStars"),b=$("#gRoom");if(a)a.textContent="⭐ "+g.stars;if(b&&GM.room)b.textContent=GM.room.name;const h=$("#gHome");if(h)h.style.display=GM.room&&GM.room.id!=="hub"?"":"none"}
+function gDlg(html,acts){const d=$("#gDlg");if(!d)return;d.innerHTML='<div class="gbox">'+html+"</div>";d.classList.add("on");GM.paused=true;GM.keys={};GM.order=[];GM.path=[];GM.dlgActs=acts||{};const b=d.querySelector(".gbox");if(b)b.scrollTop=0}
+function gDlgClose(){const d=$("#gDlg");if(d){d.classList.remove("on");d.innerHTML=""}GM.paused=false;GM.dlgActs={};GM.bump=true;setTimeout(()=>{GM.bump=false},250);gSavePos();gHud()}
+function gInteract(o){
+  const g=GS();
+  if(o.t==="shelf")return gShelfDlg(o);
+  if(o.t==="house"){
+    if(g.unlocked.includes(o.sid)){const s=subj(o.sid);gGoRoom(o.sid,7,gRoomH(o.sid)-2,1,()=>{if(!g.visited[o.sid]){g.visited[o.sid]=1;gGain(1);setTimeout(()=>gDlg(`<div class="gh">🗺️ 发现新区域！</div><p class="gp">你走进了「${esc(s.name)}」图书馆。每个书架是一个章节，走到书架前按互动键，就能看笔记或做小测验。</p><p class="gp">第一次来，奖励 ⭐1</p><div class="gbtns"><button data-g="x">好的</button></div>`,{x:gDlgClose}),350)}});return}
+    return gUnlockDlg(o)}
+  if(o.t==="npc")return o.who==="owl"?gOwlDlg():gRoomNpcDlg(o.sid);
+  if(o.t==="board")return gBoardDlg();
+  if(o.t==="kt")return gTreeDlg()}
+function gRoomH(sid){return 3+4*Math.max(1,Math.ceil(chapsOf(sid).length/3))+1}
+function gUnlockDlg(o){
+  const g=GS(),s=subj(o.sid),cost=gCost(g),ok=g.stars>=cost;
+  gDlg(`<div class="gh">🌿 ${esc(s.name)}屋 · 还没开发</div><p class="gp">这间屋子被藤蔓盖住了。开发它需要 <b>⭐${cost}</b>，你现在有 <b>⭐${g.stars}</b>。</p>${ok?"":`<p class="gp">还差 ⭐${cost-g.stars}。到已经开发的图书馆里，做书架的小测验就能赚星星。</p>`}<div class="gbtns">${ok?`<button data-g="dev">🔨 开发 (⭐${cost})</button>`:""}<button data-g="x" class="gx">再等等</button></div>`,{
+    dev:()=>{g.stars-=cost;g.unlocked.push(o.sid);save();gHud();for(let i=0;i<14;i++)GM.parts.push({e:i%2?"✨":"🌸",x:o.x+1.5+(Math.random()-.5)*2.6,y:o.y+1.5+Math.random()*1.4,vx:(Math.random()-.5)*.0016,vy:-.0016-Math.random()*.0014,t:0,life:1300});
+      gDlg(`<div class="gh">🎉 开发完成！</div><p class="gp">「${esc(s.name)}」图书馆开门啦。走到门口就能进去逛逛。</p><div class="gbtns"><button data-g="x">太好了</button></div>`,{x:gDlgClose})},
+    x:gDlgClose})}
+function gOwlDlg(){
+  const g=GS(),st=gStage(g);
+  gDlg(`<div class="gh">🦉 小猫头鹰向导</div><p class="gp">欢迎来到知识小镇！每一间屋子是一门科目，里面的书架就是章节。</p><p class="gp">赚 ⭐ 的方法：<br>• 书架小测验：答对一题 ⭐1，3 题全对再 ⭐2<br>• 第一次读完某章笔记 ⭐1<br>• 发现新图书馆 ⭐1，每天第一次来 ⭐2<br>• 图书馆里的小动物每天有任务，完成有奖励</p><p class="gp">你有 <b>⭐${g.stars}</b>，一共赚过 ${g.total} 颗。小镇中间的知识之树现在是第 ${st+1}/4 阶段。</p><div class="gbtns"><button data-g="x">知道啦</button></div>`,{x:gDlgClose})}
+function gTreeDlg(){
+  const g=GS(),st=gStage(g),next=G_TREE[st+1];
+  gDlg(`<div class="gh">🌳 知识之树</div><p class="gp">它会随着你学到的东西慢慢长大。${next?`再赚 <b>${next-g.total}</b> 颗 ⭐ 就会长到下一阶段。`:"它已经长成最大的样子了，满树都是金色的星星！"}</p><p class="gp fine">你一共赚过 ${g.total} 颗 ⭐。</p><div class="gbtns"><button data-g="x">摸摸树</button></div>`,{x:gDlgClose})}
+function gBoardDlg(){
+  const g=GS(),mine=mySubjects();
+  const rows=mine.map(s=>{const cs=chapsOf(s.id),got=cs.filter(c=>(g.shelf[c.k]||{}).best>=2).length;const un=g.unlocked.includes(s.id);return`<div class="grow2"><span>${un?"🏠":"🌿"} ${esc(s.name)}</span><span>${un?got+" / "+cs.length+" 本收集":"未开发"}</span></div>`}).join("");
+  gDlg(`<div class="gh">📋 布告栏</div><p class="gp">每个书架做小测验，答对 2 题以上就算「收集」到这一章。</p>${rows}<div class="gbtns"><button data-g="x">关闭</button></div>`,{x:gDlgClose})}
+function gRoomNpcDlg(sid){
+  const g=GS(),s=subj(sid),d=today(),q=g.quest[sid]&&g.quest[sid].d===d?g.quest[sid]:null,e=G_EMO[sid]||"🐱";
+  if(q&&q.claimed)return gDlg(`<div class="gh">${e} ${esc(s.name)}管理员</div><p class="gp">今天的整理任务已经完成啦，谢谢你！明天再来吧。</p><div class="gbtns"><button data-g="x">好的</button></div>`,{x:gDlgClose});
+  if(q&&q.plays>=1)return gDlg(`<div class="gh">${e} ${esc(s.name)}管理员</div><p class="gp">你今天已经帮我整理过书架了，真厉害！这是谢礼：<b>⭐3</b></p><div class="gbtns"><button data-g="claim">收下 ⭐3</button></div>`,{claim:()=>{q.claimed=true;gGain(3);save();gDlgClose()}});
+  gDlg(`<div class="gh">${e} ${esc(s.name)}管理员</div><p class="gp">今天的小任务：随便挑一个书架，做一次小测验，回来找我就有奖励。</p><div class="gbtns"><button data-g="x">好，我去</button></div>`,{x:gDlgClose})}
+
+/* 题库：AI 为每一章出一批选择题，存在这台设备上，之后重复玩不再耗额度 */
+function gPoolLoad(){try{return JSON.parse(localStorage.getItem("spm-gq")||"{}")}catch(e){return{}}}
+function gPoolSave(p){const ks=Object.keys(p);if(ks.length>60){ks.sort((a,b)=>(p[a].t||0)-(p[b].t||0)).slice(0,ks.length-60).forEach(k=>delete p[k])}try{localStorage.setItem("spm-gq",JSON.stringify(p))}catch(e){}}
+async function gPick(sid,c,n){
+  let pool=gPoolLoad(),e=pool[c.k];
+  const fresh=()=>(e.qs||[]).map((_,i)=>i).filter(i=>!(e.used||[]).includes(i));
+  if(!e||fresh().length<n){
+    if(!aiOK()){if(e&&e.qs&&e.qs.length>=n){e.used=[]}else throw new Error("这一章还没有题目。请先到「设置」填 API key，之后书架就能出题了。")}
+    else{
+      const prompt=`为 SPM「${subj(sid).name}」的这一章出 8 道单选题，用来做小测验 (难度由易到中)。
+章节：${c.t}
+${chapText(c,3500)}
+要求：每题 4 个选项，答案可以从章节内容和 SPM 考点判断；干扰项要有迷惑性；不要出需要看图的题；e 用一两句华文解释为什么。
+只输出 JSON：[{"q":"","o":["","","",""],"a":0,"e":""}]。a 是正确选项的序号 (0-3)。`;
+      const out=await gem([{role:"user",parts:[{text:prompt}]}],sysPrompt(sid),6000,{json:"["});
+      const arr=parseJSON(out,"[",1).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4).map(x=>({q:String(x.q),o:x.o.map(String),a:x.a,e:String(x.e||"")}));
+      if(arr.length<n)throw new Error("AI 这次没有出好题目，请再试一次。");
+      e=pool[c.k]={qs:arr,used:[],t:Date.now()}}}
+  const f=fresh().sort(()=>Math.random()-.5).slice(0,n);e.used=(e.used||[]).concat(f);e.t=Date.now();gPoolSave(pool);return f.map(i=>e.qs[i])}
+function gShelfDlg(o){
+  const g=GS(),c=o.chap,sh=g.shelf[c.k]||(g.shelf[c.k]={best:0,plays:0,read:false}),st="⭐".repeat(sh.best)+"☆".repeat(3-sh.best);
+  gDlg(`<div class="gh">📚 ${esc(c.t)}</div><div class="gs">${st} ${S.done[c.k]?'<span class="gtag">✓ 已标记完成</span>':""}${sh.best>=2?'<span class="gtag">已收集</span>':""}</div><p class="gp">${c.subs&&c.subs.length?esc(c.subs.slice(0,6).join("、")):"翻开看看这一章讲什么吧～"}</p><div class="gbtns"><button data-g="read">📖 看笔记</button><button data-g="quiz">🎯 小测验 (3 题)</button><button data-g="x" class="gx">关闭</button></div>`,{
+    read:()=>{if(!sh.read){sh.read=true;gGain(1)}S.openChap=c.k;gDlgClose();go("notes",o.sid)},
+    quiz:()=>gQuiz(o.sid,c,o),x:gDlgClose})}
+async function gQuiz(sid,c,o){
+  gDlg(`<div class="gh">🎯 小测验</div><p class="gp">书架在翻找题目… <span class="spin"></span></p>`,{});
+  let qs;try{qs=await gPick(sid,c,3)}catch(e){return gDlg(`<div class="gh">😿 出题失败</div><p class="gp">${esc(e.message)}</p><div class="gbtns"><button data-g="retry">再试一次</button><button data-g="x" class="gx">关闭</button></div>`,{retry:()=>gQuiz(sid,c,o),x:gDlgClose})}
+  let i=0,ok=0;const wrong=[];
+  const show=()=>{const q=qs[i];gDlg(`<div class="gh">🎯 第 ${i+1} / ${qs.length} 题</div><div class="gq">${esc(q.q)}</div>${q.o.map((t,k)=>`<button class="gopt" data-g="o${k}"><b>${"ABCD"[k]}</b> ${esc(t)}</button>`).join("")}`,Object.fromEntries(q.o.map((t,k)=>["o"+k,()=>ans(k)])))};
+  const ans=k=>{const q=qs[i],right=k===q.a;if(right)ok++;else wrong.push({q,k});
+    gDlg(`<div class="gh">${right?"✅ 答对了！":"❌ 差一点点"}</div><div class="gq">${esc(q.q)}</div><div class="gp">正确答案：<b>${"ABCD"[q.a]}. ${esc(q.o[q.a])}</b></div>${q.e?`<p class="gp">${esc(q.e)}</p>`:""}<div class="gbtns"><button data-g="n">${i+1<qs.length?"下一题":"看结果"}</button></div>`,{n:()=>{i++;i<qs.length?show():finish()}})};
+  const finish=()=>{
+    const g=GS(),sh=g.shelf[c.k]||(g.shelf[c.k]={best:0,plays:0,read:false}),bonus=ok===qs.length?2:0,stars=ok+bonus;
+    sh.plays++;sh.best=Math.max(sh.best,ok);
+    wrong.forEach((w,j)=>S.wrong.push({id:"g"+Date.now()+"_"+j,type:"quiz",s:sid,q:"(小镇) "+w.q.q+"  ("+w.q.o.map((t,k)=>"ABCD"[k]+". "+t).join(" / ")+")",a:"正确答案："+"ABCD"[w.q.a]+". "+w.q.o[w.q.a]+"。"+w.q.e}));
+    const d=today(),qd=g.quest[sid]&&g.quest[sid].d===d?g.quest[sid]:(g.quest[sid]={d,plays:0,claimed:false});qd.plays++;
+    gGain(stars);let extra="";
+    const cs=chapsOf(sid);if(!g.done[sid]&&cs.length&&cs.every(x=>(g.shelf[x.k]||{}).best>=2)){g.done[sid]=1;gGain(5);extra=`<p class="gp">🏆 这间图书馆的书架全部收集完成！额外奖励 <b>⭐5</b></p>`}
+    save();
+    gDlg(`<div class="gh">${ok===qs.length?"🎉 全对！":ok>=2?"👍 不错哦":"💪 再接再厉"}</div><p class="gp">答对 ${ok} / ${qs.length} 题，获得 <b>⭐${stars}</b>${bonus?"（全对奖励 ⭐2）":""}。</p>${wrong.length?`<p class="gp fine">答错的 ${wrong.length} 题已放进错题本。</p>`:""}${extra}<div class="gbtns"><button data-g="again">🎯 再来一次</button>${wrong.length?'<button data-g="read">📖 看笔记</button>':""}<button data-g="x" class="gx">回到书架</button></div>`,{again:()=>gQuiz(sid,c,o),read:()=>{S.openChap=c.k;gDlgClose();go("notes",sid)},x:gDlgClose})};
+  show()}
+function gHelpDlg(){gDlg(`<div class="gh">🎮 怎么玩</div><p class="gp">• 电脑：方向键或 WASD 走路，空格或回车互动，Esc 关闭对话框<br>• 手机：用左下角的方向键走路，右下角的 A 互动；也可以直接点地面或点想去的东西，小人会自己走过去<br>• 走到书架、房子或小动物面前互动就会触发<br>• 走到图书馆最下面的红色地毯上，就能回到小镇<br>• 左上角的 🏠 可以直接回小镇</p><div class="gbtns"><button data-g="x">知道了</button></div>`,{x:gDlgClose})}
+
+/* ---- 画面绘制 ---- */
+function gHouseL(A,col){const u=A.u;return A._h["L"+col]||(A._h["L"+col]=A.mk(48,48,x=>{
+  x.drawImage(A.house(col),0,0);x.globalCompositeOperation="source-atop";x.globalAlpha=.5;x.fillStyle="#9fb0c6";x.fillRect(0,0,48*u,48*u);x.globalAlpha=1;x.globalCompositeOperation="source-over";
+  [[8,19],[15,21],[27,21],[40,20],[36,25]].forEach((p,i)=>{const len=13+gHash(i,2)*12;for(let k=0;k<len;k++){const w=Math.sin(k*.6+i)*1.6;A.R(x,"#3f8f4e",p[0]+w,p[1]+k,1.4,1.4);if(k%4===1)A.disc(x,"#5fb860",p[0]+w+(i%2?2:-2),p[1]+k,1.5)}});
+  [[9,36],[22,41],[35,37],[29,32],[15,40],[41,30]].forEach(p=>{A.disc(x,"#4fa956",p[0],p[1],2.4);A.disc(x,"#6cc86c",p[0]-1,p[1]-1,1.3)})}))}
+function gLabel(x,text,cx,cy,ts){x.font="800 "+Math.round(ts*.3)+"px sans-serif";x.textAlign="center";x.textBaseline="middle";const w=x.measureText(text).width+ts*.4,h=ts*.5;
+  x.fillStyle="#fff7e6";x.strokeStyle="#b7834f";x.lineWidth=Math.max(2,ts*.06);const l=cx-w/2,t=cy-h/2,r=h/2;
+  x.beginPath();x.moveTo(l+r,t);x.arcTo(l+w,t,l+w,t+h,r);x.arcTo(l+w,t+h,l,t+h,r);x.arcTo(l,t+h,l,t,r);x.arcTo(l,t,l+w,t,r);x.closePath();x.fill();x.stroke();x.fillStyle="#5a3a1a";x.fillText(text,cx,cy+ts*.02)}
+function gDraw(){
+  const cv=GM.cv,x=GM.ctx,A=GM.A,r=GM.room,pl=GM.pl;if(!r||!A||!cv)return;
+  const g=GS(),ts=A.ts,u=A.u,vw=cv.width/ts,vh=cv.height/ts,T=GM.t;
+  x.setTransform(1,0,0,1,0,0);x.imageSmoothingEnabled=false;
+  x.fillStyle=r.id==="hub"?"#8fcf7e":"#3b2a24";x.fillRect(0,0,cv.width,cv.height);
+  let cx=pl.rx+.5-vw/2,cy=pl.ry+.5-vh/2;
+  cx=r.W<=vw?(r.W-vw)/2:Math.max(0,Math.min(r.W-vw,cx));cy=r.H<=vh?(r.H-vh)/2:Math.max(0,Math.min(r.H-vh,cy));
+  const ox=-Math.round(cx*ts),oy=-Math.round(cy*ts);GM.cam.ox=ox;GM.cam.oy=oy;
+  const th=A.themed(r.theme);
+  const tile=id=>id[0]==="g"?A.grass[+id[1]]:id[0]==="p"?A.path[+id[1]]:(id[0]==="w"&&id.length===2)?A.wood[+id[1]]:id==="hedge"?A.hedge:id==="side"?A.sideWall:id==="mat"?A.mat:id==="rug"?th.rug:id==="wallT"?th.wallT:id==="wallB"?th.wallB:A.grass[0];
+  const x0=Math.max(0,Math.floor(cx)),x1=Math.min(r.W-1,Math.ceil(cx+vw)),y0=Math.max(0,Math.floor(cy)),y1=Math.min(r.H-1,Math.ceil(cy+vh));
+  for(let y=y0;y<=y1;y++)for(let xx=x0;xx<=x1;xx++)x.drawImage(tile(r.ground[y][xx]),xx*ts+ox,y*ts+oy);
+  r.decals.forEach(d=>{if(d.t==="win")x.drawImage(A.win,d.x*ts+ox,d.y*ts+oy)});
+  const items=r.objs.filter(o=>o.x+(o.w||1)>=x0-3&&o.x<=x1+3&&o.y+(o.h||1)>=y0-3&&o.y<=y1+3).map(o=>({by:o.by,o}));
+  items.push({by:pl.ry+1,pl:true});
+  const pet=GM.pet;if(pet&&GM.petOn)items.push({by:pet.y+1-.02,pet:true});
+  items.sort((a,b)=>a.by-b.by);
+  const emo=(e,px,py,size)=>{x.fillStyle="#000";x.font=Math.round(size)+"px "+G_FONT;x.textAlign="center";x.textBaseline="middle";x.fillText(e,px,py)};
+  const shadow=(cxp,cyp,rw)=>{x.fillStyle="rgba(0,0,0,.16)";x.beginPath();x.ellipse(cxp,cyp,rw,rw*.38,0,0,7);x.fill()};
+  items.forEach(it=>{
+    if(it.pl){const f=pl.moving?1+(Math.floor(pl.t/(G_STEP/2))%2):0;x.drawImage(A.pl[pl.dir][f],Math.round(pl.rx*ts+ox),Math.round(pl.ry*ts+oy-1.2*u));return}
+    if(it.pet){const bob=Math.sin(T/160)*ts*.03*(pet.mv?1:.3);emo(GM.petE||"🐶",pet.x*ts+ts/2+ox,pet.y*ts+ts*.62+oy+bob,ts*.58);return}
+    const o=it.o,px=o.x*ts+ox,py=o.y*ts+oy;
+    if(o.t==="house"){const s=subj(o.sid),un=g.unlocked.includes(o.sid);x.drawImage(un?A.house(s.color):gHouseL(A,s.color),px,py);
+      x.font="800 "+Math.round(3.4*u)+"px sans-serif";x.textAlign="center";x.textBaseline="middle";const nm=s.name.split(" ")[0];x.lineWidth=Math.max(2,u*.9);x.strokeStyle="rgba(0,0,0,.45)";x.fillStyle="#fff";x.strokeText(nm,px+24*u,py+14.2*u);x.fillText(nm,px+24*u,py+14.2*u);
+      emo(un?(G_PROP[o.sid]||"📚"):"🔒",px+24*u,py+24.4*u,4.2*u);
+      if(!un&&g.stars>=gCost(g)){emo("✨",px+40*u,py+10*u+Math.sin(T/260)*u,5*u)}return}
+    if(o.t==="shelf"){const sh=g.shelf[o.chap.k]||{best:0};
+      if(sh.best>=2){x.fillStyle="rgba(255,225,100,"+(.32+.14*Math.sin(T/320))+")";x.fillRect(px-1.5*u,py-1.5*u,35*u,35*u)}
+      x.drawImage(A.shelf(o.seed),px,py);
+      x.fillStyle="#fff7e6";x.fillRect(px+12*u,py+24*u,8*u,4*u);x.strokeStyle="#6e4524";x.lineWidth=Math.max(1,u*.5);x.strokeRect(px+12*u,py+24*u,8*u,4*u);
+      x.font="800 "+Math.round(3.1*u)+"px sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillStyle="#6e4524";x.fillText(String(o.idx+1),px+16*u,py+26.2*u);
+      x.save();x.translate(px,py);for(let i=0;i<3;i++)A.star(x,10+i*6,-1.2,i<sh.best?"#ffd23f":"rgba(60,40,20,.45)");x.restore();
+      if(S.done[o.chap.k]){x.fillStyle="#3aa86a";x.beginPath();x.arc(px+28*u,py+4*u,3*u,0,7);x.fill();x.fillStyle="#fff";x.font="800 "+Math.round(3.6*u)+"px sans-serif";x.fillText("✓",px+28*u,py+4.2*u)}
+      if(sh.best>=2){x.save();x.translate(px,py);A.star(x,4+((T/180)%24),6,"rgba(255,255,255,.9)");x.restore()}return}
+    if(o.t==="tree"){x.drawImage(A.tree(o.v),px,py);return}
+    if(o.t==="kt"){const st=gStage(g),spr=A.kt(st),dx=px+ts/2-spr.width/2,dy=(o.y+1)*ts+oy-spr.height;
+      const under=st>=1&&pl.x>=o.x-2&&pl.x<=o.x+2&&pl.y<o.y&&pl.y>=o.y-(spr.height/ts-.5);
+      if(under)x.globalAlpha=.55;x.drawImage(spr,Math.round(dx),Math.round(dy));x.globalAlpha=1;return}
+    if(o.t==="board"){x.drawImage(A.board,px,py+ts-A.board.height);return}
+    if(o.t==="lamp"){x.drawImage(A.lamp,px,py+ts-A.lamp.height);return}
+    if(o.t==="npc"){shadow(px+ts/2,py+ts*.86,ts*.3);const bob=Math.sin(T/420+o.x)*ts*.035;emo(o.e,px+ts/2,py+ts*.5+bob,ts*.82);
+      if(o.who==="room"){const d=today(),q=g.quest[o.sid]&&g.quest[o.sid].d===d?g.quest[o.sid]:null;if(!q||(q.plays>=1&&!q.claimed))emo("❗",px+ts*.85,py-ts*.05+Math.sin(T/240)*ts*.04,ts*.4)}return}
+    if(o.t==="emo"){shadow(px+ts/2,py+ts*.84,ts*.28);emo(o.e,px+ts/2,py+ts*.55,ts*.78);return}
+  });
+  /* 提示：面前有什么可以互动 */
+  const near=GM.near;
+  if(near&&!GM.paused&&!GM.fade&&!pl.moving){
+    const bx=(near.x+(near.w||1)/2)*ts+ox,by=near.y*ts+oy-ts*.15+Math.sin(T/200)*ts*.04;
+    if(near.t==="shelf")gLabel(x,(near.chap.t.length>15?near.chap.t.slice(0,15)+"…":near.chap.t),bx,by-ts*.45,ts);
+    else if(near.t==="house"){const s=subj(near.sid);gLabel(x,s.name+(g.unlocked.includes(near.sid)?"":" · 未开发"),bx,by-ts*.1,ts)}
+    else if(near.t==="board")gLabel(x,"布告栏",bx,by-ts*.55,ts);else if(near.t==="kt")gLabel(x,"知识之树",bx,by-ts*1.7,ts);
+    emo("💬",bx+ts*.35,by-ts*.2,ts*.5)}
+  GM.parts.forEach(p=>{x.globalAlpha=Math.max(0,1-p.t/p.life);emo(p.e,p.x*ts+ox,p.y*ts+oy,ts*.5)});x.globalAlpha=1;
+  if(GM.fade){const f=GM.fade,k=Math.min(1,f.t/220);x.fillStyle="rgba(30,20,10,"+(f.out?k:1-k)+")";x.fillRect(0,0,cv.width,cv.height)}}
+
+/* ---- 主循环 ---- */
+function gUpdate(dt){
+  GM.t+=dt;const pl=GM.pl,r=GM.room;if(!pl||!r)return;
+  if(GM.fade){const f=GM.fade;f.t+=dt;if(f.out&&f.t>=220){const cb=f.cb;GM.fade={t:0,out:false};if(cb)cb()}else if(!f.out&&f.t>=220)GM.fade=null}
+  GM.parts=GM.parts.filter(p=>{p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;return p.t<p.life});
+  if(pl.moving){pl.t+=dt;const k=Math.min(1,pl.t/G_STEP);pl.rx=pl.fx+(pl.tx-pl.fx)*k;pl.ry=pl.fy+(pl.ty-pl.fy)*k;if(k>=1)gArrive()}
+  else gDecide();
+  if(!GM.pet||GM.petRoom!==r.id){GM.pet={x:pl.x,y:pl.y,mv:false};GM.petRoom=r.id}
+  const tg=GM.trail[2]||GM.trail[GM.trail.length-1]||{x:pl.x,y:pl.y},pt=GM.pet,dx=tg.x-pt.x,dy=tg.y-pt.y,k=Math.min(1,dt*.009);
+  pt.mv=Math.abs(dx)+Math.abs(dy)>.05;pt.x+=dx*k;pt.y+=dy*k;
+  try{const ps=window.petState&&window.petState();GM.petOn=!ps||ps.on!==false;GM.petE=G_PETE[ps&&ps.kind]||"🐶"}catch(e){GM.petOn=true}
+  if(!GM.paused&&!GM.fade&&!pl.moving){const d=G_DIRS[pl.dir],fx=pl.x+d[0],fy=pl.y+d[1];GM.near=(r.ob[fy]&&r.ob[fy][fx])||null}else if(pl.moving)GM.near=null}
+function gLoop(t){if(!GM.on)return;const dt=Math.min(60,t-(GM.last||t));GM.last=t;try{gUpdate(dt);gDraw()}catch(e){try{console.warn("[小镇]",e)}catch(x){}}GM.raf=requestAnimationFrame(gLoop)}
+function gStop(){if(GM.on){GM.on=false;cancelAnimationFrame(GM.raf);gSavePos()}}
+function gResize(){
+  const cv=$("#gCv"),st=$(".gstage");if(!cv||!st)return;
+  const cssW=Math.max(240,Math.floor(st.clientWidth)),dpr=Math.min(window.devicePixelRatio||1,3),cssTile=Math.max(26,Math.min(60,Math.floor(cssW/11.5))),u=Math.max(2,Math.round(cssTile*dpr/16));
+  const cssH=Math.max(300,Math.min(Math.round(cssW*1.18),Math.round(window.innerHeight*.7)));
+  cv.style.height=cssH+"px";cv.width=Math.round(cssW*dpr);cv.height=Math.round(cssH*dpr);
+  if(!GM.A||GM.A.u!==u)GM.A=gAssets(u)}
+function gTap(tx,ty){
+  const r=GM.room,pl=GM.pl;if(!r||tx<0||ty<0||tx>=r.W||ty>=r.H)return;
+  GM.keys={};GM.order=[];GM.after=null;GM.path=[];GM.bump=false;
+  const o=r.ob[ty][tx];
+  if(o){const adj=[[0,1],[0,-1],[-1,0],[1,0]].findIndex(v=>r.ob[pl.y+v[1]]&&r.ob[pl.y+v[1]][pl.x+v[0]]===o);
+    if(adj>=0&&!pl.moving){pl.dir=adj;gInteract(o);return}
+    const p=gPathTo((x,y)=>[[0,1],[0,-1],[-1,0],[1,0]].some(v=>r.ob[y+v[1]]&&r.ob[y+v[1]][x+v[0]]===o));if(p){GM.path=p;GM.after=o}return}
+  if(!r.bl[ty][tx]){const p=gPathTo((x,y)=>x===tx&&y===ty);if(p)GM.path=p}}
+function gBind(){
+  const cv=$("#gCv");
+  cv.onpointerdown=ev=>{if(GM.paused||GM.fade)return;ev.preventDefault();const rc=cv.getBoundingClientRect(),px=(ev.clientX-rc.left)*cv.width/rc.width,py=(ev.clientY-rc.top)*cv.height/rc.height;gTap(Math.floor((px-GM.cam.ox)/GM.A.ts),Math.floor((py-GM.cam.oy)/GM.A.ts))};
+  $("#gDlg").onclick=ev=>{const b=ev.target.closest("[data-g]");if(!b)return;const f=GM.dlgActs[b.dataset.g];if(f)f()};
+  $$("[data-pad]").forEach(b=>{const d=+b.dataset.pad,on=e=>{e.preventDefault();if(GM.paused||GM.fade)return;if(!GM.keys[d]){GM.keys[d]=true;GM.order.push(d)}},off=e=>{e.preventDefault();GM.keys[d]=false;GM.order=GM.order.filter(v=>v!==d);if(!Object.values(GM.keys).some(Boolean))GM.bump=false};b.onpointerdown=on;b.onpointerup=off;b.onpointerleave=off;b.onpointercancel=off});
+  $("#gA").onpointerdown=e=>{e.preventDefault();if(GM.near&&!GM.paused&&!GM.fade)gInteract(GM.near)};
+  $("#gHome").onclick=()=>{if(GM.paused||GM.fade)return;const h=gHouseOf(GM.room.id)||{x:11,y:1};gGoRoom("hub",h.x+1,h.y+3,0)};
+  $("#gHelp").onclick=()=>{if(!GM.paused)gHelpDlg()};
+  if(!GM.bound){GM.bound=true;
+    const K={ArrowDown:0,s:0,S:0,ArrowUp:1,w:1,W:1,ArrowLeft:2,a:2,A:2,ArrowRight:3,d:3,D:3};
+    window.addEventListener("keydown",ev=>{if(!GM.on||S.tab!=="game")return;const tg=ev.target;if(tg&&/INPUT|TEXTAREA|SELECT/.test(tg.tagName))return;
+      if(GM.paused){if(ev.key==="Escape"&&GM.dlgActs&&GM.dlgActs.x){ev.preventDefault();GM.dlgActs.x()}return}
+      if(ev.key in K){ev.preventDefault();const d=K[ev.key];if(!GM.keys[d]){GM.keys[d]=true;GM.order.push(d)}}
+      else if(ev.key===" "||ev.key==="Enter"){ev.preventDefault();if(GM.near&&!GM.fade)gInteract(GM.near)}});
+    window.addEventListener("keyup",ev=>{if(ev.key in K){const d=K[ev.key];GM.keys[d]=false;GM.order=GM.order.filter(v=>v!==d);if(!Object.values(GM.keys).some(Boolean))GM.bump=false}});
+    window.addEventListener("resize",()=>{if(GM.on&&S.tab==="game")gResize()});
+    document.addEventListener("visibilitychange",()=>{if(document.hidden){if(GM.on){GM.on=false;cancelAnimationFrame(GM.raf);gSavePos()}}else if(S.tab==="game"&&$("#gCv")){GM.on=true;GM.last=0;GM.raf=requestAnimationFrame(gLoop)}})}}
+function gIntro(){
+  const g=GS(),d=today(),first=!g.intro,daily=g.day!==d;
+  if(daily){g.day=d;g.stars+=2;g.total+=2}g.intro=true;save();gHud();
+  if(first)gDlg(`<div class="gh">🏡 欢迎来到知识小镇！</div><p class="gp">这里每一间屋子是一门科目，走进去是一座图书馆，每个书架就是一个章节。看笔记、做小测验就能赚 ⭐，用 ⭐ 可以开发新的屋子，让小镇越来越大。</p><p class="gp">你现在有 <b>⭐${g.stars}</b>（含今天的 ⭐2）。先走进你已经开发好的那间屋子逛逛吧！点 ❓ 可以看操作说明。</p><div class="gbtns"><button data-g="x">出发！</button></div>`,{x:gDlgClose});
+  else if(daily)gDlg(`<div class="gh">☀️ 早安！</div><p class="gp">每天第一次来小镇，送你 <b>⭐2</b>。现在一共有 ⭐${g.stars}。</p><div class="gbtns"><button data-g="x">谢谢</button></div>`,{x:gDlgClose})}
+function gMount(){
+  const cv=$("#gCv");if(!cv)return;
+  GM.cv=cv;GM.ctx=cv.getContext("2d");GM.paused=false;GM.fade=null;GM.parts=[];GM.bump=false;GM.pet=null;
+  gResize();gBind();
+  const g=GS();let id=g.room||"hub";
+  if(id!=="hub"&&!(g.unlocked.includes(id)&&mySubjects().some(s=>s.id===id)))id="hub";
+  const same=id===g.room;gLoadRoom(id,same?g.x:undefined,same?g.y:undefined);
+  GM.on=true;GM.last=0;cancelAnimationFrame(GM.raf);GM.raf=requestAnimationFrame(gLoop);
+  window.SPMGAME=GM;gIntro()}
+function rGame(){
+  ensureGameCss();
+  $("#sheet").innerHTML=`<div class="gwrap"><div class="gstage"><canvas id="gCv"></canvas>
+   <div class="ghud"><span class="gchip" id="gStars">⭐ 0</span><span class="gchip" id="gRoom"></span><span style="flex:1"></span><button class="gchip gbtn" id="gHome" style="display:none">🏠 小镇</button><button class="gchip gbtn" id="gHelp" aria-label="怎么玩">❓</button></div>
+   <div class="gpad"><button data-pad="1" style="grid-area:u">▲</button><button data-pad="2" style="grid-area:l">◀</button><button data-pad="3" style="grid-area:r">▶</button><button data-pad="0" style="grid-area:d">▼</button></div>
+   <button class="gA" id="gA">A</button><div id="gDlg"></div></div>
+   <p class="fine muted gnote">电脑：方向键或 WASD 走路，空格互动。手机：左下方向键走路，右下 A 互动，也可以直接点地面。</p></div>`;
+  gMount()}
+function ensureGameCss(){if(document.getElementById("gameCss"))return;const s=document.createElement("style");s.id="gameCss";
+  s.textContent=`.gwrap{max-width:780px;margin:0 auto}
+@media (max-width:640px){.gwrap{margin-left:calc(10px - var(--pl,0px));margin-right:-6px}}
+.gstage{position:relative;border-radius:16px;overflow:hidden;border:4px solid #b7834f;box-shadow:0 6px 0 #8a5f33,0 14px 30px rgba(80,50,20,.25);background:#8fcf7e;touch-action:none;-webkit-user-select:none;user-select:none}
+#gCv{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.ghud{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;align-items:center;pointer-events:none;z-index:2}
+.ghud>*{pointer-events:auto}
+.gchip{background:rgba(255,247,230,.94);border:2px solid #b7834f;border-radius:999px;padding:3px 10px;font:800 13px var(--sans);color:#5a3a1a;box-shadow:0 2px 0 #b7834f}
+.gbtn{cursor:pointer}
+.gpad{display:none;position:absolute;left:10px;bottom:12px;grid-template-areas:". u ." "l . r" ". d .";grid-template-columns:repeat(3,46px);grid-template-rows:repeat(3,46px);gap:2px;z-index:2}
+.gpad button{border:2px solid #b7834f;background:rgba(255,247,230,.88);border-radius:12px;font:800 16px var(--sans);color:#5a3a1a;box-shadow:0 3px 0 #b7834f;touch-action:none}
+.gA{display:none;position:absolute;right:14px;bottom:22px;width:66px;height:66px;border-radius:50%;border:3px solid #b7834f;background:rgba(255,226,150,.92);font:800 24px var(--sans);color:#5a3a1a;box-shadow:0 4px 0 #b7834f;z-index:2;touch-action:none}
+@media (pointer:coarse){.gpad{display:grid}.gA{display:block}}
+#gDlg{position:absolute;inset:0;display:none;align-items:flex-end;justify-content:center;padding:10px;background:rgba(40,25,10,.3);z-index:5}
+#gDlg.on{display:flex}
+.gbox{width:100%;max-height:94%;overflow:auto;background:#fff7e6;border:4px solid #b7834f;border-radius:14px;padding:12px 14px;color:#5a3a1a;box-shadow:0 4px 0 #8a5f33;font-family:var(--sans)}
+.gbox .gh{font-weight:800;font-size:17px;margin-bottom:4px}.gbox .gs{margin:2px 0 6px;font-size:15px}.gbox .gp{margin:6px 0;font-size:14px;line-height:1.55}.gbox .fine{opacity:.75}
+.gbox .gq{font-weight:700;font-size:15px;margin:6px 0 8px;line-height:1.5}
+.gtag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#ffe9b8;border:1.5px solid #b7834f;font-size:12px;font-weight:700}
+.gbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.gbtns button,.gopt{border:2px solid #b7834f;background:#ffe9b8;border-radius:10px;padding:8px 13px;font:700 14px var(--sans);color:#5a3a1a;cursor:pointer;box-shadow:0 3px 0 #b7834f}
+.gbtns button:active,.gopt:active{transform:translateY(2px);box-shadow:0 1px 0 #b7834f}
+.gbtns .gx{background:#fff;}
+.gopt{display:block;width:100%;text-align:left;margin:6px 0;line-height:1.45}
+.gopt b{display:inline-block;width:22px;height:22px;border-radius:50%;background:#b7834f;color:#fff;text-align:center;line-height:22px;margin-right:6px;font-size:12px}
+.grow2{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed #e2c898;font-size:13.5px}
+.gnote{margin:8px 4px 0;text-align:center}`;
+  document.head.appendChild(s)}
+
 const CHANGELOG=[
+{v:"2026-10-18o",date:"2026-10-18",title:"新功能：知识小镇 (可以走动探索的学习小游戏)",
+  items:["🏡 新的「小镇」页：一个可爱的 2D 小镇。电脑用方向键或 WASD 走路，手机用左下角的方向键，也可以直接点地面，小人会自己走过去。",
+   "🏠 每一科是小镇里的一间屋子，走进去是一座图书馆，每个书架是一个章节。屋子一开始被藤蔓盖住，用 ⭐ 就能「开发」新的区域。",
+   "📚 走到书架前互动：📖 看笔记，或者 🎯 做 3 题小测验。答对赚 ⭐，答错的题会进错题本。",
+   "🌳 ⭐ 越多，小镇中间的知识之树就长得越大。每天第一次来还有 ⭐ 奖励，图书馆里的小动物每天也有任务。",
+   "🐾 你的小宠物会跟着你一起走。",
+   "⚠️ 小测验的题目由 AI 出，第一次做某一章需要联网和你的 API key；出过的题会存在这台设备上，之后重复玩不再耗额度。"],
+  go:[{t:"去小镇逛逛",tab:"game"}]},
+...(ONLINE_ON?[{v:"2026-10-18n",date:"2026-10-18",title:"新增：实时在线人数",
+  items:["🟢 右上角多了一个绿点和数字，显示现在有多少位同学在线。点一下它可以看说明。",
+   "只统计人数：每台设备随机一个编号，不记录姓名、笔记、答案，也不会上传你的任何内容。",
+   "没有网络，或者连不上的时候，这个小标签会自己藏起来，不影响其他功能。"]}]:[]),
 {v:"2026-10-18m",date:"2026-10-18",title:"数学科笔记按 SPM 给分格式重做 (T4 + T5 共 18 章)",
    items:[
     "➗ 数学 18 章内置笔记全部重做，每章 15–22 页，按小节 (1.1、1.2 …) 一节一节写，包含关键术语、公式速记、例题、答题方法、常见错误和自测。",
