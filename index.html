@@ -405,6 +405,41 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
 </div>
 <button id="petBack" type="button" hidden aria-label="把小宠物叫回来" title="把小宠物叫回来">🐶</button>
 
+<style id="town-btn-style">
+#townBtn{position:fixed;left:0;top:0;z-index:30;width:58px;padding:5px 0 4px;border-radius:18px;border:3px solid #b7834f;background:#fff7e6;color:#5a3a1a;box-shadow:0 4px 0 #8a5f33,0 8px 16px rgba(80,50,20,.25);cursor:pointer;display:flex;flex-direction:column;align-items:center;font:800 12px/1.15 var(--sans,sans-serif);-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;visibility:hidden}
+#townBtn.ready{visibility:visible}
+#townBtn .tb-ic{font-size:26px;line-height:1.1}
+#townBtn:active{transform:translateY(2px);box-shadow:0 2px 0 #8a5f33,0 5px 10px rgba(80,50,20,.25)}
+#townBtn:focus-visible{outline:2px dashed var(--accent,#17263f);outline-offset:3px}
+@media (max-width:640px){#townBtn{width:52px;border-radius:16px}#townBtn .tb-ic{font-size:23px}}
+@media print{#townBtn{display:none!important}}
+</style>
+<button id="townBtn" class="no-print" type="button" aria-label="打开知识小镇" title="知识小镇"><span class="tb-ic">🏡</span><span class="tb-tx">小镇</span></button>
+<script>
+/* 🏡 小镇按钮：永远贴在小宠物正上方（宠物被拖动、收起、关闭都会跟着走）。只读宠物的位置，不改宠物的任何东西。 */
+(function () {
+  try {
+    var btn = document.getElementById('townBtn'), box = document.getElementById('petBox'), back = document.getElementById('petBack');
+    if (!btn) return;
+    function place() {
+      var w = btn.offsetWidth || 58, h = btn.offsetHeight || 62, vw = window.innerWidth, vh = window.innerHeight, gap = 8, m = 4, l, t, rc = null;
+      if (box && !box.hidden) rc = box.getBoundingClientRect(); else if (back && !back.hidden) rc = back.getBoundingClientRect();
+      if (rc) { l = rc.left + rc.width / 2 - w / 2; t = rc.top - gap - h; if (t < m) t = rc.bottom + gap; }
+      else { l = vw - w - 16; t = vh - h - 16; }
+      l = Math.min(Math.max(m, l), vw - w - m); t = Math.min(Math.max(m, t), vh - h - m);
+      btn.style.left = l + 'px'; btn.style.top = t + 'px'; btn.classList.add('ready');
+    }
+    if (window.MutationObserver) {
+      var mo = new MutationObserver(place);
+      [box, back].forEach(function (n) { if (n) mo.observe(n, { attributes: true, attributeFilter: ['style', 'hidden'] }); });
+    }
+    window.addEventListener('resize', place); window.addEventListener('orientationchange', place); window.addEventListener('load', place);
+    btn.addEventListener('click', function () { try { if (window.__spmTown) window.__spmTown.open(); } catch (e) {} });
+    place(); setTimeout(place, 300);
+  } catch (err) { /* 按钮出问题不影响主系统 */ }
+})();
+</script>
+
 <script src="data/sej.js?v=2026-10-17c"></script>
 <script src="data/bio.js?v=2026-10-17c"></script>
 <script src="data/kim.js?v=2026-10-18k"></script>
@@ -1553,7 +1588,7 @@ const busy={};
 function setBusy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.l=btn.innerHTML;btn.innerHTML='<span class="spin"></span>'+(label||"处理中…")}else if(btn.dataset.l){btn.innerHTML=btn.dataset.l}}
 
 /* ---- 导航 ---- */
-const TABS=[["today","今日"],["notes","笔记"],["flash","闪卡"],["drill","刷题"],["exam","模拟卷"],["chat","问答"],["res","资料"],["game","小镇"]];
+const TABS=[["today","今日"],["notes","笔记"],["flash","闪卡"],["drill","刷题"],["exam","模拟卷"],["chat","问答"],["res","资料"]];
 let exTimer=null;
 function renderNav(){
   $("#subjects").innerHTML=mySubjects().map(s=>`<button data-sub="${s.id}" aria-pressed="${s.id===S.sub&&S.tab!=="today"&&S.tab!=="set"}"><span class="sd" style="background:${s.color}"></span>${esc(s.name)}<span class="cnt">${prog(s.id).p}%</span></button>`).join("");
@@ -1561,8 +1596,8 @@ function renderNav(){
   const left=dd(today(),S.exam);$("#daysChip").innerHTML=left>0?`距笔试 <b>${left}</b> 天`:left===0?`<b>今天开考</b>`:`已开考 <b>${-left}</b> 天`;
   $("#subjects").style.display=(S.tab==="today"||S.tab==="set"||S.tab==="game")?"none":"";}
 function go(tab,sub){if(sub&&S.my.includes(sub))S.sub=sub;else if(sub&&!S.my.includes(sub)){S.my.push(sub);S.sub=sub}S.tab=tab;save();render();window.scrollTo(0,0);try{history.replaceState(null,"","#"+tab)}catch(e){}}
-function render(){if(exTimer&&S.tab!=="exam"){clearInterval(exTimer);exTimer=null}if(S.tab!=="drill"){TTSX.stop();if(LS)LS.playing=false}if(S.tab!=="game")gStop();renderNav();
-  ({today:rToday,notes:rNotes,flash:rFlash,drill:rDrill,exam:rExam,chat:rChat,res:rRes,game:rGame,set:rSet})[S.tab]()}
+function render(){if(exTimer&&S.tab!=="exam"){clearInterval(exTimer);exTimer=null}if(S.tab!=="drill"){TTSX.stop();if(LS)LS.playing=false}renderNav();
+  ({today:rToday,notes:rNotes,flash:rFlash,drill:rDrill,exam:rExam,chat:rChat,res:rRes,set:rSet})[S.tab]()}
 function needKey(){return aiOK()?"":`<div class="notice warn"><b>先设置 API key</b><p>AI 功能（生成笔记、出题、模拟卷、问答）要用你自己的 API key (Gemini，或设置里的备用 AI)，Gemini 免费申请：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>。</p><p class="fine muted">第一次用？到「设置」最上面有新手指南，几步就能开始。</p><button class="btn pri small" data-act="goset">去设置</button></div>`}
 
 /* ---- SPM 2026 官方时间表 (JWP 18 Ogos 2026，据 LP 公布整理) ---- */
@@ -2167,7 +2202,7 @@ function rFlash(){
    <label>张数<select id="fgN"><option>6</option><option selected>10</option><option>15</option></select></label><button class="btn pri" id="fgGo" ${aiOK()?"":"disabled"}>生成</button></div>
   <details class="chap"><summary><span class="t">＋ 添加自己的闪卡</span></summary><div class="body"><input type="text" id="acQ" placeholder="问题" style="margin-bottom:8px"><textarea id="acA" placeholder="答案"></textarea><button class="btn pri small" id="acAdd" style="margin-top:8px">保存</button></div></details>`;
   const flip=()=>{fShow=!fShow;rFlash()};const f=$("#face");if(f){f.onclick=flip;f.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}}}
-  const nxt=ok=>{const id=c.id;S.box[id]=ok?(S.box[id]||0)+1:0;if(!ok&&!S.wrong.some(w=>w.id===id))S.wrong.push({id,type:"card",s:c.s,q:c.q,a:c.a});
+  const nxt=ok=>{const id=c.id;if(ok){try{farmWater()}catch(e){}}S.box[id]=ok?(S.box[id]||0)+1:0;if(!ok&&!S.wrong.some(w=>w.id===id))S.wrong.push({id,type:"card",s:c.s,q:c.q,a:c.a});
     if(ok)S.wrong=S.wrong.filter(w=>!(w.id===id&&w.type==="card"));save();
     if(ok&&S.box[id]>=3)fq.splice(fi,1);else fi++;if(fi>=fq.length){fi=0;fq=shuffle(fq.filter(x=>(S.box[x.id]||0)<3))}fShow=false;rFlash()};
   if($("#fYes")){$("#fYes").onclick=()=>nxt(true);$("#fNo").onclick=()=>nxt(false)}if($("#fFlip"))$("#fFlip").onclick=flip;
@@ -2458,11 +2493,58 @@ const G_PROP={bm:"✒️",bi:"📖",bc:"🏮",sej:"🏺",mat:"📐",am:"📐",sa
 const G_PETE={dog:"🐶",cat:"🐱",rabbit:"🐰",panda:"🐼",bear:"🐻"};
 const G_TREE=[0,12,36,80];
 const G_FONT='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const TOWN={open:false,pseudo:false,ro:null,bo:"",bound:false};
 const GM={on:false,raf:0,cv:null,ctx:null,A:null,room:null,pl:null,keys:{},order:[],path:[],after:null,paused:false,fade:null,parts:[],near:null,cam:{ox:0,oy:0},last:0,t:0,bound:false,bump:false,trail:[],dlgActs:{}};
 function gHash(a,b){let h=Math.imul(a|0,374761393)^Math.imul(b|0,668265263);h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967295}
 function gRGB(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]}
 function gMix(a,b,t){const A=gRGB(a),B=gRGB(b);return"#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join("")}
 function gShade(c,t){return t<0?gMix(c,"#000000",-t):gMix(c,"#ffffff",t)}
+/* ---- 农田：答题 = 浇水，作物长大 = 这一章学会了 ---- */
+const F_CROP={bm:"chili",bi:"blueberry",sej:"corn",mat:"pineapple",sains:"tomato",moral:"sunflower",am:"eggplant",fiz:"potato",kim:"cabbage",bio:"banana",bc:"bamboo"};
+const F_INFO={chili:["辣椒","🌶️",12],blueberry:["蓝莓","🫐",12],corn:["玉米","🌽",12],pineapple:["菠萝","🍍",14],tomato:["番茄","🍅",12],sunflower:["向日葵","🌻",12],eggplant:["茄子","🍆",16],potato:["土豆","🥔",12],cabbage:["紫甘蓝","🥬",16],banana:["香蕉","🍌",14],bamboo:["竹笋","🎋",12]};
+const F_STG=["种子","发芽","长叶","开花","成熟"],F_NEED=[0,3,5,6,8],F_N=12,F_SEED=6;
+const KT={ok:false,loading:false};
+function gLoadArt(){const hook=()=>{try{KTArt.ready.then(()=>{KT.ok=true})}catch(e){}};if(window.KTArt){hook();return}if(KT.loading)return;KT.loading=true;const s=document.createElement("script");s.src="ktart.js?v=2026-10-19b";s.onload=hook;s.onerror=()=>{KT.loading=false};document.head.appendChild(s)}
+function FM(){const g=GS();if(!g.farm)g.farm={water:0,wd:"",wn:0,free:3,plots:[],hv:0};const f=g.farm;while(f.plots.length<F_N)f.plots.push(null);return f}
+/* 在网站别的地方答对一题 → 小镇 💧+1 (每天 40 次之后变成每两次 +1) */
+function farmWater(){const f=FM(),d=today();if(f.wd!==d){f.wd=d;f.wn=0}const n=(f.wn>=40&&f.wn%2)?0:1;f.wn++;f.water+=n;save()}
+function farmTick(){const f=FM(),d=today();let ch=false;f.plots.forEach(p=>{if(!p||p.st>=4)return;let tg=0;F_NEED.forEach((n,i)=>{if(p.w>=n)tg=i});if(tg>p.st&&p.gd!==d){p.st++;p.gd=d;ch=true}});if(ch)save();return ch}
+function gFarmPuff(o,e,n){for(let i=0;i<n;i++)GM.parts.push({e:e,x:o.x+.5+(Math.random()-.5)*.9,y:o.y+.3,vx:(Math.random()-.5)*.0016,vy:-.0016-Math.random()*.0012,t:0,life:1000})}
+function gFarmDlg(o){
+  const f=FM(),g=GS(),p=f.plots[o.i],d=today();farmTick();
+  if(!p)return gFarmEmpty(o);
+  const inf=F_INFO[p.crop],sj=subj(p.sid),e=inf[1];
+  if(p.st>=4){
+    return gDlg(`<div class="gh">${e} ${inf[0]}成熟啦！</div><p class="gp">这是「${esc(sj.name)}」的 <b>${esc(p.t)}</b>。作物长大，就是这一章被你学会了。</p><p class="gp">收成可以换 <b>⭐${inf[2]}</b>。</p><div class="gbtns"><button data-g="hv">🧺 收成 ⭐${inf[2]}</button><button data-g="x" class="gx">先留着</button></div>`,{
+      hv:()=>{f.plots[o.i]=null;f.hv=(f.hv||0)+1;gGain(inf[2]);gFarmPuff(o,"✨",6);save();gDlg(`<div class="gh">🧺 收成了！</div><p class="gp">${e} 带回家啦，获得 <b>⭐${inf[2]}</b>。这块地空出来了，可以种下一章。</p><div class="gbtns"><button data-g="again">🌰 再种一棵</button><button data-g="x" class="gx">好的</button></div>`,{again:()=>gFarmEmpty(o),x:gDlgClose})},
+      x:gDlgClose})}
+  const need=F_NEED[p.st+1]-p.w,wet=p.wd===d;
+  let msg;
+  if(need<=0)msg=`今天已经长大一格了，水也够了，<b>明天再来</b>它就会长到下一阶段。`;
+  else if(p.gd===d)msg=`今天已经长大一格了，<b>明天再来</b>才会继续长。现在多浇的水会留给它，还差 <b>${need}</b> 次 💧。`;
+  else msg=`再浇 <b>${need}</b> 次 💧 就能长到「${F_STG[p.st+1]}」。你现在有 <b>💧${f.water}</b>。`;
+  gDlg(`<div class="gh">${e} ${inf[0]} · ${F_STG[p.st]}</div><p class="gp">「${esc(sj.name)}」 <b>${esc(p.t)}</b></p><p class="gp">${msg}</p><p class="gp fine">在闪卡、刷题里答对一题，就会得到 1 💧。每块地一天最多长大一格。</p><div class="gbtns">${need>0?`<button data-g="w">💧 浇水${f.water>0?"（"+Math.min(f.water,need)+"）":""}</button>`:""}<button data-g="x" class="gx">关闭</button><button data-g="rm" class="gx">🧹 铲掉</button></div>`,{
+    w:()=>{
+      if(f.water<=0)return gDlg(`<div class="gh">💧 没有水了</div><p class="gp">水来自学习：去「闪卡」或「刷题」答对题目，每答对一题得 1 💧。</p><div class="gbtns"><button data-g="x">好的</button></div>`,{x:gDlgClose});
+      const amt=Math.min(f.water,need);p.w+=amt;f.water-=amt;p.wd=d;const before=p.st;farmTick();save();gHud();gFarmPuff(o,"💧",Math.min(8,amt+2));
+      const grew=p.st>before,left=F_NEED[p.st+1]!==undefined?F_NEED[p.st+1]-p.w:0;
+      gDlg(`<div class="gh">💧 浇好啦</div><p class="gp">${grew?`${e} 长大了！现在是「${F_STG[p.st]}」。${p.st>=4?"已经成熟，可以收成了！":""}`:left>0?`还差 ${left} 次 💧 才会长大。`:"水够了，明天再来看它长大。"}</p><div class="gbtns"><button data-g="x">好的</button></div>`,{x:()=>{gDlgClose();if(p.st>=4)gFarmDlg(o)}})},
+    rm:()=>gDlg(`<div class="gh">🧹 铲掉这棵？</div><p class="gp">这棵 ${e} 和已经浇的水都会没有，不会退还。</p><div class="gbtns"><button data-g="yes">铲掉</button><button data-g="x" class="gx">不要</button></div>`,{yes:()=>{f.plots[o.i]=null;save();gDlgClose()},x:gDlgClose}),
+    x:gDlgClose})}
+function gFarmEmpty(o){
+  const f=FM(),g=GS(),cost=f.free>0?0:F_SEED;
+  const subs=mySubjects();
+  gDlg(`<div class="gh">🌱 空地</div><p class="gp">每块地种一章的作物，一章对应一棵。${f.free>0?`你还有 <b>${f.free}</b> 包免费种子。`:`一包种子 <b>⭐${F_SEED}</b>，你现在有 ⭐${g.stars}。`}</p><p class="gp">先选一个科目：</p><div class="gbtns">${subs.map((s,i)=>`<button data-g="s${i}">${F_INFO[F_CROP[s.id]||"corn"][1]} ${esc(s.name)}</button>`).join("")}<button data-g="x" class="gx">不种了</button></div>`,
+    Object.assign({x:gDlgClose},...subs.map((s,i)=>({["s"+i]:()=>gFarmPick(o,s.id)}))))}
+function gFarmPick(o,sid){
+  const f=FM(),g=GS(),cost=f.free>0?0:F_SEED,cs=chapsOf(sid),used=new Set(f.plots.filter(Boolean).map(p=>p.ch)),crop=F_CROP[sid]||"corn",sj=subj(sid);
+  const acts={x:gDlgClose,back:()=>gFarmEmpty(o)};
+  cs.forEach((c,i)=>{acts["c"+i]=()=>{
+    if(g.stars<cost)return gDlg(`<div class="gh">⭐ 不够</div><p class="gp">种子要 ⭐${cost}，你现在有 ⭐${g.stars}。到图书馆做书架小测验就能赚星星。</p><div class="gbtns"><button data-g="x">好的</button></div>`,{x:gDlgClose});
+    if(f.free>0)f.free--;else g.stars-=cost;
+    f.plots[o.i]={sid,ch:c.k,t:c.t,crop,st:0,w:0,gd:"",wd:""};save();gHud();gFarmPuff(o,"🌱",4);
+    gDlg(`<div class="gh">🌱 种下去啦</div><p class="gp">${F_INFO[crop][1]} 种在了这块地上，对应 <b>${esc(c.t)}</b>。去答题赚 💧，回来浇水它就会长大。</p><div class="gbtns"><button data-g="x">好的</button></div>`,{x:gDlgClose})}});
+  gDlg(`<div class="gh">${F_INFO[crop][1]} ${esc(sj.name)}</div><p class="gp">选一章来种（${cost?"⭐"+cost:"免费"}）：</p><div class="gbtns gchaps">${cs.map((c,i)=>`<button data-g="c${i}" ${used.has(c.k)?'disabled':''}>${esc(c.t)}${used.has(c.k)?" · 已种":""}</button>`).join("")||"<p class=gp>这个科目还没有章节。</p>"}</div><div class="gbtns"><button data-g="back" class="gx">← 换科目</button><button data-g="x" class="gx">不种了</button></div>`,acts)}
 function GS(){
   if(!S.game||S.game.v!==1)S.game={v:1,stars:6,total:0,unlocked:[],visited:{},shelf:{},day:"",quest:{},done:{},intro:false,room:"hub",x:12,y:10};
   const g=S.game;
@@ -2561,8 +2643,12 @@ function gBuildHub(){
   for(let y=4;y<=10;y++)[4,8,12,16,20].forEach(x=>P(x,y));
   for(let y=11;y<H-1;y++)for(let x=7;x<=17;x++)P(x,y);
   gSlots().forEach((s,i)=>{const h=gHouseOf(s.id);gAdd(r,{t:"house",x:h.x,y:h.y,w:3,h:3,by:h.y+3,sid:s.id,act:true,door:{x:h.x+1,y:h.y+2}})});
-  [[2,12,1],[22,12,1],[2,15,0],[22,15,0],[5,12,0],[19,12,0]].forEach(p=>gAdd(r,{t:"tree",x:p[0],y:p[1],w:2,h:2,by:p[1]+2,v:p[2],cx:p[0]}));
+  [[22,12,1],[22,15,0],[19,12,0]].forEach(p=>gAdd(r,{t:"tree",x:p[0],y:p[1],w:2,h:2,by:p[1]+2,v:p[2],cx:p[0]}));
   gAdd(r,{t:"kt",x:12,y:14,w:1,h:1,by:15,act:true});
+  try{farmTick()}catch(e){}
+  for(let x=1;x<=6;x++)r.ground[13][x]="p"+((x+13)%2);
+  for(let i=0;i<F_N;i++)gAdd(r,{t:"plot",i,x:1+(i%6),y:i<6?12:14,by:(i<6?12:14)-.5,act:true});
+  [{n:"prop/scarecrow",e:"🧑‍🌾",x:3,y:11},{n:"prop/bush",e:"🌿",x:1,y:11},{n:"prop/bush",e:"🌿",x:6,y:11},{n:"prop/well",e:"⛲",x:1,y:15},{n:"prop/bush",e:"🌿",x:4,y:15},{n:"prop/rock",e:"🪨",x:6,y:15}].forEach(d=>gAdd(r,{t:"prop",n:d.n,e:d.e,x:d.x,y:d.y,by:d.y+1}));
   const st=gStage(g);if(st>=2){r.bl[14][11]=true;r.bl[14][13]=true}
   gAdd(r,{t:"board",x:8,y:12,w:2,h:1,by:13,act:true});
   gAdd(r,{t:"lamp",x:7,y:11,w:1,h:1,by:12});gAdd(r,{t:"lamp",x:17,y:11,w:1,h:1,by:12});
@@ -2632,12 +2718,13 @@ function gSavePos(){try{const g=GS();if(GM.pl&&GM.room){g.room=GM.room.id;g.x=GM
 function gGain(n,why){const g=GS();g.stars+=n;g.total+=n;
   const pl=GM.pl;if(pl)for(let i=0;i<Math.min(8,n+2);i++)GM.parts.push({e:"⭐",x:pl.rx+.5+(Math.random()-.5)*.8,y:pl.ry,vx:(Math.random()-.5)*.002,vy:-.0022-Math.random()*.001,t:0,life:1100});
   gHud();return n}
-function gHud(){const g=GS(),a=$("#gStars"),b=$("#gRoom");if(a)a.textContent="⭐ "+g.stars;if(b&&GM.room)b.textContent=GM.room.name;const h=$("#gHome");if(h)h.style.display=GM.room&&GM.room.id!=="hub"?"":"none"}
+function gHud(){const g=GS(),a=$("#gStars"),b=$("#gRoom");if(a)a.textContent="⭐ "+g.stars;const wt=$("#gWater");if(wt)wt.textContent="💧 "+(g.farm?g.farm.water:0);if(b&&GM.room)b.textContent=GM.room.name;const h=$("#gHome");if(h)h.style.display=GM.room&&GM.room.id!=="hub"?"":"none"}
 function gDlg(html,acts){const d=$("#gDlg");if(!d)return;d.innerHTML='<div class="gbox">'+html+"</div>";d.classList.add("on");GM.paused=true;GM.keys={};GM.order=[];GM.path=[];GM.dlgActs=acts||{};const b=d.querySelector(".gbox");if(b)b.scrollTop=0}
 function gDlgClose(){const d=$("#gDlg");if(d){d.classList.remove("on");d.innerHTML=""}GM.paused=false;GM.dlgActs={};GM.bump=true;setTimeout(()=>{GM.bump=false},250);gSavePos();gHud()}
 function gInteract(o){
   const g=GS();
   if(o.t==="shelf")return gShelfDlg(o);
+  if(o.t==="plot")return gFarmDlg(o);
   if(o.t==="house"){
     if(g.unlocked.includes(o.sid)){const s=subj(o.sid);gGoRoom(o.sid,7,gRoomH(o.sid)-2,1,()=>{if(!g.visited[o.sid]){g.visited[o.sid]=1;gGain(1);setTimeout(()=>gDlg(`<div class="gh">🗺️ 发现新区域！</div><p class="gp">你走进了「${esc(s.name)}」图书馆。每个书架是一个章节，走到书架前按互动键，就能看笔记或做小测验。</p><p class="gp">第一次来，奖励 ⭐1</p><div class="gbtns"><button data-g="x">好的</button></div>`,{x:gDlgClose}),350)}});return}
     return gUnlockDlg(o)}
@@ -2689,7 +2776,7 @@ ${chapText(c,3500)}
 function gShelfDlg(o){
   const g=GS(),c=o.chap,sh=g.shelf[c.k]||(g.shelf[c.k]={best:0,plays:0,read:false}),st="⭐".repeat(sh.best)+"☆".repeat(3-sh.best);
   gDlg(`<div class="gh">📚 ${esc(c.t)}</div><div class="gs">${st} ${S.done[c.k]?'<span class="gtag">✓ 已标记完成</span>':""}${sh.best>=2?'<span class="gtag">已收集</span>':""}</div><p class="gp">${c.subs&&c.subs.length?esc(c.subs.slice(0,6).join("、")):"翻开看看这一章讲什么吧～"}</p><div class="gbtns"><button data-g="read">📖 看笔记</button><button data-g="quiz">🎯 小测验 (3 题)</button><button data-g="x" class="gx">关闭</button></div>`,{
-    read:()=>{if(!sh.read){sh.read=true;gGain(1)}S.openChap=c.k;gDlgClose();go("notes",o.sid)},
+    read:()=>{if(!sh.read){sh.read=true;gGain(1)}S.openChap=c.k;gDlgClose();closeTown(true);go("notes",o.sid)},
     quiz:()=>gQuiz(o.sid,c,o),x:gDlgClose})}
 async function gQuiz(sid,c,o){
   gDlg(`<div class="gh">🎯 小测验</div><p class="gp">书架在翻找题目… <span class="spin"></span></p>`,{});
@@ -2754,6 +2841,14 @@ function gDraw(){
       if(S.done[o.chap.k]){x.fillStyle="#3aa86a";x.beginPath();x.arc(px+28*u,py+4*u,3*u,0,7);x.fill();x.fillStyle="#fff";x.font="800 "+Math.round(3.6*u)+"px sans-serif";x.fillText("✓",px+28*u,py+4.2*u)}
       if(sh.best>=2){x.save();x.translate(px,py);A.star(x,4+((T/180)%24),6,"rgba(255,255,255,.9)");x.restore()}return}
     if(o.t==="tree"){x.drawImage(A.tree(o.v),px,py);return}
+    if(o.t==="plot"){const fm=g.farm,pp=fm&&fm.plots[o.i],wet=pp&&pp.wd===today();
+      if(KT.ok){KTArt.draw(x,wet?"tile/soil_wet":"tile/soil_dry",px,py,u)}else{x.fillStyle=wet?"#8a5a34":"#a8723f";x.fillRect(px,py,ts,ts);x.fillStyle="rgba(0,0,0,.12)";x.fillRect(px,py+ts-2*u,ts,2*u)}
+      if(pp){const inf=F_INFO[pp.crop],nm=pp.st===0?"crop/stage0_seed":"crop/"+pp.crop+"_s"+pp.st;
+        if(KT.ok)KTArt.draw(x,nm,px,py,u);else emo(pp.st===0?"🌰":pp.st<4?"🌱":inf[1],px+ts/2,py+ts*.55,ts*(.3+.1*pp.st));
+        if(pp.st>=4)emo("✨",px+ts*.8,py+ts*.15+Math.sin(T/220+o.i)*ts*.05,ts*.4);
+        else if(fm.water>0&&F_NEED[pp.st+1]-pp.w>0)emo("💧",px+ts*.82,py+ts*.16+Math.sin(T/260+o.i)*ts*.04,ts*.34)}
+      else if(fm&&false){}return}
+    if(o.t==="prop"){if(KT.ok&&KTArt.has(o.n)){const sz=KTArt.size(o.n);KTArt.draw(x,o.n,px+Math.round((ts-sz.w*u)/2),py+ts-sz.h*u,u)}else{shadow(px+ts/2,py+ts*.86,ts*.3);emo(o.e,px+ts/2,py+ts*.55,ts*.8)}return}
     if(o.t==="kt"){const st=gStage(g),spr=A.kt(st),dx=px+ts/2-spr.width/2,dy=(o.y+1)*ts+oy-spr.height;
       const under=st>=1&&pl.x>=o.x-2&&pl.x<=o.x+2&&pl.y<o.y&&pl.y>=o.y-(spr.height/ts-.5);
       if(under)x.globalAlpha=.55;x.drawImage(spr,Math.round(dx),Math.round(dy));x.globalAlpha=1;return}
@@ -2769,7 +2864,7 @@ function gDraw(){
     const bx=(near.x+(near.w||1)/2)*ts+ox,by=near.y*ts+oy-ts*.15+Math.sin(T/200)*ts*.04;
     if(near.t==="shelf")gLabel(x,(near.chap.t.length>15?near.chap.t.slice(0,15)+"…":near.chap.t),bx,by-ts*.45,ts);
     else if(near.t==="house"){const s=subj(near.sid);gLabel(x,s.name+(g.unlocked.includes(near.sid)?"":" · 未开发"),bx,by-ts*.1,ts)}
-    else if(near.t==="board")gLabel(x,"布告栏",bx,by-ts*.55,ts);else if(near.t==="kt")gLabel(x,"知识之树",bx,by-ts*1.7,ts);
+    else if(near.t==="plot"){const pp=(g.farm&&g.farm.plots[near.i]);gLabel(x,pp?F_INFO[pp.crop][0]+" · "+F_STG[pp.st]:"空地",bx,by-ts*.1,ts)}else if(near.t==="board")gLabel(x,"布告栏",bx,by-ts*.55,ts);else if(near.t==="kt")gLabel(x,"知识之树",bx,by-ts*1.7,ts);
     emo("💬",bx+ts*.35,by-ts*.2,ts*.5)}
   GM.parts.forEach(p=>{x.globalAlpha=Math.max(0,1-p.t/p.life);emo(p.e,p.x*ts+ox,p.y*ts+oy,ts*.5)});x.globalAlpha=1;
   if(GM.fade){const f=GM.fade,k=Math.min(1,f.t/220);x.fillStyle="rgba(30,20,10,"+(f.out?k:1-k)+")";x.fillRect(0,0,cv.width,cv.height)}}
@@ -2790,9 +2885,10 @@ function gLoop(t){if(!GM.on)return;const dt=Math.min(60,t-(GM.last||t));GM.last=
 function gStop(){if(GM.on){GM.on=false;cancelAnimationFrame(GM.raf);gSavePos()}}
 function gResize(){
   const cv=$("#gCv"),st=$(".gstage");if(!cv||!st)return;
-  const cssW=Math.max(240,Math.floor(st.clientWidth)),dpr=Math.min(window.devicePixelRatio||1,3),cssTile=Math.max(26,Math.min(60,Math.floor(cssW/11.5))),u=Math.max(2,Math.round(cssTile*dpr/16));
-  const cssH=Math.max(300,Math.min(Math.round(cssW*1.18),Math.round(window.innerHeight*.7)));
-  cv.style.height=cssH+"px";cv.width=Math.round(cssW*dpr);cv.height=Math.round(cssH*dpr);
+  const cssW=Math.floor(st.clientWidth),cssH=Math.floor(st.clientHeight);if(cssW<60||cssH<60)return;
+  const dpr=Math.min(window.devicePixelRatio||1,3),cssTile=Math.max(26,Math.min(48,Math.floor(cssW/11.5),Math.floor(cssH/7))),u=Math.max(2,Math.round(cssTile*dpr/16));
+  const w=Math.round(cssW*dpr),h=Math.round(cssH*dpr);
+  if(cv.width!==w)cv.width=w;if(cv.height!==h)cv.height=h;
   if(!GM.A||GM.A.u!==u)GM.A=gAssets(u)}
 function gTap(tx,ty){
   const r=GM.room,pl=GM.pl;if(!r||tx<0||ty<0||tx>=r.W||ty>=r.H)return;
@@ -2812,13 +2908,14 @@ function gBind(){
   $("#gHelp").onclick=()=>{if(!GM.paused)gHelpDlg()};
   if(!GM.bound){GM.bound=true;
     const K={ArrowDown:0,s:0,S:0,ArrowUp:1,w:1,W:1,ArrowLeft:2,a:2,A:2,ArrowRight:3,d:3,D:3};
-    window.addEventListener("keydown",ev=>{if(!GM.on||S.tab!=="game")return;const tg=ev.target;if(tg&&/INPUT|TEXTAREA|SELECT/.test(tg.tagName))return;
+    window.addEventListener("keydown",ev=>{if(!GM.on||!TOWN.open)return;const tg=ev.target;if(tg&&/INPUT|TEXTAREA|SELECT/.test(tg.tagName))return;
       if(GM.paused){if(ev.key==="Escape"&&GM.dlgActs&&GM.dlgActs.x){ev.preventDefault();GM.dlgActs.x()}return}
+      if(ev.key==="Escape"&&!townIsFs()){ev.preventDefault();closeTown();return}
       if(ev.key in K){ev.preventDefault();const d=K[ev.key];if(!GM.keys[d]){GM.keys[d]=true;GM.order.push(d)}}
       else if(ev.key===" "||ev.key==="Enter"){ev.preventDefault();if(GM.near&&!GM.fade)gInteract(GM.near)}});
     window.addEventListener("keyup",ev=>{if(ev.key in K){const d=K[ev.key];GM.keys[d]=false;GM.order=GM.order.filter(v=>v!==d);if(!Object.values(GM.keys).some(Boolean))GM.bump=false}});
-    window.addEventListener("resize",()=>{if(GM.on&&S.tab==="game")gResize()});
-    document.addEventListener("visibilitychange",()=>{if(document.hidden){if(GM.on){GM.on=false;cancelAnimationFrame(GM.raf);gSavePos()}}else if(S.tab==="game"&&$("#gCv")){GM.on=true;GM.last=0;GM.raf=requestAnimationFrame(gLoop)}})}}
+    window.addEventListener("resize",()=>{if(GM.on&&TOWN.open)gResize()});
+    document.addEventListener("visibilitychange",()=>{if(document.hidden){if(GM.on){GM.on=false;cancelAnimationFrame(GM.raf);gSavePos()}}else if(TOWN.open&&$("#gCv")){GM.on=true;GM.last=0;GM.raf=requestAnimationFrame(gLoop)}})}}
 function gIntro(){
   const g=GS(),d=today(),first=!g.intro,daily=g.day!==d;
   if(daily){g.day=d;g.stars+=2;g.total+=2}g.intro=true;save();gHud();
@@ -2835,17 +2932,16 @@ function gMount(){
   window.SPMGAME=GM;gIntro()}
 function rGame(){
   ensureGameCss();
-  $("#sheet").innerHTML=`<div class="gwrap"><div class="gstage"><canvas id="gCv"></canvas>
-   <div class="ghud"><span class="gchip" id="gStars">⭐ 0</span><span class="gchip" id="gRoom"></span><span style="flex:1"></span><button class="gchip gbtn" id="gHome" style="display:none">🏠 小镇</button><button class="gchip gbtn" id="gHelp" aria-label="怎么玩">❓</button></div>
+  const host=$("#townBody");if(!host)return;
+  host.innerHTML=`<div class="gwrap"><div class="ghud"><span class="gchip gc-star" id="gStars">⭐ 0</span><span class="gchip gc-drop" id="gWater">💧 0</span><span class="gchip gc-room" id="gRoom"></span><span style="flex:1"></span><button class="gchip gbtn" id="gHome" style="display:none" aria-label="回小镇">🏠</button><button class="gchip gbtn" id="gHelp" aria-label="怎么玩">❓</button><button class="gchip gbtn" id="gFs" aria-label="全屏" title="全屏">⛶</button><button class="gchip gbtn gc-x" id="gClose" aria-label="关闭小镇" title="关闭">✕</button></div>
+   <div class="gstage"><canvas id="gCv"></canvas>
    <div class="gpad"><button data-pad="1" style="grid-area:u">▲</button><button data-pad="2" style="grid-area:l">◀</button><button data-pad="3" style="grid-area:r">▶</button><button data-pad="0" style="grid-area:d">▼</button></div>
-   <button class="gA" id="gA">A</button><div id="gDlg"></div></div>
-   <p class="fine muted gnote">电脑：方向键或 WASD 走路，空格互动。手机：左下方向键走路，右下 A 互动，也可以直接点地面。</p></div>`;
-  gMount()}
+   <button class="gA" id="gA">A</button><div id="gDlg"></div></div></div>`;
+  gMount();townBind()}
 function ensureGameCss(){if(document.getElementById("gameCss"))return;const s=document.createElement("style");s.id="gameCss";
   s.textContent=`.gwrap{max-width:780px;margin:0 auto}
-@media (max-width:640px){.gwrap{margin-left:calc(10px - var(--pl,0px));margin-right:-6px}}
 .gstage{position:relative;border-radius:16px;overflow:hidden;border:4px solid #b7834f;box-shadow:0 6px 0 #8a5f33,0 14px 30px rgba(80,50,20,.25);background:#8fcf7e;touch-action:none;-webkit-user-select:none;user-select:none}
-#gCv{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+#gCv{position:absolute;inset:0;display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
 .ghud{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;align-items:center;pointer-events:none;z-index:2}
 .ghud>*{pointer-events:auto}
 .gchip{background:rgba(255,247,230,.94);border:2px solid #b7834f;border-radius:999px;padding:3px 10px;font:800 13px var(--sans);color:#5a3a1a;box-shadow:0 2px 0 #b7834f}
@@ -2870,7 +2966,83 @@ function ensureGameCss(){if(document.getElementById("gameCss"))return;const s=do
 .gnote{margin:8px 4px 0;text-align:center}`;
   document.head.appendChild(s)}
 
+/* ---- 小镇浮层：宠物上方的 🏡 按钮点开，支持全屏 ---- */
+function ensureTownCss(){if(document.getElementById("townCss"))return;const s=document.createElement("style");s.id="townCss";
+  s.textContent=`#townOv{position:fixed;inset:0;z-index:90;display:none;background:rgba(36,24,12,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);overscroll-behavior:contain}
+#townOv.on{display:block}
+#townBody{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:max(10px,env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+#townOv .gwrap{width:min(780px,100%);max-width:none;height:min(100%,max(76vh,340px),740px);margin:0;display:flex;flex-direction:column;gap:8px;padding:8px;background:linear-gradient(180deg,#fff9ea,#ffeecb);border:4px solid #c8955a;border-radius:26px;box-shadow:0 6px 0 #9a6b3a,0 22px 44px rgba(60,35,10,.38)}
+#townOv .gstage{flex:1;min-height:0;border:3px solid #e6c48e;border-radius:18px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
+#townOv .ghud{position:static;display:flex;align-items:center;gap:6px;flex:none;padding:0 2px;pointer-events:auto}
+#townOv .gchip{border:0;border-radius:999px;padding:6px 12px;font:800 14px var(--sans);color:#5a3a1a;background:#fff;box-shadow:0 3px 0 #e6c48e;white-space:nowrap}
+#townOv .gc-star{background:#fff0b3;box-shadow:0 3px 0 #e8c75a}
+#townOv .gc-drop{background:#d8f0ff;box-shadow:0 3px 0 #8ec9ec}
+#townOv .gc-room{background:#ffe0cf;box-shadow:0 3px 0 #efae8c;min-width:0;max-width:34vw;overflow:hidden;text-overflow:ellipsis}
+#townOv .gbtn{flex:none;min-width:36px;height:36px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+#townOv .gbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #e6c48e}
+#townOv .gc-x{background:#ffd3d3;box-shadow:0 3px 0 #ef9a9a}
+#townOv .gbox{background:#fffaf0;border:4px solid #e0b77a;border-radius:22px;padding:14px 16px;box-shadow:0 5px 0 #c8955a}
+#townOv .gbox .gh{display:inline-block;margin-bottom:6px;padding:4px 14px;border-radius:999px;background:#ffe3a3;border:2px solid #e3b25c;font-size:16px}
+#townOv .gbox .gp{font-size:14.5px;line-height:1.65}
+#townOv .gbtns{gap:10px}
+#townOv .gbtns button{min-height:44px;padding:8px 16px;border:0;border-radius:16px;background:linear-gradient(180deg,#ffe08a,#ffc860);box-shadow:0 4px 0 #d9a13d;font:800 15px var(--sans);color:#5a3a1a}
+#townOv .gbtns button.gx{background:#fff;box-shadow:0 4px 0 #e0c9a0;color:#7a5a38}
+#townOv .gbtns button:disabled{opacity:.45;box-shadow:none}
+#townOv .gbtns.gchaps{max-height:38vh;overflow:auto;padding:2px 2px 6px}
+#townOv .gbtns.gchaps button{flex:1 1 100%;text-align:left}
+#townOv .gpad button{border:0;border-radius:16px;background:rgba(255,250,235,.92);box-shadow:0 4px 0 #d9b27a}
+#townOv .gA{border:0;background:linear-gradient(180deg,#ffe08a,#ffc860);box-shadow:0 5px 0 #d9a13d}
+#townOv.tfs #townBody{padding:0}
+#townOv.tfs .gwrap{width:100%;height:100%;max-height:none;border:0;border-radius:0;box-shadow:none;padding:calc(6px + env(safe-area-inset-top,0px)) calc(8px + env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) calc(8px + env(safe-area-inset-left,0px))}
+#townOv.tfs .gstage{box-shadow:none}
+#townOv.tfs .gpad{left:calc(12px + env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+#townOv.tfs .gA{right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+@media (max-width:640px){#townBody{padding:max(6px,env(safe-area-inset-top,0px)) max(6px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}}`;
+  document.head.appendChild(s)}
+function townIsFs(){return!!(document.fullscreenElement||document.webkitFullscreenElement)}
+function townSyncFs(){const ov=$("#townOv");if(!ov)return;const on=townIsFs()||TOWN.pseudo;ov.classList.toggle("tfs",on);
+  const b=$("#gFs");if(b){b.textContent=on?"⤡":"⛶";b.setAttribute("aria-label",on?"退出全屏":"全屏");b.title=on?"退出全屏":"全屏"}
+  setTimeout(()=>{if(TOWN.open)gResize()},60)}
+function townToggleFs(){
+  const ov=$("#townOv");if(!ov)return;
+  if(townIsFs()){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}return}
+  if(TOWN.pseudo){TOWN.pseudo=false;townSyncFs();return}
+  const rf=ov.requestFullscreen||ov.webkitRequestFullscreen,ok=document.fullscreenEnabled||document.webkitFullscreenEnabled;
+  if(rf&&ok){try{const p=rf.call(ov);if(p&&p.catch)p.catch(()=>{TOWN.pseudo=true;townSyncFs()})}catch(e){TOWN.pseudo=true;townSyncFs()}}
+  else{TOWN.pseudo=true;townSyncFs()}}
+function townBind(){
+  const fs=$("#gFs"),cl=$("#gClose");if(fs)fs.onclick=townToggleFs;if(cl)cl.onclick=()=>{if(!GM.paused)closeTown()};
+  const st=$(".gstage");if(st&&window.ResizeObserver){if(TOWN.ro)TOWN.ro.disconnect();TOWN.ro=new ResizeObserver(()=>{if(TOWN.open)gResize()});TOWN.ro.observe(st)}
+  if(!TOWN.bound){TOWN.bound=true;
+    ["fullscreenchange","webkitfullscreenchange"].forEach(n=>document.addEventListener(n,()=>{if(TOWN.open)townSyncFs()}));
+    window.addEventListener("popstate",()=>{if(TOWN.open)closeTown(true)})}
+  townSyncFs()}
+function openTown(){
+  if(TOWN.open)return;
+  try{ensureGameCss();ensureTownCss();gLoadArt()}catch(e){}
+  let ov=$("#townOv");
+  if(!ov){ov=document.createElement("div");ov.id="townOv";ov.className="no-print";ov.setAttribute("role","dialog");ov.setAttribute("aria-label","知识小镇");ov.innerHTML='<div id="townBody"></div>';document.body.appendChild(ov)}
+  TOWN.open=true;TOWN.pseudo=false;TOWN.bo=document.body.style.overflow;document.body.style.overflow="hidden";
+  ov.classList.remove("tfs");ov.classList.add("on");
+  try{history.pushState({town:1},"",location.href)}catch(e){}
+  try{rGame()}catch(e){try{console.warn("[小镇]",e)}catch(x){}closeTown(true)}}
+function closeTown(noHist){
+  if(!TOWN.open)return;TOWN.open=false;
+  try{if(townIsFs())(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}
+  TOWN.pseudo=false;gStop();
+  if(TOWN.ro){TOWN.ro.disconnect();TOWN.ro=null}
+  const ov=$("#townOv");if(ov){ov.classList.remove("on","tfs");const b=$("#townBody");if(b)b.innerHTML=""}
+  document.body.style.overflow=TOWN.bo||"";
+  if(!noHist&&history.state&&history.state.town){try{history.back()}catch(e){}}}
+window.__spmTown={open:openTown,close:closeTown,api:{GS,FM,GM,gInteract,farmWater,farmTick}};
+
 const CHANGELOG=[
+{v:"2026-10-19b",date:"2026-10-19",title:"小镇新玩法：农田，答题就是浇水",
+  items:["🌱 小镇左下角多了一片农田，一共 12 块地。每块地种一章的作物，作物长大就代表这一章被你学会了。","💧 在「闪卡」或「刷题」里答对一题，就得 1 💧。回小镇走到地边，按互动键就能浇水；每块地每天最多长大一格，明天再来看它。","🧺 作物成熟后可以收成换 ⭐。前 3 包种子免费，之后一包 ⭐6。","🎀 小镇整个界面重新排了一遍：顶栏放到了画面外面，按钮和弹窗换成圆圆软软的样式，换上了新的像素画素材。"],
+  go:[{t:"打开小镇",tab:"game"}]},
+{v:"2026-10-19a",date:"2026-10-19",title:"小镇改成按钮，还能全屏",
+  items:["🏡 「小镇」不再占顶部的页签，变成了小宠物上面的 🏡 按钮，在哪一页都能一键进去；把小宠物拖到哪里，按钮就跟到哪里。","⛶ 小镇右上角多了「全屏」按钮：电脑和平板是真正的全屏；iPhone 的浏览器不支持网页全屏，会自动变成铺满整个屏幕的沉浸模式。","✕ 点右上角的 ✕ （电脑按 Esc，手机按返回键）就回到刚才的页面，小镇进度不变。"],
+  go:[{t:"打开小镇",tab:"game"}]},
 {v:"2026-10-18o",date:"2026-10-18",title:"新功能：知识小镇 (可以走动探索的学习小游戏)",
   items:["🏡 新的「小镇」页：一个可爱的 2D 小镇。电脑用方向键或 WASD 走路，手机用左下角的方向键，也可以直接点地面，小人会自己走过去。",
    "🏠 每一科是小镇里的一间屋子，走进去是一座图书馆，每个书架是一个章节。屋子一开始被藤蔓盖住，用 ⭐ 就能「开发」新的区域。",
@@ -2959,7 +3131,7 @@ function openUpdates(){
   document.addEventListener("keydown",onKey);
   back.onclick=ev=>{if(ev.target===back)close()};$("#updX",back).onclick=close;
   $$("[data-upd-go]",back).forEach(b=>b.onclick=()=>{const [i,gi]=b.dataset.updGo.split(":").map(Number),g=CHANGELOG[i].go[gi];close();
-    if(g.dm){dMode=g.dm;qz=null}go(g.tab,g.sub&&S.my.includes(g.sub)?g.sub:undefined)})}
+    if(g.dm){dMode=g.dm;qz=null}if(g.tab==="game"){openTown();return}go(g.tab,g.sub&&S.my.includes(g.sub)?g.sub:undefined)})}
 function initBell(){if(DATA_MISSING.length)setTimeout(()=>toast("有些内置笔记没有加载："+DATA_MISSING.join("、")+"。请确认 data 文件夹已和 index.html 一起上传。"),900);const b=$("#btnBell");if(!b)return;b.onclick=openUpdates;bellUpdate();
   const s=seenVer();if(s!==null&&CHANGELOG.length&&s!==CHANGELOG[0].v)setTimeout(()=>toast("🔔 有新功能了，点右上角的小铃铛看看"),1800)}
 
@@ -3077,7 +3249,7 @@ function renderMcq(q){
    ${q.qz?`<details style="margin:2px 0 6px"><summary class="fine muted" style="cursor:pointer">华文翻译</summary><div class="fine" style="margin-top:4px">${esc(q.qz)}</div></details>`:""}
    ${q.o.map((o,i)=>`<button class="opt ${qz.picked===null?"":i===q.a?"right":i===qz.picked?"wrong":""}" data-o="${i}" ${qz.picked!==null?"disabled":""}><span class="bub">${L[i]}</span><span>${esc(o)}</span></button>`).join("")}
    ${qz.picked!==null?`<div class="tip"><b>${qz.picked===q.a?"答对了":"答错了"}</b>：${esc(q.e||"")}${q.ez?`<div class="fine" style="margin-top:4px">华文：${esc(q.ez)}</div>`:""}</div><button class="btn pri" id="qNext">${qz.i+1>=qz.qs.length?"看结果":"下一题"}</button>`:""}</div>`;
-  $$("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;qz.picked=i;if(i===q.a)qz.score++;else{S.wrong.push({id:"q"+Date.now()+qz.i,type:"quiz",s:qz.sid,q:q.q+"  ("+q.o.map((o,k)=>L[k]+". "+o).join(" / ")+")",a:"正确答案："+L[q.a]+". "+q.o[q.a]+"。"+(q.e||"")+(q.ez?"\n华文："+q.ez:"")});save()}renderMcq(q)});
+  $$("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;qz.picked=i;if(i===q.a){qz.score++;try{farmWater()}catch(e){}}else{S.wrong.push({id:"q"+Date.now()+qz.i,type:"quiz",s:qz.sid,q:q.q+"  ("+q.o.map((o,k)=>L[k]+". "+o).join(" / ")+")",a:"正确答案："+L[q.a]+". "+q.o[q.a]+"。"+(q.e||"")+(q.ez?"\n华文："+q.ez:"")});save()}renderMcq(q)});
   if($("#qNext"))$("#qNext").onclick=nextQ}
 function renderOpen(q){
   const box=$("#dBody"),r=qz.res;

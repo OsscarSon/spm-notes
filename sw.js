@@ -1,7 +1,7 @@
 // 改了网站内容后，把版本号 +1 (spm-v6、v7...)，用户就会收到「有新版本」提示
-const CACHE = 'spm-v9';
+const CACHE = 'spm-v11';
 // 新增 data/ 里的数据文件时，记得把它也加进下面这个清单 (这样装好 App 后第一次没网也能打开)
-const PRECACHE = ['./', './index.html', './data/sej.js', './data/bio.js', './data/kim.js', './data/mat.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
+const PRECACHE = ['./', './index.html', './data/sej.js', './data/bio.js', './data/kim.js', './data/mat.js', './ktart.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   // 某个文件暂时下载失败，也不会让整个安装失败
