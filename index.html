@@ -2393,6 +2393,13 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-19v",date:"2026-10-19",title:"小镇修复：自动接上 AI key / 同步，能种田了，不再按天数卡你",
+   items:["🔌 修好了「小镇读不到网站设置」的问题：现在网站里填好的 AI key、同步网址，小镇里会自动接上；选好的科目也会正确解锁房子，可以种田了。",
+    "🌱 作物不用再等「一天一个阶段」：答对 8 题攒够水，一次浇完就能长到成熟；很久没浇才会枯萎 (从 5 天放宽到 10 天)。",
+    "🐔 鸡蛋 / 牛奶 / 羊毛 / 蜂蜜改成按答题数攒 (每答 5 / 10 / 15 / 5 题一份)，不用再等隔天；货车天天都来；和老师聊天、送礼每天各 3 次。",
+    "🏛 知识馆只显示你选的科目，进度分母是你选的科目数；每个书架的奖励会按科目数折算，选 7 科和选 11 科拿到的总奖励一样，不会因为多选科目占便宜。",
+    "🤖 AI 出题每天上限从 6 次提到 12 次。"],
+  go:[{t:"去小镇逛逛",tab:"game"}]},
 {v:"2026-10-19u",date:"2026-10-19",title:"知识小镇大更新：主线剧情、关卡挑战、钓鱼烹饪、迷雾世界、AI 出题、云同步",
    items:[
     "📜 主线剧情 5 章（Skyblock 式任务链）：从修复荒废的知识馆，到矿洞、池塘厨房、迷雾森林、海岸，完成每个目标拿奖励；屏幕上方一直显示当前目标。",
@@ -3207,6 +3214,10 @@ load();applyTheme();
 const h0=(location.hash||"").slice(1);if(TABS.some(t=>t[0]===h0))S.tab=h0;else if(!TABS.some(t=>t[0]===S.tab)&&S.tab!=="set")S.tab="today";
 render();
 if(syncOn())setTimeout(()=>syncPull(false),1200);
+/* ---- 小镇桥接：网站的主程序被包在一个函数里，town.js 看不到里面的东西，所以在这里把它需要的递给它 ---- */
+try{Object.defineProperty(window,"S",{get:()=>S,configurable:true})}catch(e){}
+Object.assign(window,{chapsOf,gemOK,gem,sysPrompt,parseJSON,syncOn,syncPull,save,esc,allCards,PPTS,today,subj,mySubjects,go});
+window.toast=toast;
 window.__spm={S:()=>S,go};
 })();
 
@@ -3518,6 +3529,6 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   apply();
 })();
 </script>
-<script src="town-launcher.js?v=2026-10-19u" defer></script>
+<script src="town-launcher.js?v=2026-10-19v" defer></script>
 </body>
 </html>

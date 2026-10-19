@@ -40,7 +40,7 @@ function rollDay(){var t=TODAY();if(G.last===t)return;
  if(G.last){var gap=dayDiff(G.last,t);G.dayN+=Math.max(1,gap);
   G.streak=(G.lastStudy&&dayDiff(G.lastStudy,t)<=1)?G.streak:0;}
  G.last=t;G.td={day:t,ans:0,ok:0,w:0};G.took={};G.seen={};
- G.plots.forEach(function(p){if(!p)return;growPlot(p);if(!p.wilt&&G.dayN-(p.lw||p.pd)>=5)p.wilt=1});
+ G.plots.forEach(function(p){if(!p)return;growPlot(p);if(!p.wilt&&G.dayN-(p.lw||p.pd)>=10)p.wilt=1});
  genQuests();saveG()}
 function lvl(k){return Math.min(30,Math.floor(Math.sqrt((G.xp[k]||0)/8)))}
 function addXP(k,n){var a=lvl(k);G.xp[k]=(G.xp[k]||0)+n;var b=lvl(k);if(b>a)note("✨ "+SKN[k]+" 升到 Lv."+b+"！")}
@@ -55,7 +55,7 @@ function addWater(sid,n,ext){var w=G.water[sid]||0;var wr=(typeof S!=="undefined
  if(wr>=4)n=Math.max(1,Math.ceil(n*.5)); // 杂草太多长得慢
  G.water[sid]=w+n}
 function stageOf(p){var s=0;THR.forEach(function(t,i){if(p.w>=t)s=i+1});return s}
-function growPlot(p){if(p.wilt)return;if(p.adv<G.dayN){var t=stageOf(p);if(t>p.st){p.st++;p.adv=G.dayN}}}
+function growPlot(p){if(p.wilt)return;var t=stageOf(p);if(t>p.st){p.st=t;p.adv=G.dayN}} /* 不再限制「一天只长一个阶段」：水够了就直接长 */
 function wrongOf(sid){return(typeof S!=="undefined"&&S.wrong?S.wrong:[]).filter(function(x){return x.s===sid})}
 function chapName(sid,ci){try{var c=chapsOf(sid)[ci];return c?c.t.replace(/^T\d\s*Bab\s*\d+\s*/i,function(m){return m.trim()+" "}):"章节"}catch(e){return"章节"}}
 function chapCount(sid){try{return chapsOf(sid).length}catch(e){return 0}}
@@ -154,7 +154,7 @@ function craft(id){var r=RECIPES.filter(function(x){return x.id===id})[0];if(!r|
 function swordDmg(){return(SWORD[G.eq.sword]||SWORD.sword_ruler).dmg}
 function maxHearts(){return 3+(G.eq.armor==="shield_book"?1:0)+(lvl("combat")>=5?1:0)+(lvl("combat")>=15?1:0)+(lvl("combat")>=25?1:0)}
 /* ───────── AI 出题池（存进 S.game.pool，随云同步；不需要 key 时自动不用） ───────── */
-var POOL_MAX=60,AI_DAILY=6;
+var POOL_MAX=60,AI_DAILY=12;
 function aiAvail(){try{return !!(G.ai&&G.ai.on&&typeof gemOK==="function"&&gemOK()&&typeof gem==="function")}catch(e){return false}}
 function validQ(q){if(!q||typeof q.q!=="string"||q.q.length<6||q.q.length>400)return false;if(!Array.isArray(q.o)||q.o.length!==4)return false;
  var set={};for(var i=0;i<4;i++){if(typeof q.o[i]!=="string"||!q.o[i].trim()||q.o[i].length>160)return false;set[q.o[i].trim().toLowerCase()]=1}
@@ -225,7 +225,7 @@ UI.showQ=function(box,q,cb,hdr){var L="ABCD";if(KT.debug)KT.debug.q=q;
 /* ───────── 学习浇水（核心玩法：答对 = 水） ───────── */
 UI.study=function(sid,opt){opt=opt||{};var left=opt.n||0,got=0,p=UI.panel(SNAME(sid)+" · 学习时间",'',{cls:"wide"});
  function next(){var q=C.getQuestion(sid);if(!q){p.body.innerHTML='<p class="soft">这一科暂时没有可出的题目 🥲<br>先去网站里的「速记卡」或「刷题」添加一些吧。</p>';return}
-  var g=G(),capNote=(g.td.ans>=40)?"（今天答太多啦，水减半）":"";
+  var g=G(),capNote="";
   var hdr='<div class="strip">'+ico("icon/ui_drop",1)+' 这科的水 <b>'+(g.water[sid]||0)+'</b>'+(opt.n?' · 还剩 '+left+' 题':'')+capNote+'</div>';
   UI.showQ(p.body,q,function(ok){C.recordAnswer(sid,ok,q);
    var w=0;if(ok){w=(G().td.ans>40)?1:1;C.addWater(sid,1);got++}if(opt.n){left--}
@@ -249,7 +249,7 @@ UI.plot=function(i,cb){var g=G(),pl=g.plots[i];
  if(!pl.wilt&&pl.st<4)btn.push('<button class="btn ghost" data-a="clear">铲掉重种</button>');
  var p=UI.panel("🌾 田地 #"+(i+1),h+(wr>=4?'<div class="tip">杂草太多，作物长得慢了（水只算一半）。</div>':'')+'<div class="btns">'+btn.join("")+'</div>');
  p.body.onclick=function(e){var b=e.target.closest("[data-a]");if(!b||b.disabled)return;var a=b.dataset.a;
-  if(a==="water"){var need=8-pl.w,use=Math.min(g.water[sid]||0,need);if(use<=0){C.note("已经浇够啦");return}g.water[sid]-=use;pl.w+=use;pl.lw=g.dayN;C.growPlot(pl);C.addXP("farm",use);C.cnt("water");C.saveG();UI.hud();p.close();cb&&cb();C.note("💧 浇了 "+use+" 水"+(pl.st>0?"，长到「"+["","发芽","长叶","花苞","成熟"][pl.st]+"」":"，明天会发芽"))}
+  if(a==="water"){var need=8-pl.w,use=Math.min(g.water[sid]||0,need);if(use<=0){C.note("已经浇够啦");return}g.water[sid]-=use;pl.w+=use;pl.lw=g.dayN;C.growPlot(pl);C.addXP("farm",use);C.cnt("water");C.saveG();UI.hud();p.close();cb&&cb();C.note("💧 浇了 "+use+" 水"+(pl.st>0?"，长到「"+["","发芽","长叶","花苞","成熟"][pl.st]+"」":"，再答题攒水就会发芽"))}
   else if(a==="study"){UI.study(sid,{done:function(){cb&&cb()}})}
   else if(a==="weed")weedReview(sid,function(){cb&&cb()});
   else if(a==="revive")UI.study(sid,{n:3,done:function(){pl.wilt=0;pl.lw=g.dayN;C.saveG();C.note("🌱 救活啦！");cb&&cb()}});
@@ -291,14 +291,14 @@ UI.house=function(sid,cb){var nid=Object.keys(KTD.npcs).filter(function(k){retur
  function addPts(n2){var a=Math.floor(f.pts/10);f.pts=Math.min(100,f.pts+n2);var b=Math.floor(f.pts/10);if(b>a&&n.mile&&n.mile[b])return n.mile[b]; return null}
  p.body.onclick=function(e){var b=e.target.closest("[data-a]");if(!b)return;var a=b.dataset.a;
   if(a==="study")UI.study(sid);
-  else if(a==="chat"){var ms=null;if(f.talk!==C.TODAY()){f.talk=C.TODAY();ms=addPts(5);C.qprog("talk",1);C.cnt("talk");C.saveG()}out.innerHTML='<div class="say">“'+E(pick(n.chat))+'”</div>'+(ms?'<div class="tip">❤ '+E(ms)+'</div>':f.talk===C.TODAY()&&!ms?'':'');$(".hrt",p.body).innerHTML=UI.hearts(nid)}
+  else if(a==="chat"){var ms=null;if(f.talk!==C.TODAY()){f.talk=C.TODAY();f.tn=0}if((f.tn||0)<3){f.tn=(f.tn||0)+1;ms=addPts(5);C.qprog("talk",1);C.cnt("talk");C.saveG()}out.innerHTML='<div class="say">“'+E(pick(n.chat))+'”</div>'+(ms?'<div class="tip">❤ '+E(ms)+'</div>':f.talk===C.TODAY()&&!ms?'':'');$(".hrt",p.body).innerHTML=UI.hearts(nid)}
   else if(a==="gift"){var ks=Object.keys(g.inv).filter(function(k){return k.indexOf("crop_")===0&&g.inv[k]>0});if(!ks.length){out.innerHTML='<div class="soft">背包里还没有收成可以送～先去田里收获吧。</div>';return}
-   if(f.gift===C.TODAY()){out.innerHTML='<div class="soft">今天已经送过礼物啦。</div>';return}
+   if(f.gift!==C.TODAY()){f.gift=C.TODAY();f.gn=0}if((f.gn||0)>=3){out.innerHTML='<div class="soft">今天送得够多啦，明天再送吧。</div>';return}
    out.innerHTML='<div class="strip">送哪个？</div><div class="btns g2">'+ks.map(function(k){var it=itemInfo(k);return'<button class="btn alt" data-g="'+k+'">'+ico(it[0],2)+" "+E(it[1])+" ×"+g.inv[k]+'</button>'}).join("")+'</div>'}
   else if(a==="tip"){if(f.pts<40){out.innerHTML='<div class="soft">好感度 4 颗心解锁（聊天、送礼可以涨好感）。</div>';return}var t=tipOf(sid);out.innerHTML=t?'<div class="tipcard"><b>'+E(t.t)+'</b><div>'+E(t.h)+'</div></div>':'<div class="soft">这科暂时没有小贴士。</div>';UI.math(out)}
   else if(a==="site"){UI.close();KT.close();try{go("notes",sid)}catch(e){try{S.sub=sid;render()}catch(e2){}}}}
  p.body.addEventListener("click",function(e){var b=e.target.closest("[data-g]");if(!b)return;var k=b.dataset.g;g.inv[k]--;var cid=(KTD.crops[k.slice(5)]||{}).id,like=!!(n.likes&&n.likes.indexOf(cid)>=0);
-  var ms=addPts(like?6:2);f.gift=C.TODAY();C.saveG();$(".hrt",p.body).innerHTML=UI.hearts(nid);out.innerHTML='<div class="say">'+(like?"哇！这正是我喜欢的！":"谢谢你～")+'</div>'+(ms?'<div class="tip">❤ '+E(ms)+'</div>':'')})};
+  var ms=addPts(like?6:2);f.gift=C.TODAY();f.gn=(f.gn||0)+1;C.saveG();$(".hrt",p.body).innerHTML=UI.hearts(nid);out.innerHTML='<div class="say">'+(like?"哇！这正是我喜欢的！":"谢谢你～")+'</div>'+(ms?'<div class="tip">❤ '+E(ms)+'</div>':'')})};
 UI.npcTalk=function(nid,extra){var n=KTD.npcs[nid];if(!n)return;UI.panel(E(n.zh),'<div class="row cen">'+ico("portrait/"+nid,4)+'<div class="say">“'+E(pick(Math.random()<.5?n.greet:n.chat))+'”</div></div>'+(extra||''))};
 
 /* ───────── 公告板（每日任务） ───────── */
@@ -313,7 +313,7 @@ UI.board=function(){var g=G();if(g.q.day!==C.TODAY())C.genQuests();
 function sellAll(){var g=G(),t=0;for(var k in g.inv){var it=itemInfo(k);t+=Math.round(g.inv[k]*it[2]*(k.indexOf("crop_")===0?1:1))}return t}
 UI.shop=function(){var g=G();function draw(){var inv=Object.keys(g.inv).filter(function(k){return g.inv[k]>0&&itemInfo(k)[2]>0});
   var rows=inv.map(function(k){var it=itemInfo(k);return'<div class="line">'+ico(it[0],2)+'<span>'+E(it[1])+' ×'+g.inv[k]+'</span><button class="btn alt s" data-sell="'+k+'">卖 '+it[2]*g.inv[k]+'</button></div>'}).join("")||'<div class="soft">背包里没有可卖的东西。</div>';
-  var an=[["cow","奶牛","icon/milk",80,"每答 10 题可挤一次奶，每天最多 2 次"],["sheep","绵羊","icon/wool",150,"连续学习 3 天可剪羊毛"]].map(function(a){return'<div class="line">'+ico(a[2],2)+'<span><b>'+a[1]+'</b> <small>'+a[4]+'</small></span>'+(g.animals[a[0]]?'<span>✅ 已拥有</span>':'<button class="btn alt s" data-buy="'+a[0]+':'+a[3]+'">'+ico("icon/ui_coin",1)+' '+a[3]+'</button>')+'</div>'}).join("");
+  var an=[["cow","奶牛","icon/milk",80,"每答 10 题可挤一次奶（不限天数）"],["sheep","绵羊","icon/wool",150,"每答 15 题可剪一次羊毛（不限天数）"]].map(function(a){return'<div class="line">'+ico(a[2],2)+'<span><b>'+a[1]+'</b> <small>'+a[4]+'</small></span>'+(g.animals[a[0]]?'<span>✅ 已拥有</span>':'<button class="btn alt s" data-buy="'+a[0]+':'+a[3]+'">'+ico("icon/ui_coin",1)+' '+a[3]+'</button>')+'</div>'}).join("");
   p.body.innerHTML='<div class="row cen">'+ico("portrait/pak_din",3)+'<div class="say">“要卖点什么，还是看看牧场新朋友？”</div></div><h4>卖东西</h4>'+rows+(inv.length?'<button class="btn gold" data-all="1">全部卖掉（'+sellAll()+'）</button>':'')+'<h4>买动物</h4>'+an}
  var p=UI.panel("🏪 丁叔的小店","");draw();
  p.body.onclick=function(e){var s=e.target.closest("[data-sell]"),b=e.target.closest("[data-buy]"),a=e.target.closest("[data-all]");
@@ -321,21 +321,23 @@ UI.shop=function(){var g=G();function draw(){var inv=Object.keys(g.inv).filter(f
   else if(a){var t=sellAll();for(var k2 in g.inv)if(itemInfo(k2)[2]>0)delete g.inv[k2];C.coin(t)}
   else if(b){var x=b.dataset.buy.split(":"),c=+x[1];if(g.coins<c){C.note("金币不够哦");return}g.coins-=c;g.animals[x[0]]=1;if(x[0]==="cow")C.cnt("cow");C.note("🎉 新朋友来牧场啦！")}
   else return;C.saveG();UI.hud();draw()}};
-UI.merchantToday=function(){var d=new Date().getDay();return d===3||d===6};
+UI.merchantToday=function(){return true}; /* 货车天天都来：离考试只有一个多月，不再按星期限制 */
 UI.merchant=function(){var g=G(),r=C.srand("m"+C.TODAY()),pool=KTD.merch.slice().sort(function(){return r()-.5}).slice(0,5);
  var NM={windmill:["icon/windmill","小风车"],lamp:["icon/lamp","路灯"],flag:["icon/flag","小旗子"],wallpaper:["icon/wallpaper","壁纸"],rug:["icon/rug","地毯"],lantern:["icon/lantern","灯笼"],hat:["icon/hat","小帽子"],collar:["icon/collar","彩色项圈"],rainbow_coconut_seedling:["icon/rainbow_coconut","彩虹椰树苗"],golden_pumpkin_fragment:["icon/golden_pumpkin","金南瓜碎片"],recipe_nasi_lemak:["icon/nasi_lemak","椰浆饭食谱"],recipe_fruit_salad:["icon/fruit_salad","水果沙拉食谱"],hint_ticket:["icon/hint_ticket","提示券"]};
  var items=pool.map(function(m){var price=Math.round(m.base*(1.2+r()*.4));return{id:m.id,price:price,n:NM[m.id]||["icon/gem",m.id]}});
- function draw(){p.body.innerHTML='<div class="row cen">'+ico("portrait/pak_kereta",3)+'<div class="say">“周三、周六才来一趟，今天的货很新鲜！”</div></div>'+items.map(function(it){var own=g.owned[it.id]||0;return'<div class="line">'+ico(it.n[0],2)+'<span>'+E(it.n[1])+(own?' <small>已收藏 ×'+own+'</small>':'')+'</span><button class="btn alt s" data-b="'+it.id+'">'+ico("icon/ui_coin",1)+' '+it.price+'</button></div>'}).join("")+'<div class="soft">收藏品会放进「图鉴 → 收藏」；帽子和项圈会自动戴在小狗身上。</div>'}
+ function draw(){p.body.innerHTML='<div class="row cen">'+ico("portrait/pak_kereta",3)+'<div class="say">“货车天天都在，今天的货很新鲜！”</div></div>'+items.map(function(it){var own=g.owned[it.id]||0;return'<div class="line">'+ico(it.n[0],2)+'<span>'+E(it.n[1])+(own?' <small>已收藏 ×'+own+'</small>':'')+'</span><button class="btn alt s" data-b="'+it.id+'">'+ico("icon/ui_coin",1)+' '+it.price+'</button></div>'}).join("")+'<div class="soft">收藏品会放进「图鉴 → 收藏」；帽子和项圈会自动戴在小狗身上。</div>'}
  var p=UI.panel("🚚 流动货车","");draw();
  p.body.onclick=function(e){var b=e.target.closest("[data-b]");if(!b)return;var it=items.filter(function(x){return x.id===b.dataset.b})[0];if(g.coins<it.price){C.note("金币不够");return}g.coins-=it.price;g.owned[it.id]=(g.owned[it.id]||0)+1;C.saveG();UI.hud();draw()}};
 
 /* ───────── 牧场 ───────── */
-UI.coop=function(){var g=G(),td=g.td.day===C.TODAY()?g.td.ans:0;
- var P={chicken:{k:"egg",n:td>=5?1:0,why:"今天答满 5 题就有蛋",has:g.animals.chicken},cow:{k:"milk",n:Math.max(0,Math.min(2,Math.floor(td/10))-(g.took.milk||0)),why:"每答 10 题可挤 1 次，最多 2 次",has:g.animals.cow},sheep:{k:"wool",n:(g.streak>=3&&(g.dayN-(g.woolDay||-9))>=3)?1:0,why:"连续学习 3 天后可剪（每 3 天一次）",has:g.animals.sheep}};
- var p=UI.panel("🐔 牧场","");function draw(){p.body.innerHTML='<div class="soft">小动物靠你每天的学习来开心。今天已答 <b>'+td+'</b> 题。</div>'+Object.keys(P).map(function(a){var x=P[a],nm={chicken:"小鸡",cow:"奶牛",sheep:"绵羊"}[a];var left=a==="chicken"?(g.took.egg?0:x.n):x.n;
-  return'<div class="line">'+ico("animal/"+a+"_walk0",a==="cow"?1:2)+'<span><b>'+nm+'</b> <small>'+(x.has?x.why:'在小店可以买')+'</small></span>'+(x.has?(left>0?'<button class="btn gold s" data-c="'+a+'">收 '+ico(ITEMS[x.k][0],1)+'</button>':'<span class="soft">暂无</span>'):'🔒')+'</div>'}).join("")}
- draw();p.body.onclick=function(e){var b=e.target.closest("[data-c]");if(!b)return;var a=b.dataset.c,x=P[a];give(x.k,1);if(a==="chicken")g.took.egg=1;if(a==="cow"){g.took.milk=(g.took.milk||0)+1;x.n--}if(a==="sheep")g.woolDay=g.dayN;C.saveG();C.addXP("farm",2);C.note("收到 "+ITEMS[x.k][1]+" ×1");draw();
-  if(a==="sheep")P.sheep.n=0}};
+UI.coop=function(){var g=G(),tot=(g.cnt&&g.cnt.ans)||0;g.pk=g.pk||{};
+ /* 产出按「累计答题数」算，不再按天数：每答 per 题攒 1 份，最多存 cap 份 */
+ function base(x){return Math.max(g.pk[x.k]||0,tot-x.per*x.cap)}
+ function av(x){return x.has?Math.min(x.cap,Math.floor((tot-base(x))/x.per)):0}
+ var P={chicken:{k:"egg",per:5,cap:3,has:g.animals.chicken,why:"每答 5 题生 1 个蛋（最多存 3 个）"},cow:{k:"milk",per:10,cap:3,has:g.animals.cow,why:"每答 10 题可挤 1 次（最多存 3 次）"},sheep:{k:"wool",per:15,cap:2,has:g.animals.sheep,why:"每答 15 题可剪 1 次（最多存 2 次）"}};
+ var p=UI.panel("🐔 牧场","");function draw(){p.body.innerHTML='<div class="soft">小动物靠你答题来开心，不用等隔天，答得多就攒得多。累计已答 <b>'+tot+'</b> 题。</div>'+Object.keys(P).map(function(a){var x=P[a],nm={chicken:"小鸡",cow:"奶牛",sheep:"绵羊"}[a],n=av(x),more=x.per-((tot-base(x))%x.per);
+   return'<div class="line">'+ico("animal/"+a+"_walk0",a==="cow"?1:2)+'<span><b>'+nm+'</b> <small>'+(x.has?x.why:'在小店可以买')+'</small></span>'+(x.has?(n>0?'<button class="btn gold s" data-c="'+a+'">收 '+ico(ITEMS[x.k][0],1)+' ×'+n+'</button>':'<span class="soft">再答 '+more+' 题</span>'):'🔒')+'</div>'}).join("")}
+ draw();p.body.onclick=function(e){var b=e.target.closest("[data-c]");if(!b)return;var a=b.dataset.c,x=P[a];if(av(x)<1)return;give(x.k,1);g.pk[x.k]=base(x)+x.per;C.saveG();C.addXP("farm",2);C.note("收到 "+ITEMS[x.k][1]+" ×1");draw()}};
 
 /* ───────── 采集 ───────── */
 UI.forage=function(spot,cb){var sid=pick(C.MY().length?C.MY():["bm"]);if(Math.random()<.5)sid=C.weakest();
@@ -371,20 +373,20 @@ function fight(sid){var g=G(),hearts=3+(C.lvl("combat")>=5?1:0)+(C.lvl("combat")
 UI.fight=fight;
 
 /* ───────── 知识馆：任务书架 + 图鉴 + 收藏 ───────── */
-UI.hall=function(){var g=G(),my=C.MY();
- function draw(){var rows=C.SUBS().map(function(s){var mine=my.indexOf(s.id)>=0,h=g.harv[s.id]||0,done=h>=3,cr=cropInfo(s.id);
-   return'<div class="bund'+(done?" ok":"")+(mine?"":" lock")+'">'+ico("prop/subj_"+s.id,2)+'<div><b>'+E(s.name)+'</b><div class="bar"><i style="width:'+Math.min(100,h/3*100)+'%"></i></div><small>收获 '+E(cr.zh)+' '+Math.min(3,h)+' / 3</small></div>'+(done?(g.bund[s.id]===1?'<span>✅</span>':'<button class="btn gold s" data-b="'+s.id+'">领 50</button>'):mine?'':'<small>未选科</small>')+'</div>'}).join("");
-  var n=C.SUBS().filter(function(s){return g.bund[s.id]===1}).length;
-  p.body.innerHTML='<div class="row cen">'+ico("npc/owl_0",4)+'<div class="say">“知识馆在慢慢修复… 每科收获 3 次作物，就点亮一个书架。”</div></div><div class="strip">已点亮 '+n+' / '+C.SUBS().length+(n>=3?' · 🎉 大厅已修好':' · 点亮 3 个修好大厅')+'</div><div class="bgrid">'+rows+'</div><div class="btns g2"><button class="btn alt" data-a="gl">📖 术语图鉴</button><button class="btn alt" data-a="sk">⭐ 技能</button></div>'}
+UI.hall=function(){var g=G(),my=C.MY(),RW=Math.round(50*11/Math.max(1,my.length));
+ function draw(){var rows=C.SUBS().filter(function(s){return my.indexOf(s.id)>=0}).map(function(s){var mine=true,h=g.harv[s.id]||0,done=h>=3,cr=cropInfo(s.id);
+   return'<div class="bund'+(done?" ok":"")+(mine?"":" lock")+'">'+ico("prop/subj_"+s.id,2)+'<div><b>'+E(s.name)+'</b><div class="bar"><i style="width:'+Math.min(100,h/3*100)+'%"></i></div><small>收获 '+E(cr.zh)+' '+Math.min(3,h)+' / 3</small></div>'+(done?(g.bund[s.id]===1?'<span>✅</span>':'<button class="btn gold s" data-b="'+s.id+'">领 '+RW+'</button>'):mine?'':'<small>未选科</small>')+'</div>'}).join("");
+  var n=C.SUBS().filter(function(s){return g.bund[s.id]===1&&my.indexOf(s.id)>=0}).length;
+  p.body.innerHTML='<div class="row cen">'+ico("npc/owl_0",4)+'<div class="say">“知识馆在慢慢修复… 每科收获 3 次作物，就点亮一个书架。”</div></div><div class="strip">已点亮 '+n+' / '+my.length+(n>=3?' · 🎉 大厅已修好':' · 点亮 3 个修好大厅')+'</div><div class="bgrid">'+rows+'</div><div class="btns g2"><button class="btn alt" data-a="gl">📖 术语图鉴</button><button class="btn alt" data-a="sk">⭐ 技能</button></div>'}
  var p=UI.panel("🏛 知识馆","",{cls:"wide"});draw();
  p.body.onclick=function(e){var b=e.target.closest("[data-b]"),a=e.target.closest("[data-a]");
-  if(b){g.bund[b.dataset.b]=1;C.setMax("bund",C.SUBS().filter(function(s){return g.bund[s.id]===1}).length);C.coin(50);C.saveG();UI.hud();draw()}else if(a){a.dataset.a==="gl"?UI.glossary():UI.skills()}}};
+  if(b){g.bund[b.dataset.b]=1;C.setMax("bund",C.SUBS().filter(function(s){return g.bund[s.id]===1}).length);C.coin(RW);C.saveG();UI.hud();draw()}else if(a){a.dataset.a==="gl"?UI.glossary():UI.skills()}}};
 UI.hallRestored=function(){var g=G();return C.SUBS().filter(function(s){return g.bund[s.id]===1}).length>=3};
 UI.glossary=function(tab){var g=G(),cs=[];try{cs=allCards()}catch(e){}var by={};cs.forEach(function(c){(by[c.s]=by[c.s]||[]).push(c)});
  var my=C.MY(),sid=tab||my[0];
  var tabs=my.map(function(s){var all=by[s]||[],m=all.filter(function(c){return(S.box[c.id]||0)>=3}).length;return'<button class="chip btn2'+(s===sid?" on":"")+'" data-s="'+s+'">'+E(SNAME(s))+' '+m+'/'+all.length+'</button>'}).join("")+'<button class="chip btn2" data-s="_own">🎁 收藏</button>';
  var all=by[sid]||[],m=all.filter(function(c){return(S.box[c.id]||0)>=3});
- var body=sid==="_own"?Object.keys(g.owned).map(function(k){return'<div class="line"><span>'+E(k)+' ×'+g.owned[k]+'</span></div>'}).join("")||'<div class="soft">还没有收藏，周三、周六货车会来～</div>':
+ var body=sid==="_own"?Object.keys(g.owned).map(function(k){return'<div class="line"><span>'+E(k)+' ×'+g.owned[k]+'</span></div>'}).join("")||'<div class="soft">还没有收藏，去货车那里逛逛～</div>':
   '<div class="strip">已掌握（同一张卡答对 3 次）'+m.length+' / '+all.length+'</div>'+(m.slice(0,80).map(function(c){return'<div class="term"><b>'+E(plainT(c.q))+'</b><div>'+E(plainT(c.a))+'</div></div>'}).join("")||'<div class="soft">还没有掌握的卡片，去浇水答题吧！</div>');
  var p=UI.panel("📖 术语图鉴",'<div class="tabs">'+tabs+'</div>'+body,{cls:"wide"});UI.math(p.body);
  p.body.onclick=function(e){var t=e.target.closest("[data-s]");if(t)UI.glossary(t.dataset.s)}};
@@ -491,10 +493,10 @@ UI.fish=function(){var g=G(),state="idle",tmr=0;
     C.addXP("fish",1);state="idle";cast.disabled=false;return{msg:"鱼挣脱跑掉了…",nextLabel:"再试试",next:function(){$(".qbox",p.body).innerHTML="";msg("点「抛竿」")}}},'<div class="strip">'+E(UI.SNAME(sid))+(q.ai?" · 🤖 AI 出题":"")+'</div>')}}};
 
 /* ───────── 蜂箱 / 老农 ───────── */
-UI.hive=function(){var g=G(),td=g.td.day===C.TODAY()?g.td.ans:0,can=td>=5&&!g.took.honey;
- UI.panel("🐝 蜂箱",'<div class="soft">今天答满 5 题，蜜蜂就会酿一份蜂蜜。今日已答 <b>'+td+'</b> 题。</div><div class="btns"><button class="btn gold" '+(can?"":"disabled")+' id="ktHoney">'+ico("icon/honey",1)+' 收蜂蜜'+(g.took.honey?"（今天已收）":"")+'</button></div>');
- var b=document.getElementById("ktHoney");if(b)b.onclick=function(){give("honey",1);g.took.honey=1;C.addXP("farm",2);C.saveG();C.note("🍯 收到蜂蜜 ×1");UI.close()}};
-var TANI=["作物一章一株：先种下，再去小屋答题攒水，水够了回来浇。","一天最多长一个阶段，所以别想一天催熟，每天来一点就好。","错题会长成杂草。别怕，点杂草重学一遍就能拔掉。","去公告板看看每日任务，再按 📜 看主线。","矿洞里每层都是考题战斗，通关能拿矿石，回工作台做武器。","钓鱼、养蜂、做料理都能当作复习。"];
+UI.hive=function(){var g=G(),tot=(g.cnt&&g.cnt.ans)||0;g.pk=g.pk||{};var bs=Math.max(g.pk.honey||0,tot-15),n=Math.min(3,Math.floor((tot-bs)/5)),can=n>0;
+  UI.panel("🐝 蜂箱",'<div class="soft">每答 5 题，蜜蜂就酿一份蜂蜜（最多存 3 份，不用等隔天）。现在可收 <b>'+n+'</b> 份。</div><div class="btns"><button class="btn gold" '+(can?"":"disabled")+' id="ktHoney">'+ico("icon/honey",1)+' 收蜂蜜</button></div>');
+  var b=document.getElementById("ktHoney");if(b)b.onclick=function(){give("honey",1);g.pk.honey=bs+5;C.addXP("farm",2);C.saveG();C.note("🍯 收到蜂蜜 ×1");UI.close()}};
+var TANI=["作物一章一株：先种下，再去小屋答题攒水，水够了回来浇。","作物不用等天数：答对 8 题攒够水，一次浇完就能长到成熟。","错题会长成杂草。别怕，点杂草重学一遍就能拔掉。","去公告板看看每日任务，再按 📜 看主线。","矿洞里每层都是考题战斗，通关能拿矿石，回工作台做武器。","钓鱼、养蜂、做料理都能当作复习。"];
 UI.tani=function(){C.cnt("tani");UI.npcTalk("pak_tani",'<div class="say">'+E(TANI[Math.floor(Math.random()*TANI.length)])+'</div><div class="btns"><button class="btn alt" id="ktSt">📜 看看主线任务</button></div>');var b=document.getElementById("ktSt");if(b)b.onclick=UI.story};
 
 /* ───────── 迷雾封印 / 宝箱 / 世界地图 ───────── */
@@ -518,7 +520,7 @@ UI.worldMap=function(){var g=G(),W=[["town","🏡 知识小镇","你的家。"],
 /* ───────── 设置：AI 出题 / 同步 / 角色 ───────── */
 UI.settings=function(){var g=G();function draw(){var keyOK=false,syncOK=false;try{keyOK=gemOK()}catch(e){}try{syncOK=syncOn()}catch(e){}
   var pool=C.MY().map(function(s){var arr=(g.pool[s]||[]).filter(function(x){return!x.u}).length;return'<span class="chip">'+E(UI.SNAME(s))+' '+arr+'</span>'}).join(" ");
-  p.body.innerHTML='<h4>🤖 AI 出题</h4><div class="soft">开启后，游戏里的题目会混入 AI 出的 SPM 风格选择题（每天最多请求 '+6+' 次，题目存进云同步）。需要在网站设置里填好 AI key。</div><div class="btns g2"><button class="btn'+(g.ai.on?"":" ghost")+'" id="ktAi" '+(keyOK?"":"disabled")+'>'+(g.ai.on?"✅ 已开启":"开启")+'</button><button class="btn alt" id="ktFill" '+(g.ai.on&&keyOK?"":"disabled")+'>立即补题</button></div><div class="tabs">'+pool+'</div>'+(keyOK?"":'<div class="tip">还没有 AI key，先去网站「设置」填写。</div>')+
+  p.body.innerHTML='<h4>🤖 AI 出题</h4><div class="soft">开启后，游戏里的题目会混入 AI 出的 SPM 风格选择题（每天最多请求 '+12+' 次，题目存进云同步）。需要在网站设置里填好 AI key。</div><div class="btns g2"><button class="btn'+(g.ai.on?"":" ghost")+'" id="ktAi" '+(keyOK?"":"disabled")+'>'+(g.ai.on?"✅ 已开启":"开启")+'</button><button class="btn alt" id="ktFill" '+(g.ai.on&&keyOK?"":"disabled")+'>立即补题</button></div><div class="tabs">'+pool+'</div>'+(keyOK?"":'<div class="tip">还没有 AI key，先去网站「设置」填写。</div>')+
    '<h4>☁ 多设备同步</h4><div class="soft">小镇进度已经并进网站的云同步（和笔记、错题一起加密同步）。'+(syncOK?'同步已开启 ✓':'去网站「设置 → 同步」填好 Worker 网址就能在手机/电脑之间共享。')+'</div><div class="btns"><button class="btn alt" id="ktSync" '+(syncOK?"":"disabled")+'>☁ 立即同步</button></div>'+
    '<h4>🧒 角色</h4><div class="btns g2"><button class="btn'+(g.sex==="girl"?"":" ghost")+'" data-sx="girl">女孩</button><button class="btn'+(g.sex==="boy"?"":" ghost")+'" data-sx="boy">男孩</button></div>'}
  var p=UI.panel("⚙ 设置","");draw();
@@ -669,7 +671,7 @@ function near2(x,y){// 避开路径、围栏、建筑周围
 function freeGrass(x,y){return x>1&&y>1&&x<MW-2&&y<MH-2&&!blocked[y][x]&&ground[y][x].indexOf("grass")>=0}
 function walkable(x,y){var tx=Math.floor(x/TS),ty=Math.floor(y/TS);if(!(tx>=0&&ty>=0&&tx<MW&&ty<MH)||blocked[ty][tx])return false;if(WID!=="town"&&!wUnlocked(WID,zoneOf(tx,ty)))return false;return true}
 function canMove(x,y){return walkable(x-5,y)&&walkable(x+5,y)&&walkable(x-5,y-4)&&walkable(x+5,y-4)}
-function ensureForage(){var g=G();if(g.forage.day===C.TODAY())return;var r=C.srand("f"+C.TODAY()),n=Math.min(10,4+Math.floor(C.lvl("forage")/5)),sp=[],its=["mushroom","wild_berry","flower","herb","wood"],tries=0;
+function ensureForage(){var g=G();if(g.forage.day===C.TODAY())return;var r=C.srand("f"+C.TODAY()),n=Math.min(14,8+Math.floor(C.lvl("forage")/5)),sp=[],its=["mushroom","wild_berry","flower","herb","wood"],tries=0;
  while(sp.length<n&&tries++<200){var x=2+Math.floor(r()*(MW-4)),y=2+Math.floor(r()*(MH-4));if(!freeGrass(x,y)||near3(x,y))continue;if(sp.some(function(s){return Math.abs(s.x-x)+Math.abs(s.y-y)<4}))continue;sp.push({x:x,y:y,it:its[Math.floor(r()*its.length)],done:0})}
  g.forage={day:C.TODAY(),spots:sp};C.saveG()}
 function near3(x,y){return acts.some(function(a){return Math.abs(a.tx-x)<=2&&Math.abs(a.ty-y)<=2})||(y>=17&&y<=24&&((x>=3&&x<=15)||(x>=24&&x<=37)))}
@@ -774,7 +776,9 @@ KT.travel=function(id){if(!run||!C.worldUnlocked(id)){C.note("这个世界还没
  if(id==="town"){pl.x=20*TS+8;pl.y=15*TS+8}else{pl.x=wd.start.x*TS+8;pl.y=(wd.start.y+1)*TS+8;wildForage(id);C.cnt("w_"+id);}
  dog.x=pl.x;dog.y=pl.y;dog.trail=[];path=null;pendAct=null;near=null;UI.close();var wn=ov.querySelector(".kt-wn"),mc=ov.querySelector(".kt-mini");wn.textContent=wd.wild?"📍 "+wd.name:"";mc.style.display=wd.wild?"block":"none";ov.querySelector(".kt-title").textContent=wd.wild?"🌲 "+wd.name:"🏡 知识小镇";C.saveG();UI.hud();sizeUp()};
 KT.debug={acts:function(){return allActs()},do:function(a){doAct(a)},tp:function(x,y){pl.x=x*TS+8;pl.y=y*TS+8;dog.x=pl.x;dog.y=pl.y}};
-KT.open=function(){if(run)return;KTArt.ready.then(function(){
+KT.open=function(){if(run)return;
+ if(typeof chapsOf!=="function"||typeof gemOK!=="function"){alert("小镇没有接上网站：index.html 里缺少「小镇桥接」那几行（在 window.__spm= 上面）。请用最新的 index.html。");return}
+KTArt.ready.then(function(){
  C.loadG();C.rollDay();var ext=C.syncExternal();C.saveG();
  if(!document.getElementById("ktCSS")){var st=document.createElement("style");st.id="ktCSS";st.textContent=CSS;document.head.appendChild(st)}
  ov=document.createElement("div");ov.className="ktov";var fsOK=!!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen);

@@ -6,7 +6,7 @@ st.textContent='#ktBtn{position:fixed;right:16px;bottom:112px;z-index:31;display
 document.head.appendChild(st);
 var b=document.createElement("button");b.id="ktBtn";b.type="button";b.setAttribute("aria-label","打开知识小镇");b.innerHTML='<span>🏡</span>小镇';
 document.body.appendChild(b);
-var V="2026-10-19u",loading=0;
+var V="2026-10-19v",loading=0;
 function load(src){return new Promise(function(ok,no){var s=document.createElement("script");s.src=src+"?v="+V;s.onload=ok;s.onerror=function(){no(new Error(src))};document.head.appendChild(s)})}
 b.onclick=function(){if(loading)return;
  if(window.KT&&KT.open){KT.open();return}
