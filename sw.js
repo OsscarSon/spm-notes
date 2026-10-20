@@ -1,5 +1,5 @@
 // 改了网站内容后，把版本号 +1 (spm-v6、v7...)，用户就会收到「有新版本」提示
-const CACHE = 'spm-v11';
+const CACHE = 'spm-v13';
 const PRECACHE = ['./', './index.html', './music.js', './data/sej.js', './data/bio.js', './data/kim.js', './data/mat.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -18,7 +18,6 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
-  if (/(^|\.)(spotify\.com|scdn\.co|spotifycdn\.com)$/.test(url.hostname)) return; // Spotify 播放器不缓存
 
   e.respondWith(caches.open(CACHE).then(async cache => {
     const cached = await cache.match(req, { ignoreSearch: true });

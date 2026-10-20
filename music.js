@@ -4,7 +4,7 @@
   "use strict";
   try {
     var KEY = "spm-music";
-    var DEF = { master: 0.8, rain: 0.55, thunder: 0, sea: 0, fire: 0, wind: 0, music: "lofi", mv: 0.55, drops: 1, tab: "mix", sp: "" };
+    var DEF = { master: 0.8, rain: 0.55, thunder: 0, sea: 0, fire: 0, wind: 0, music: "lofi", mv: 0.55, drops: 1 };
     var st = {};
     try { st = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) {}
     Object.keys(DEF).forEach(function (k) { if (st[k] === undefined) st[k] = DEF[k]; });
@@ -203,12 +203,6 @@
       ".mz-row{display:grid;grid-template-columns:62px 1fr 34px;align-items:center;gap:8px;font-size:13.5px}.mz-row output{font-size:12px;color:var(--muted,#5d6b7c);text-align:right}",
       ".mz-row input[type=range]{width:100%;accent-color:var(--accent,#3b6fd8);height:22px;margin:0}",
       ".mz-foot{font-size:12px;color:var(--muted,#5d6b7c);display:flex;justify-content:space-between;gap:8px;align-items:center}",
-      ".mz-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:12px 14px 0;border-radius:12px;background:var(--sheet2,#f1f4fb)}",
-      ".mz-tabs button{border:0;border-radius:9px;padding:7px;font:inherit;font-weight:700;font-size:13.5px;background:none;color:var(--muted,#5d6b7c);cursor:pointer}.mz-tabs button.on{background:var(--sheet,#fff);color:var(--ink,#17263f);box-shadow:0 1px 4px rgba(0,0,0,.15)}",
-      "#mzSp{display:none;padding:12px 14px 16px;gap:12px}#mzPanel.sp #mzSp{display:grid}#mzPanel.sp .mz-body{display:none}",
-      ".mz-in{display:flex;gap:6px}.mz-in input{flex:1;min-width:0;border:1px solid var(--line,#d3dbe8);background:var(--sheet2,#f1f4fb);color:var(--ink,#17263f);border-radius:10px;padding:8px 10px;font:inherit;font-size:14px}",
-      "#mzFrame iframe{width:100%;border:0;border-radius:14px;display:block}#mzFrame:empty{display:none}",
-      ".mz-tip{font-size:12.5px;color:var(--muted,#5d6b7c);line-height:1.6}",
       "@media (prefers-reduced-motion:reduce){.mz-rain,.mz-dog *,.mz-note,.mz-zzz,.mz-fire,#btnMusic.on::after{animation:none!important}}",
       "@media print{#mzPanel,#btnMusic{display:none!important}}"
     ].join("\n");
@@ -229,8 +223,6 @@
 
     var panel = document.createElement("div");
     panel.id = "mzPanel"; panel.className = "no-print"; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-label", "读书音乐");
-    var SPP = [["🌿 Relax", "playlist/17oo9WFxyKDJNYpvuJDEBq"], ["🎧 Lofi Beats", "playlist/37i9dQZF1DWWQRwui0ExPn"], ["🎹 Peaceful Piano", "playlist/37i9dQZF1DX4sWSpwq3LiO"], ["🧠 Deep Focus", "playlist/37i9dQZF1DWZeKCadgRdKQ"], ["📚 Lofi 学习", "playlist/37i9dQZF1DX8Uebhn9wzrS"],
-      ["⛏ Minecraft C418 经典", "playlist/1ZNIetyhnoL6lS5KeFYlrb"], ["⛏ Minecraft Ambient", "playlist/0qYcztUEKLdr4mbD2H7Sda"], ["⛏ Minecraft Sleep", "playlist/5PJyCOBxpD0HbDT7FM6t9L"]];
     var LAY = [["rain", "🌧 雨声"], ["thunder", "⛈ 雷声"], ["sea", "🌊 海浪"], ["fire", "🔥 篝火"], ["wind", "🍃 风声"]];
     var PRE = [
       ["🌧 雨夜书桌", { rain: .55, thunder: 0, sea: 0, fire: 0, wind: 0, music: "lofi" }],
@@ -244,17 +236,13 @@
       '<div class="mz-scene" id="mzScene"><div class="mz-rain"></div><div class="mz-rain b"></div><span class="mz-fire">🔥</span>' +
       '<div class="mz-title">读书音乐<small>戴上耳机，小狗陪你</small></div><button class="mz-x" id="mzX" aria-label="关闭">✕</button>' +
       '<span class="mz-note">♪</span><span class="mz-note">♫</span><span class="mz-note">♪</span><span class="mz-zzz">z Z</span>' + DOG + '</div>' +
-      '<div class="mz-tabs"><button data-t="mix">🎧 内置音乐</button><button data-t="sp">🎵 Spotify</button></div><div class="mz-body">' +
+      '<div class="mz-body">' +
       '<div class="mz-main"><button id="mzPlay" aria-label="播放 / 暂停">▶</button><div class="mz-now"><span id="mzNow">点一下开始</span><small id="mzSub"></small></div></div>' +
       '<div><div class="mz-h">一键场景</div><div class="mz-chips" id="mzPre">' + PRE.map(function (p, i) { return '<button class="mz-chip" data-p="' + i + '">' + p[0] + '</button>'; }).join("") + '</div></div>' +
       '<div><div class="mz-h">音乐</div><div class="mz-chips" id="mzMus"><button class="mz-chip" data-m="lofi">Lo-fi 轻音乐</button><button class="mz-chip" data-m="pixel">像素小镇钢琴</button><button class="mz-chip" data-m="off">关</button></div></div>' +
       '<div><div class="mz-h">混音</div><div style="display:grid;gap:4px" id="mzSl"></div></div>' +
       '<div><div class="mz-h">睡眠定时</div><div class="mz-chips" id="mzSlp"><button class="mz-chip" data-s="0">不定时</button><button class="mz-chip" data-s="15">15 分</button><button class="mz-chip" data-s="30">30 分</button><button class="mz-chip" data-s="60">60 分</button><button class="mz-chip" data-s="90">90 分</button></div></div>' +
-      '<div class="mz-foot"><label><input type="checkbox" id="mzDrops"> 雨滴细节</label><span>想听歌？切到 Spotify</span></div></div>' +
-      '<div id="mzSp"><div><div class="mz-h">粘贴 Spotify 链接（歌单 / 专辑 / 歌曲 / 播客都可以）</div><div class="mz-in"><input id="mzUrl" type="url" inputmode="url" placeholder="https://open.spotify.com/playlist/…" autocomplete="off"><button class="mz-chip on" id="mzGo">载入</button></div></div>' +
-      '<div><div class="mz-h">常用读书歌单</div><div class="mz-chips" id="mzSpPre">' + SPP.map(function (x, i) { return '<button class="mz-chip" data-sp="' + i + '">' + x[0] + '</button>'; }).join("") + '</div></div>' +
-      '<div id="mzFrame"></div>' +
-      '<div class="mz-tip"><b>怎么连接你的 Spotify：</b>想选别的歌：在 Spotify 里找到歌或歌单，点分享 → 复制链接，粘贴到上面的框就能载入。<br>登录：点下面的按钮，在新分页登录 Spotify，回到这里刷新播放器（先点别的歌单再点回来）就会用你的账号播放，Premium 可以完整播放，也能按播放器里的「+」把歌存进你的库。<br><button class="mz-chip" id="mzLogin" type="button" style="margin:6px 0 8px">🔑 登录 Spotify（新分页）</button><br>在「内置音乐」页把音乐关掉、只留雨声，可以一边听 Spotify 一边叠雨声（Spotify 的音量请在播放器里调）。免费账号只能试听片段；要完整播放，需要 Premium，并且在这个浏览器登录 Spotify。收起面板后歌会继续放，要停就在播放器里按暂停。</div></div>';
+      '<div class="mz-foot"><label><input type="checkbox" id="mzDrops"> 雨滴细节</label></div></div>';
     document.body.appendChild(panel);
     var sl = panel.querySelector("#mzSl");
     sl.innerHTML = '<div class="mz-row"><span>🔊 总音量</span><input type="range" min="0" max="100" data-k="master"><output></output></div>' +
@@ -293,31 +281,6 @@
     document.addEventListener("click", function (e) { if (panel.classList.contains("open") && !panel.contains(e.target) && !e.target.closest("#btnMusic")) panel.classList.remove("open"); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") panel.classList.remove("open"); });
     setInterval(function () { if (sleepEnd && panel.classList.contains("open")) ui(); }, 20000);
-
-    function spParse(v) {
-      v = (v || "").trim(); var m = v.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?(playlist|album|track|episode|show|artist)\/([A-Za-z0-9]{10,30})/) || v.match(/^spotify:(playlist|album|track|episode|show|artist):([A-Za-z0-9]{10,30})/);
-      return m ? m[1] + "/" + m[2] : "";
-    }
-    function spLoad(path) {
-      var box = $("#mzFrame"); if (!path) { box.innerHTML = ""; return; }
-      var compact = /^(track|episode)/.test(path);
-      if (box.dataset.p === path && box.firstChild) return;
-      box.dataset.p = path;
-      box.innerHTML = '<iframe src="https://open.spotify.com/embed/' + path + '?utm_source=generator" height="' + (compact ? 152 : 352) + '" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Spotify"></iframe>';
-      st.sp = path; save();
-    }
-    function setTab(t) { st.tab = t === "sp" ? "sp" : "mix"; panel.classList.toggle("sp", st.tab === "sp"); panel.querySelectorAll("[data-t]").forEach(function (b) { b.classList.toggle("on", b.dataset.t === st.tab); }); if (st.tab === "sp" && st.sp) spLoad(st.sp); save(); }
-    panel.addEventListener("click", function (e) {
-      var t = e.target.closest("button"); if (!t) return;
-      if (t.dataset.t) setTab(t.dataset.t);
-      else if (t.dataset.sp !== undefined) { var pa = SPP[+t.dataset.sp][1]; $("#mzUrl").value = "https://open.spotify.com/" + pa; spLoad(pa); }
-      else if (t.id === "mzLogin") { window.open("https://accounts.spotify.com/login", "_blank", "noopener"); }
-      else if (t.id === "mzGo") { var pp = spParse($("#mzUrl").value); if (!pp) { toastMsg("这不是 Spotify 链接，请从 Spotify 的「分享 → 复制链接」粘贴"); return; } spLoad(pp); }
-    });
-    $("#mzUrl").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#mzGo").click(); });
-    $("#mzUrl").addEventListener("paste", function () { setTimeout(function () { var pp = spParse($("#mzUrl").value); if (pp) spLoad(pp); }, 30); });
-    if (st.sp) $("#mzUrl").value = "https://open.spotify.com/" + st.sp;
-    setTab(st.tab);
 
     function mountBtn() {
       if (document.getElementById("btnMusic")) return;
