@@ -229,7 +229,8 @@
 
     var panel = document.createElement("div");
     panel.id = "mzPanel"; panel.className = "no-print"; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-label", "读书音乐");
-    var SPP = [["🎧 Lofi Beats", "playlist/37i9dQZF1DWWQRwui0ExPn"], ["🎹 Peaceful Piano", "playlist/37i9dQZF1DX4sWSpwq3LiO"], ["🧠 Deep Focus", "playlist/37i9dQZF1DWZeKCadgRdKQ"], ["📚 Lofi 学习", "playlist/37i9dQZF1DX8Uebhn9wzrS"]];
+    var SPP = [["🌿 Relax", "playlist/17oo9WFxyKDJNYpvuJDEBq"], ["🎧 Lofi Beats", "playlist/37i9dQZF1DWWQRwui0ExPn"], ["🎹 Peaceful Piano", "playlist/37i9dQZF1DX4sWSpwq3LiO"], ["🧠 Deep Focus", "playlist/37i9dQZF1DWZeKCadgRdKQ"], ["📚 Lofi 学习", "playlist/37i9dQZF1DX8Uebhn9wzrS"],
+      ["⛏ Minecraft C418 经典", "playlist/1ZNIetyhnoL6lS5KeFYlrb"], ["⛏ Minecraft Ambient", "playlist/0qYcztUEKLdr4mbD2H7Sda"], ["⛏ Minecraft Sleep", "playlist/5PJyCOBxpD0HbDT7FM6t9L"]];
     var LAY = [["rain", "🌧 雨声"], ["thunder", "⛈ 雷声"], ["sea", "🌊 海浪"], ["fire", "🔥 篝火"], ["wind", "🍃 风声"]];
     var PRE = [
       ["🌧 雨夜书桌", { rain: .55, thunder: 0, sea: 0, fire: 0, wind: 0, music: "lofi" }],
@@ -253,7 +254,7 @@
       '<div id="mzSp"><div><div class="mz-h">粘贴 Spotify 链接（歌单 / 专辑 / 歌曲 / 播客都可以）</div><div class="mz-in"><input id="mzUrl" type="url" inputmode="url" placeholder="https://open.spotify.com/playlist/…" autocomplete="off"><button class="mz-chip on" id="mzGo">载入</button></div></div>' +
       '<div><div class="mz-h">常用读书歌单</div><div class="mz-chips" id="mzSpPre">' + SPP.map(function (x, i) { return '<button class="mz-chip" data-sp="' + i + '">' + x[0] + '</button>'; }).join("") + '</div></div>' +
       '<div id="mzFrame"></div>' +
-      '<div class="mz-tip">在「内置音乐」页把音乐关掉、只留雨声，可以一边听 Spotify 一边叠雨声（Spotify 的音量请在播放器里调）。免费账号只能试听片段；要完整播放，需要 Premium，并且在这个浏览器登录 Spotify。收起面板后歌会继续放，要停就在播放器里按暂停。</div></div>';
+      '<div class="mz-tip"><b>怎么连接你的 Spotify：</b>想选别的歌：在 Spotify 里找到歌或歌单，点分享 → 复制链接，粘贴到上面的框就能载入。<br>登录：点下面的按钮，在新分页登录 Spotify，回到这里刷新播放器（先点别的歌单再点回来）就会用你的账号播放，Premium 可以完整播放，也能按播放器里的「+」把歌存进你的库。<br><button class="mz-chip" id="mzLogin" type="button" style="margin:6px 0 8px">🔑 登录 Spotify（新分页）</button><br>在「内置音乐」页把音乐关掉、只留雨声，可以一边听 Spotify 一边叠雨声（Spotify 的音量请在播放器里调）。免费账号只能试听片段；要完整播放，需要 Premium，并且在这个浏览器登录 Spotify。收起面板后歌会继续放，要停就在播放器里按暂停。</div></div>';
     document.body.appendChild(panel);
     var sl = panel.querySelector("#mzSl");
     sl.innerHTML = '<div class="mz-row"><span>🔊 总音量</span><input type="range" min="0" max="100" data-k="master"><output></output></div>' +
@@ -310,6 +311,7 @@
       var t = e.target.closest("button"); if (!t) return;
       if (t.dataset.t) setTab(t.dataset.t);
       else if (t.dataset.sp !== undefined) { var pa = SPP[+t.dataset.sp][1]; $("#mzUrl").value = "https://open.spotify.com/" + pa; spLoad(pa); }
+      else if (t.id === "mzLogin") { window.open("https://accounts.spotify.com/login", "_blank", "noopener"); }
       else if (t.id === "mzGo") { var pp = spParse($("#mzUrl").value); if (!pp) { toastMsg("这不是 Spotify 链接，请从 Spotify 的「分享 → 复制链接」粘贴"); return; } spLoad(pp); }
     });
     $("#mzUrl").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#mzGo").click(); });
