@@ -2393,6 +2393,12 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-19b",date:"2026-10-19",title:"读书音乐加入 Spotify 播放器 🎵",
+   items:[
+    "🎵 🎧 面板里多了「Spotify」页：粘贴任何 Spotify 歌单、专辑、歌曲或播客的链接就能直接在网站里播放，也有几个常用的读书歌单（Lofi Beats、Peaceful Piano、Deep Focus 等）一键载入。",
+    "🌧 可以一边听 Spotify，一边在「内置音乐」页叠上雨声（把内置音乐关掉、只留雨声）。",
+    "ℹ️ Spotify 免费账号只能试听片段；要完整播放需要 Premium，并在这个浏览器登录 Spotify。",
+    "📁 更新时把 index.html、sw.js、music.js 一起覆盖上传。"]},
 {v:"2026-10-19a",date:"2026-10-19",title:"新增「读书音乐」🎧（雨声 / Lo-fi / 像素钢琴）",
    items:[
     "🎧 顶部多了一个耳机按钮，点开就是读书音乐面板：雨声、雷雨、海浪、篝火、风声，可以自己混音，也有「雨夜书桌」「雷雨」「海边」等一键场景。",
@@ -3506,6 +3512,6 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   apply();
 })();
 </script>
-<script src="music.js?v=2026-10-19a" defer></script>
+<script src="music.js?v=2026-10-19b" defer></script>
 </body>
 </html>
