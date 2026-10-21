@@ -2394,6 +2394,12 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-21c",date:"2026-10-21",title:"修复刷新后笔记排版变成星号 + 几处说明",
+   items:[
+    "🛠 修复：刷新页面后，AI 笔记偶尔显示成 ** 和 ## 这类符号，现在会自动恢复成正常排版。",
+    "💡 笔记页「批量生成」旁加了提示：建议先配好 Groq 和 OpenRouter 的备用 key；只用 Gemini 也可以，但比较耗额度。",
+    "⚠️ 设置里 Gemini API key 旁加了提醒：请用自己的 Gmail 申请，尽量不要用学校账号。"
+   ]},
 {v:"2026-10-21b",date:"2026-10-21",title:"壁纸新增 Minecraft 系列",
    items:[
     "🖼️ 设置 → 壁纸 多了「Minecraft」一栏，内置 8 张壁纸，电脑用横屏版、手机用竖屏版，可以自动轮播。"
@@ -2490,7 +2496,7 @@ function openUpdates(){
   back.innerHTML=`<div class="upd" role="dialog" aria-label="更新记录"><div class="row"><h2 style="margin:0">🔔 更新记录</h2><span class="spacer"></span><button class="btn small" id="updX">关闭</button></div>
    <p class="fine muted" style="margin:6px 0 0">点一下标题可以展开看详情。</p>
    ${CHANGELOG.slice(0,10).map((e,i)=>`<details class="updit"><summary><span class="chev">▸</span><b>${esc(e.title)}</b>${i<nNew?'<span class="tag warn">新</span>':""}<span class="spacer"></span><span class="fine muted">${esc(e.date)}</span></summary><ul style="margin:8px 0 0 18px;padding:0">${e.items.map(x=>`<li class="fine" style="margin:3px 0">${esc(x)}</li>`).join("")}</ul>${(e.go||[]).length?`<div class="row" style="margin-top:6px;gap:6px;flex-wrap:wrap">${e.go.map((g,gi)=>`<button class="btn small" data-upd-go="${i}:${gi}">去试试：${esc(g.t)}</button>`).join("")}</div>`:""}</details>`).join("")}
-   <p class="fine muted" style="margin-top:16px">AI 的批改和估分只是练习参考，请以老师和课本为准。</p></div>`;
+   <p class="fine muted" style="margin-top:16px">AI 的批改和估分只是练习参考，请以老师和课本为准。</p><p class="fine muted" style="margin:10px 0 0;text-align:right;opacity:.55">Made by Osscarson</p></div>`;
   document.body.appendChild(back);markSeen();bellUpdate();
   const onKey=ev=>{if(ev.key==="Escape")close()},close=()=>{back.remove();document.removeEventListener("keydown",onKey)};
   document.addEventListener("keydown",onKey);
@@ -3134,7 +3140,8 @@ function rSet(){
   <div id="syncStatus" class="fine" style="margin-top:6px">${S.sync.url?(S.sync.ts?"上次同步："+fmtAt(S.sync.ts):"尚未同步"):"未启用"}</div>
   ${S.sync.url?'<div class="row" style="margin-top:6px"><button class="btn small" id="syncNow">立即同步</button><button class="btn small badb" id="syncOff">关闭同步</button></div>':""}</div>
   <h3>备份</h3><p class="fine muted">进度、AI 笔记和错题都只在这个浏览器里。换设备或清缓存前先导出 (导出文件不含 API key，也不含上传的文件)。</p>
-  <div class="row"><button class="btn" id="bkOut">导出 JSON</button><label class="btn">导入 JSON<input type="file" id="bkIn" accept=".json" hidden></label><button class="btn badb" id="bkRs">清空全部进度</button></div>`;
+  <div class="row"><button class="btn" id="bkOut">导出 JSON</button><label class="btn">导入 JSON<input type="file" id="bkIn" accept=".json" hidden></label><button class="btn badb" id="bkRs">清空全部进度</button></div>
+  <p class="fine muted" style="margin:26px 0 4px;text-align:center;opacity:.55;letter-spacing:.04em">SPM 备考本 · Made by Osscarson</p>`;
   $("#sKeyOk").onclick=()=>{S.ai.key=$("#sKey").value.trim();S.ai.model=$("#sMd").value;save();$("#sKeyMsg").innerHTML=S.ai.key?'<span style="color:var(--ok)">已保存 ✓</span>':"已清除 key";toast(S.ai.key?"已保存":"已清除 key")};
   keyTools();
   $("#pvSave").onclick=()=>{S.ai.provider=$("#pvMain").value;S.ai.fallback=$("#pvFb").checked;S.ai.route=$("#pvAuto").checked?"auto":"manual";S.ai.imgModel=$("#sImgM").value.trim()||"gemini-3.1-flash-image-preview";$$("[data-pk]").forEach(i=>{S.ai.alt[i.dataset.pk].key=i.value.trim()});$$("[data-pm]").forEach(i=>{S.ai.alt[i.dataset.pm].model=i.value.trim()||PROVS[i.dataset.pm].model});save();$("#pvMsg").innerHTML='<span style="color:var(--ok)">已保存 ✓</span>';toast("已保存")};
