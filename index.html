@@ -2394,6 +2394,10 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-21b",date:"2026-10-21",title:"壁纸新增 Minecraft 系列",
+   items:[
+    "🖼️ 设置 → 壁纸 多了「Minecraft」一栏，内置 8 张竖屏全屏壁纸，可以自动轮播。"
+   ]},
 {v:"2026-10-21a",date:"2026-10-21",title:"物理科笔记按 SPM 给分格式重做 (中四 6 章 + 中五 7 章)",
    items:[
     "⚛️ 物理 13 章全部按 SPM 给分方式重做，每章从 7–12 页增加到 13–28 页，共 228 页：加了 SPM 物理试卷格式和给分方式、公式表与有效数字、A 部分常考定义、「事实 + 阐述 (F + H)」解释页、实验写法 (推断、假设、变量、步骤、数据表、作图)，以及试卷 2 A、B/C 部分的示例题和得分点。",
@@ -3357,11 +3361,12 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
 <script>
 (function(){
   var DOGS=["wallpapers/dog1.jpg","wallpapers/dog2.jpg","wallpapers/dog3.jpg","wallpapers/dog4.jpg","wallpapers/dog5.jpg"];
+  var MC=[1,2,3,4,5,6,7,8].map(function(n){return "wallpapers/mc"+n+".jpg"});
   var KEY="spm-wp-mode",EVERY=10000,MAX=12;
   var mode="",timer=null,idx=0,front=0,list=null,urls=[];
   var rot=true;try{rot=localStorage.getItem("spm-wp-rot")!=="0"}catch(e){}
   try{mode=localStorage.getItem(KEY)||""}catch(e){}
-  if(mode!=="custom"&&mode!=="dogs")mode="";
+  if(mode!=="custom"&&mode!=="dogs"&&mode!=="minecraft")mode="";
 
   function say(m){try{if(typeof toast==="function")toast(m)}catch(e){}}
   function saveMode(){try{localStorage.setItem(KEY,mode)}catch(e){}}
@@ -3405,7 +3410,7 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   function sliderHTML(){return '<label class="fine" style="display:flex;align-items:center;gap:10px;margin-top:12px">壁纸亮度<input type="range" id="wpBr" min="25" max="100" value="'+br+'" style="flex:1;max-width:260px"><span id="wpBrV" style="min-width:3em">'+br+'%</span></label>'}
   function rotHTML(){return '<label class="chk" style="margin-top:12px"><input type="checkbox" id="wpRot" '+(rot?"checked":"")+'> 每 10 秒自动换一张</label>'}
 
-  function sources(){return mode==="dogs"?DOGS:(mode==="custom"?urls:[])}
+  function sources(){return mode==="dogs"?DOGS:(mode==="minecraft"?MC:(mode==="custom"?urls:[]))}
   function show(url){
     var nxt=front?0:1;
     wis[nxt].style.setProperty("--u",'url("'+new URL(url,location.href).href+'")');
@@ -3425,7 +3430,7 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   }
   function apply(){
     stop();
-    if(mode==="dogs"){idx=0;setOn(true);paint();restart();fillCard();return}
+    if(mode==="dogs"||mode==="minecraft"){idx=0;setOn(true);paint();restart();fillCard();return}
     if(mode==="custom"){
       loadList().then(function(l){
         if(mode!=="custom")return;
@@ -3458,13 +3463,15 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   function card(){return document.getElementById("wpCard")}
   function refreshBtns(){
     var c=card();if(!c)return;
-    c.querySelectorAll("[data-wp=custom],[data-wp=dogs]").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-wp")===mode))});
+    c.querySelectorAll("[data-wp=custom],[data-wp=dogs],[data-wp=minecraft]").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-wp")===mode))});
     fillCard();
   }
   function fillCard(){
     var c=card();if(!c)return;var box=c.querySelector("#wpBody");if(!box)return;
     if(mode==="dogs"){
       box.innerHTML='<div class="wthumbs">'+DOGS.map(function(u){return '<img src="'+u+'" alt="" loading="lazy">'}).join("")+'</div>'+rotHTML()+'<p class="fine muted" style="margin:6px 0 0">一共 5 张。插画 © MALTESE。</p>'+sliderHTML();
+    }else if(mode==="minecraft"){
+      box.innerHTML='<div class="wthumbs">'+MC.map(function(u){return '<img src="'+u+'" alt="" loading="lazy">'}).join("")+'</div>'+rotHTML()+'<p class="fine muted" style="margin:6px 0 0">一共 8 张。Minecraft 宣传图 © Mojang / Microsoft。</p>'+sliderHTML();
     }else if(mode==="custom"){
       var th=urls.map(function(u,i){return '<span class="wt"><img src="'+u+'" alt=""><button type="button" data-wp="rm" data-i="'+i+'" aria-label="删除这张">×</button></span>'}).join("");
       box.innerHTML='<div class="wthumbs">'+th+'</div><div class="controls"><button class="btn small" type="button" data-wp="pick">＋ 添加图片</button><button class="btn small" type="button" data-wp="del">全部删除</button></div>'+(urls.length>1?rotHTML():"")+'<p class="fine muted" style="margin:6px 0 0">可以一次选多张 (最多 '+MAX+' 张)。图片只保存在这台设备的浏览器里，不会上传到任何地方。</p>'+sliderHTML();
@@ -3472,7 +3479,7 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   }
   function build(){
     var c=document.createElement("div");c.className="card";c.id="wpCard";c.style.marginTop="14px";
-    c.innerHTML='<h3 style="margin-top:0">🖼️ 壁纸</h3><p class="fine muted">默认不用壁纸。点一下选用，再点一下取消。</p><div class="seg"><button type="button" data-wp="custom" aria-pressed="'+(mode==="custom")+'">自定义</button><button type="button" data-wp="dogs" aria-pressed="'+(mode==="dogs")+'">线条小狗</button></div><div id="wpBody"></div>';
+    c.innerHTML='<h3 style="margin-top:0">🖼️ 壁纸</h3><p class="fine muted">默认不用壁纸。点一下选用，再点一下取消。</p><div class="seg"><button type="button" data-wp="custom" aria-pressed="'+(mode==="custom")+'">自定义</button><button type="button" data-wp="dogs" aria-pressed="'+(mode==="dogs")+'">线条小狗</button><button type="button" data-wp="minecraft" aria-pressed="'+(mode==="minecraft")+'">Minecraft</button></div><div id="wpBody"></div>';
     c.addEventListener("input",function(e){
       if(e.target.id!=="wpBr")return;
       br=+e.target.value;layer.style.setProperty("--wpb",br/100);
@@ -3502,7 +3509,7 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
         });return;
       }
       if(mode===w){mode="";saveMode();apply();refreshBtns();return}
-      if(w==="dogs"){mode="dogs";saveMode();apply();refreshBtns();return}
+      if(w==="dogs"||w==="minecraft"){mode=w;saveMode();apply();refreshBtns();return}
       loadList().then(function(l){
         if(l.length){mode="custom";saveMode();apply();refreshBtns()}else file.click();
       });
