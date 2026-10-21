@@ -2396,7 +2396,7 @@ ${e.text.trim()||"(见照片)"}
 const CHANGELOG=[
 {v:"2026-10-21b",date:"2026-10-21",title:"壁纸新增 Minecraft 系列",
    items:[
-    "🖼️ 设置 → 壁纸 多了「Minecraft」一栏，内置 8 张竖屏全屏壁纸，可以自动轮播。"
+    "🖼️ 设置 → 壁纸 多了「Minecraft」一栏，内置 8 张壁纸，电脑用横屏版、手机用竖屏版，可以自动轮播。"
    ]},
 {v:"2026-10-21a",date:"2026-10-21",title:"物理科笔记按 SPM 给分格式重做 (中四 6 章 + 中五 7 章)",
    items:[
@@ -3419,8 +3419,13 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   function clearShow(){wis[0].classList.remove("show");wis[1].classList.remove("show")}
   function paint(){
     var src=sources();if(!src.length)return;if(idx>=src.length)idx=0;
-    var u=src[idx],im=new Image();im.onload=function(){if(sources()[idx]===u)show(u)};im.src=u;
+    var u=src[idx],im=new Image(),wide=(mode==="dogs"||mode==="minecraft")&&innerWidth>innerHeight*1.15;
+    var v=wide?u.replace(/\.jpg$/,"-pc.jpg"):u;
+    im.onload=function(){if(sources()[idx]===u)show(v)};
+    im.onerror=function(){if(v!==u&&sources()[idx]===u)show(u)};
+    im.src=v;
   }
+  (function(){var t,w0=innerWidth>innerHeight*1.15;addEventListener("resize",function(){clearTimeout(t);t=setTimeout(function(){var w=innerWidth>innerHeight*1.15;if(w!==w0){w0=w;if(layer.classList.contains("on"))paint()}},250)})})();
   function stop(){if(timer){clearInterval(timer);timer=null}}
   function restart(){
     stop();
