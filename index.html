@@ -1225,7 +1225,7 @@ function md(t){
   const figs=[],mths=[];
   t=String(t==null?"":t).replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$|\\\([\s\S]*?\\\)/g,m=>{mths.push(m);return"MATHPLACE"+(mths.length-1)+"X"}).replace(/```(svg|plot|image|calc)[ \t]*\r?\n([\s\S]*?)```/gi,(m,k,b)=>{figs.push(figHTML(k.toLowerCase(),b));return"\n\nFIGPLACE"+(figs.length-1)+"X\n\n"});
   let h;try{if(window.marked&&window.DOMPurify)h=DOMPurify.sanitize(marked.parse(t,{breaks:true}))}catch(e){}
-  if(h===undefined)h=esc(t).replace(/\n/g,"<br>");
+  if(h===undefined){md.fb=true;h=esc(t).replace(/\n/g,"<br>")}
   h=h.replace(/<p>(\s*(?:华文|中文|华语)[：:])/g,'<p class="zhp">$1');
   return h.replace(/<p>\s*FIGPLACE(\d+)X\s*<\/p>/g,(m,i)=>figs[+i]||"").replace(/FIGPLACE(\d+)X/g,(m,i)=>figs[+i]||"").replace(/MATHPLACE(\d+)X/g,(m,i)=>esc(sanTex(mths[+i]||"")))}
 function sanTex(m){
@@ -1659,7 +1659,7 @@ function rNotes(){
    <input type="text" id="nq" placeholder="搜索所有科目的笔记…" value="${esc(nQ)}" style="max-width:240px"></div>
   ${q?`<p class="muted fine">搜索结果：${cs.length} 条</p>`:`<div class="card" style="margin-bottom:12px"><div class="row"><span class="fine muted">${p.d}/${p.n} 章已复习 · ${gen} 章有 AI 笔记</span><span class="tag blue" title="可在设置里改">AI 语言：${langLabel(sid)}</span><span class="spacer"></span>
    <button class="btn small" data-act="printsubj" data-sub="${sid}" ${gen?"":"disabled"} title="把本科所有 AI 笔记一次打印 / 存成 PDF">🖨 打印本科笔记</button> <button class="btn small pri" id="bulkBtn" ${aiOK()?"":"disabled"}>${bulk.on?"停止批量生成":"✨ 批量生成本科笔记"}</button></div><div class="bar" style="margin:8px 0"><i style="width:${p.p}%;background:${s.color}"></i></div>
-   <div class="fine muted">考试形式：${esc(s.fmt)}</div><div id="bulkMsg" class="fine" style="margin-top:6px"></div></div>`}
+   <div class="fine muted">考试形式：${esc(s.fmt)}</div><div class="fine muted" style="margin-top:6px">💡 批量生成建议先在「设置」配好 Groq 和 OpenRouter 的备用 key 再使用。只用 Gemini 也可以，但一次生成很多章，比较耗额度，容易中途用完。</div><div id="bulkMsg" class="fine" style="margin-top:6px"></div></div>`}
   <div>${cs.map(c=>chapHTML(c,c.sid||sid,!!q)).join("")}</div>
   ${q?"":`<details class="chap" style="margin-top:14px"><summary><span class="t">＋ 添加我自己的笔记 / 章节</span></summary><div class="body"><input type="text" id="ncT" placeholder="标题，例如：T5 Bab 3 要点" style="margin-bottom:8px"><textarea id="ncN" placeholder="内容 (换行会保留)"></textarea><button class="btn pri small" id="ncAdd" style="margin-top:8px">保存到 ${esc(s.name)}</button></div></details>`}`;
   $("#nq").oninput=e=>{nQ=e.target.value.trim();const pos=e.target.selectionStart;rNotes();const i=$("#nq");i.focus();i.setSelectionRange(pos,pos)};
@@ -3117,7 +3117,7 @@ function rSet(){
       <li><b>备用 key (可选)</b>：免费额度有限，用完会提示太频繁。可以再申请 Groq、OpenRouter 的免费 key，填在「备用 AI」那一块。填了之后，程序默认会在每次生成前自动判断用哪一家、哪个模型：看任务类型 (要不要读你上传的文件、轻还是重、是不是计算推理题)、各家和各模型今天的额度、最近有没有被限流，不是等 Gemini 用完才换。Gemini 内部也会按任务轻重在 3.8、3.7、3.6 Flash 和 3.5 Flash Lite 之间挑。要读你上传的 PDF 或图片时一定用 Gemini，备用模型看不到这些文件，只能读内置资料。OpenRouter、Groq 的模型栏可以填多个，用逗号分隔，程序按任务挑。生成的笔记和回答下面会写明是哪个模型做的。</li>
     </ol>
     <p class="fine muted" style="margin:6px 0 0">小提醒：key 只保存在你自己的浏览器里，不要发给别人，也不要截图；Google 免费版的内容可能被用来改进它的产品，所以不要输入个人资料；AI 整理的笔记可能有错，仅供复习，请以课本和老师为准；额度用完等一两分钟或隔天再试。</p></div></details>
-  <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p>
+  <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p><p class="fine" style="color:var(--warn)">⚠️ 请使用自己的 Gmail 账号申请，尽量不要用学校账号 (学校账号可能被管理员限制或停用，key 也会跟着失效)。</p>
     <input type="password" id="sKey" placeholder="粘贴 API key" value="${esc(S.ai.key)}" autocomplete="off">
     <div class="controls" style="margin-top:8px"><label class="grow">模型<select id="sMd">${MODELS.map(m=>`<option ${S.ai.model===m?"selected":""}>${m}</option>`).join("")}${MODELS.includes(S.ai.model)?"":`<option selected>${esc(S.ai.model)}</option>`}</select></label><button class="btn pri" id="sKeyOk">保存</button></div><div id="sKeyMsg" class="fine"></div>${petUI()}</div>
    <div class="card"><h3 style="margin-top:0">笔试开始日</h3><input type="date" id="sEx" value="${S.exam}"><p class="fine muted">默认是 SPM 2026 笔试第一天 (2026-11-23)。考的是别的日期就改这里。</p>
@@ -3214,6 +3214,8 @@ function printSubj(sid){
 load();applyTheme();
 const h0=(location.hash||"").slice(1);if(TABS.some(t=>t[0]===h0))S.tab=h0;else if(!TABS.some(t=>t[0]===S.tab)&&S.tab!=="set")S.tab="today";
 render();
+/* marked / DOMPurify 是 defer 载入的，比这段启动代码晚；刷新时若笔记已先用纯文字画出来，等库载入后补画一次 */
+if(md.fb){const fixMd=()=>{if(md.fb&&window.marked&&window.DOMPurify){md.fb=false;try{bust();render()}catch(e){}}};document.addEventListener("DOMContentLoaded",fixMd);window.addEventListener("load",fixMd);setTimeout(fixMd,1500);setTimeout(fixMd,4000)}
 if(syncOn())setTimeout(()=>syncPull(false),1200);
 window.__spm={S:()=>S,go};
 })();
