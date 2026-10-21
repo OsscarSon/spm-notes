@@ -2168,7 +2168,7 @@ function rFlash(){
    <label>张数<select id="fgN"><option>6</option><option selected>10</option><option>15</option></select></label><button class="btn pri" id="fgGo" ${aiOK()?"":"disabled"}>生成</button></div>
   <details class="chap"><summary><span class="t">＋ 添加自己的闪卡</span></summary><div class="body"><input type="text" id="acQ" placeholder="问题" style="margin-bottom:8px"><textarea id="acA" placeholder="答案"></textarea><button class="btn pri small" id="acAdd" style="margin-top:8px">保存</button></div></details>`;
   const flip=()=>{fShow=!fShow;rFlash()};const f=$("#face");if(f){f.onclick=flip;f.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}}}
-  const nxt=ok=>{const id=c.id;S.box[id]=ok?(S.box[id]||0)+1:0;if(!ok&&!S.wrong.some(w=>w.id===id))S.wrong.push({id,type:"card",s:c.s,q:c.q,a:c.a});
+  const nxt=ok=>{const id=c.id;window.ACH&&ACH.ev("fc",ok);S.box[id]=ok?(S.box[id]||0)+1:0;if(!ok&&!S.wrong.some(w=>w.id===id))S.wrong.push({id,type:"card",s:c.s,q:c.q,a:c.a});
     if(ok)S.wrong=S.wrong.filter(w=>!(w.id===id&&w.type==="card"));save();
     if(ok&&S.box[id]>=3)fq.splice(fi,1);else fi++;if(fi>=fq.length){fi=0;fq=shuffle(fq.filter(x=>(S.box[x.id]||0)<3))}fShow=false;rFlash()};
   if($("#fYes")){$("#fYes").onclick=()=>nxt(true);$("#fNo").onclick=()=>nxt(false)}if($("#fFlip"))$("#fFlip").onclick=flip;
@@ -2394,6 +2394,11 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-22a",date:"2026-10-22",title:"新增「成就」系统 🏆",
+   items:[
+    "🏆 小宠物上面多了一个小奖杯，点开是一张可爱的成就地图：7 个分支、75 个成就，鼠标移上去 (手机点一下) 会显示完成要求和进度。",
+    "🔔 完成成就时，屏幕上方会弹出提示，还有小音效 (可在成就页右上角关掉)。已经完成过的章节和模拟卷，会自动帮你补上成就。"
+   ]},
 {v:"2026-10-21c",date:"2026-10-21",title:"修复刷新后笔记排版变成星号 + 几处说明",
    items:[
     "🛠 修复：刷新页面后，AI 笔记偶尔显示成 ** 和 ## 这类符号，现在会自动恢复成正常排版。",
@@ -2620,7 +2625,7 @@ function renderMcq(q){
    ${q.qz?`<details style="margin:2px 0 6px"><summary class="fine muted" style="cursor:pointer">华文翻译</summary><div class="fine" style="margin-top:4px">${esc(q.qz)}</div></details>`:""}
    ${q.o.map((o,i)=>`<button class="opt ${qz.picked===null?"":i===q.a?"right":i===qz.picked?"wrong":""}" data-o="${i}" ${qz.picked!==null?"disabled":""}><span class="bub">${L[i]}</span><span>${esc(o)}</span></button>`).join("")}
    ${qz.picked!==null?`<div class="tip"><b>${qz.picked===q.a?"答对了":"答错了"}</b>：${esc(q.e||"")}${q.ez?`<div class="fine" style="margin-top:4px">华文：${esc(q.ez)}</div>`:""}</div><button class="btn pri" id="qNext">${qz.i+1>=qz.qs.length?"看结果":"下一题"}</button>`:""}</div>`;
-  $$("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;qz.picked=i;if(i===q.a)qz.score++;else{S.wrong.push({id:"q"+Date.now()+qz.i,type:"quiz",s:qz.sid,q:q.q+"  ("+q.o.map((o,k)=>L[k]+". "+o).join(" / ")+")",a:"正确答案："+L[q.a]+". "+q.o[q.a]+"。"+(q.e||"")+(q.ez?"\n华文："+q.ez:"")});save()}renderMcq(q)});
+  $$("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;qz.picked=i;window.ACH&&ACH.ev("q",i===q.a);if(i===q.a)qz.score++;else{S.wrong.push({id:"q"+Date.now()+qz.i,type:"quiz",s:qz.sid,q:q.q+"  ("+q.o.map((o,k)=>L[k]+". "+o).join(" / ")+")",a:"正确答案："+L[q.a]+". "+q.o[q.a]+"。"+(q.e||"")+(q.ez?"\n华文："+q.ez:"")});save()}renderMcq(q)});
   if($("#qNext"))$("#qNext").onclick=nextQ}
 function renderOpen(q){
   const box=$("#dBody"),r=qz.res;
@@ -2644,6 +2649,7 @@ function renderOpen(q){
     catch(e){setBusy($("#oSub"),false);$("#oMsg").innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}}
 function finishOpen(q,r,skipped,ans){
   qz.res=r;qz.osc+=r.score;qz.omax+=q.m;
+  window.ACH&&ACH.ev("q",r.score>=q.m*.6);
   if(r.score<q.m*.6){S.wrong.push({id:"d"+Date.now()+qz.i,type:"drill",s:qz.sid,q:q.q,a:`得分 ${r.score}/${q.m}\n评分要点：${q.scheme}${q.cz?"\n华文："+q.cz:""}\n我的作答：${skipped?"(跳过)":(ans||"(照片)")}\n评语：${r.comment}`});}
   save();renderOpen(q)}
 function rWrong(){
@@ -3224,7 +3230,7 @@ render();
 /* marked / DOMPurify 是 defer 载入的，比这段启动代码晚；刷新时若笔记已先用纯文字画出来，等库载入后补画一次 */
 if(md.fb){const fixMd=()=>{if(md.fb&&window.marked&&window.DOMPurify){md.fb=false;try{bust();render()}catch(e){}}};document.addEventListener("DOMContentLoaded",fixMd);window.addEventListener("load",fixMd);setTimeout(fixMd,1500);setTimeout(fixMd,4000)}
 if(syncOn())setTimeout(()=>syncPull(false),1200);
-window.__spm={S:()=>S,go};
+window.__spm={S:()=>S,go,getSave:()=>save,setSave:f=>{save=f},toast,prog,mySubjects,ymd,pd,dd,exam:()=>S.exam};
 })();
 
 </script>
@@ -3543,6 +3549,360 @@ body.wp-on .sheet{background-color:color-mix(in srgb,var(--paper) 80%,transparen
   apply();
 })();
 </script>
+<style id="ach-style">
+#achBtn{position:fixed;z-index:31;right:30px;bottom:96px;width:40px;height:40px;padding:0;border:0;border-radius:50%;cursor:pointer;background:var(--sheet,#fff);box-shadow:0 0 0 1px var(--line,#d3dbe8),0 8px 18px -8px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent;transition:transform .15s}
+#achBtn:hover{transform:translateY(-2px) scale(1.06)}
+#achBtn:active{transform:scale(.94)}
+#achBtn:focus-visible{outline:2px dashed var(--accent,#17263f);outline-offset:2px}
+#achBtn svg{width:30px;height:30px;display:block;margin:5px}
+#achBtn .sp{transform-origin:center;animation:achTw 2.4s ease-in-out infinite}
+#achBtn .sp2{animation-delay:1.2s}
+#achBtn.bump{animation:achBump .7s ease-out}
+#achBtn .bd{position:absolute;right:-3px;top:-3px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ff5d73;color:#fff;font:700 11px/17px var(--sans,sans-serif);text-align:center;box-shadow:0 0 0 2px var(--sheet,#fff)}
+#achBtn .bd[hidden]{display:none}
+@keyframes achTw{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.1);opacity:1}}
+@keyframes achBump{0%{transform:scale(1)}25%{transform:scale(1.25) rotate(-8deg)}50%{transform:scale(.95) rotate(6deg)}100%{transform:scale(1)}}
+#achBtn[hidden]{display:none!important}
+@media (max-width:640px){#achBtn{width:36px;height:36px}#achBtn svg{width:26px;height:26px;margin:5px}}
+/* 弹窗 */
+#achToasts{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:95;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:max-content;max-width:94vw}
+.achT{pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:12px;min-width:260px;max-width:94vw;padding:10px 20px 10px 10px;border-radius:22px;color:#4a3f6b;font-family:var(--sans,system-ui,sans-serif);
+  background:linear-gradient(135deg,#fffaf0,#fff0f8 60%,#f0f0ff);box-shadow:0 0 0 3px #fff,0 0 0 5px #ffc2dc,0 14px 30px -8px rgba(120,80,170,.5);transform:translateY(-140%) scale(.9);opacity:0;transition:transform .5s cubic-bezier(.2,1.1,.3,1.25),opacity .3s}
+.achT.on{transform:none;opacity:1}
+.achT-ic{flex:none;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:27px;background:linear-gradient(145deg,#ffe58a,#ffb86b);box-shadow:inset 0 0 0 3px #fff,0 3px 0 #f0a23a;animation:achWob 1.4s ease-in-out .5s 2}
+.achT.c{background:linear-gradient(135deg,#fff2fb,#efe8ff 60%,#e6f0ff);box-shadow:0 0 0 3px #fff,0 0 0 5px #c9a8ff,0 14px 34px -8px rgba(130,80,200,.6)}
+.achT.c .achT-ic{background:linear-gradient(145deg,#ffa8e0,#a98bff);box-shadow:inset 0 0 0 3px #fff,0 3px 0 #8d6be0}
+.achT-h{font-weight:800;font-size:12.5px;letter-spacing:.4px;color:#ee7aa8}
+.achT.c .achT-h{color:#8d63e8}
+.achT-n{font-weight:800;font-size:16px;margin-top:1px;color:#4a3f6b}
+.achT-s{font-size:11.5px;color:#9a90b8;margin-top:1px}
+@keyframes achWob{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg) scale(1.1)}75%{transform:rotate(10deg) scale(1.1)}}
+/* 面板 */
+#achPanel{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:rgba(60,40,100,.42);padding:12px;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+#achPanel.on{display:flex}
+.achW{width:min(1000px,100%);height:min(690px,calc(100vh - 24px));height:min(690px,calc(100dvh - 24px));display:flex;flex-direction:column;color:#4a3f6b;font-family:var(--sans,system-ui,sans-serif);position:relative;overflow:hidden;
+  background:radial-gradient(circle at 12% 0,#ffe6f1 0,transparent 42%),radial-gradient(circle at 100% 10%,#e4ecff 0,transparent 45%),radial-gradient(circle at 70% 100%,#dcf8ee 0,transparent 45%),#fffaff;
+  border-radius:28px;box-shadow:0 0 0 4px #fff,0 0 0 7px #ffc9e0,0 30px 70px -20px rgba(90,50,150,.55);padding:14px 16px 16px}
+.achH{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 4px 10px}
+.achH h2{margin:0;font-size:20px;color:#6a4fb8;letter-spacing:.5px;font-weight:800}
+.achH h2::before{content:"🏆 "}
+.achH h2 small{font-weight:600;font-size:12px;color:#b3a6d6;margin-left:6px;letter-spacing:.3px}
+.achCnt{margin-left:auto;font-size:13px;font-weight:700;color:#7d6ab0;display:flex;align-items:center;gap:8px}
+.achBar{width:130px;height:14px;border-radius:9px;background:#efe9fb;box-shadow:inset 0 2px 3px rgba(120,90,180,.2);overflow:hidden}
+.achBar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#ff9ec7,#ffcf6b);box-shadow:inset 0 -3px 0 rgba(255,255,255,.35);transition:width .5s}
+.achIc{width:34px;height:34px;padding:0;border:0;border-radius:50%;cursor:pointer;background:#fff;color:#8b78c4;font:700 15px/34px var(--sans,sans-serif);text-align:center;box-shadow:0 0 0 2px #eadcff,0 3px 0 #dccdf7;transition:transform .15s}
+.achIc:hover{transform:translateY(-1px) scale(1.07);background:#fff4fa}
+.achIc:active{transform:scale(.94)}
+.achTabs{display:flex;gap:7px;overflow-x:auto;padding:4px 4px 8px;position:relative;z-index:1;scrollbar-width:none}
+.achTabs::-webkit-scrollbar{display:none}
+.achTab{flex:none;display:flex;align-items:center;gap:6px;padding:8px 14px;border:0;border-radius:99px;cursor:pointer;background:rgba(255,255,255,.7);color:#8272b0;font:700 13px/1 var(--sans,sans-serif);
+  box-shadow:0 0 0 2px #eee6fb;white-space:nowrap;transition:transform .15s,background .15s}
+.achTab:hover{transform:translateY(-1px);background:#fff}
+.achTab .n{font-size:11px;font-weight:600;color:#b3a6d6}
+.achTab[aria-selected=true]{background:linear-gradient(135deg,#ff9ec7,#ffb57a);color:#fff;box-shadow:0 0 0 2px #fff,0 4px 0 #f08aa8,0 8px 14px -6px rgba(240,100,150,.6)}
+.achTab[aria-selected=true] .n{color:#fff6}
+.achTab:focus-visible{outline:2px dashed #8d63e8;outline-offset:2px}
+.achView{flex:1;min-height:0;position:relative;border-radius:22px;box-shadow:0 0 0 3px #fff,0 0 0 5px #f0e6ff,inset 0 0 22px rgba(150,120,210,.18);overflow:hidden;background:linear-gradient(160deg,var(--t1,#d9f5dc),var(--t2,#bff0d4))}
+.achScroll{position:absolute;inset:0;overflow:auto;cursor:grab;scrollbar-width:thin;scrollbar-color:#cdbdf0 transparent;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cg fill='%23ffffff' opacity='.65'%3E%3Cpath d='M30 24l3 7 7 3-7 3-3 7-3-7-7-3 7-3z'/%3E%3Cpath d='M140 96l2.4 5.6 5.6 2.4-5.6 2.4-2.4 5.6-2.4-5.6-5.6-2.4 5.6-2.4z'/%3E%3Ccircle cx='96' cy='30' r='4'/%3E%3Ccircle cx='20' cy='120' r='3'/%3E%3Ccircle cx='150' cy='20' r='2.5'/%3E%3Ccircle cx='80' cy='150' r='3.5'/%3E%3C/g%3E%3Cg fill='%23ffffff' opacity='.5'%3E%3Cpath d='M118 60c-5-9-18-1-9 8l9 9 9-9c9-9-4-17-9-8z' transform='translate(-10 70) scale(.8)'/%3E%3Cpath d='M50 80c6 0 8-9 16-9s9 7 14 7 8 5 0 5H44c-8 0-6-3 6-3z' transform='translate(0 -4)'/%3E%3C/g%3E%3C/svg%3E");background-size:180px 180px;animation:achDrift 90s linear infinite}
+@keyframes achDrift{to{background-position:360px 180px}}
+.achScroll.drag{cursor:grabbing}
+.achTree{position:relative}
+.achTree svg{position:absolute;left:0;top:0;pointer-events:none}
+.achN{position:absolute;width:58px;height:58px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;transition:transform .18s cubic-bezier(.3,1.4,.5,1)}
+.achN:hover,.achN:focus-visible{transform:translateY(-3px) scale(1.1);z-index:3}
+.achN .f,.achN .in{position:absolute}
+.achN .f{inset:0;background:linear-gradient(145deg,#ffffff,#ece6fb);box-shadow:inset 0 0 0 3px #d9d0f2,0 4px 0 #c9bdea,0 8px 12px -4px rgba(110,80,170,.28);z-index:0}
+.achN .in{inset:7px;background:#f7f4ff;z-index:1;box-shadow:inset 0 2px 4px rgba(120,90,180,.12)}
+.achN.t .f{border-radius:19px}.achN.t .in{border-radius:13px}
+.achN.g .f,.achN.g .in{border-radius:50%}
+.achN.c .f{border-radius:50%;box-shadow:inset 0 0 0 3px #d9d0f2,0 0 0 4px rgba(190,160,255,.5),0 4px 0 #c9bdea,0 8px 12px -4px rgba(110,80,170,.28)}
+.achN.c .in{border-radius:50%}
+.achN .i{position:relative;z-index:2;font-size:27px;line-height:1;filter:grayscale(1);opacity:.5}
+.achN.on .f{background:linear-gradient(145deg,#ffe58a,#ffb86b);box-shadow:inset 0 0 0 3px #fff,0 4px 0 #f0a23a,0 0 22px rgba(255,190,70,.75)}
+.achN.on .in{background:linear-gradient(145deg,#fffbe8,#ffeab8)}
+.achN.c.on .f{background:linear-gradient(145deg,#ffa8e0,#a98bff);box-shadow:inset 0 0 0 3px #fff,0 0 0 4px rgba(190,150,255,.55),0 4px 0 #8d6be0,0 0 24px rgba(180,130,255,.75)}
+.achN.c.on .in{background:linear-gradient(145deg,#fff5fc,#efe6ff)}
+.achN.on .i{filter:none;opacity:1;filter:drop-shadow(0 2px 2px rgba(120,80,20,.25))}
+.achN.c::after,.achN.on.g::after{position:absolute;right:-5px;top:-5px;z-index:4;font-size:15px;line-height:1;pointer-events:none}
+.achN.c::after{content:"👑";filter:grayscale(1);opacity:.45}
+.achN.c.on::after{filter:none;opacity:1}
+.achN.on.g::after{content:"✨"}
+.achN:focus-visible{outline:2px dashed #8d63e8;outline-offset:4px;border-radius:50%}
+.achN.pop{animation:achPop .7s ease-out}
+@keyframes achPop{0%{transform:scale(.4)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+#achTip{position:fixed;z-index:100;max-width:min(300px,86vw);padding:10px 14px 11px;border-radius:16px;background:#fffdfb;color:#4a3f6b;font:13px/1.5 var(--sans,system-ui,sans-serif);pointer-events:none;
+  box-shadow:0 0 0 2px #ffc9e0,0 12px 26px -8px rgba(100,60,160,.5);opacity:0;transition:opacity .12s;display:none}
+#achTip.on{opacity:1;display:block}
+#achTip .tt{font-weight:800;font-size:14.5px;color:#7d6ab0}
+#achTip .tt small{font-weight:600;color:#b3a6d6;margin-left:6px;font-size:11.5px}
+#achTip .tt.u{color:#e0803a}#achTip .tt.c.u{color:#9a63ea}
+#achTip .rq{color:#9a90b8;margin-top:4px;font-size:12.5px}
+#achTip .pg{margin-top:6px;color:#ee7aa8;font-size:12.5px;font-weight:700}
+#achTip .st{margin-top:6px;font-size:11.5px;color:#b3a6d6}
+#achTip .st.u{color:#4fb98a;font-weight:700}
+.achHint{position:absolute;left:14px;bottom:10px;z-index:2;font:600 11.5px var(--sans,sans-serif);color:rgba(100,80,150,.55);pointer-events:none;background:rgba(255,255,255,.6);padding:3px 10px;border-radius:99px}
+@media (max-width:640px){.achBar{width:80px}.achH h2 small{display:none}.achW{padding:12px 10px 12px;border-radius:22px}.achH h2{font-size:18px}}
+@media (prefers-reduced-motion:reduce){.achT{transition:opacity .2s;transform:none}#achBtn .sp,#achBtn.bump,.achN.pop,.achScroll,.achT-ic{animation:none}}
+@media print{#achBtn,#achPanel,#achToasts,#achTip{display:none!important}}
+</style>
+
+<button id="achBtn" type="button" class="no-print" hidden aria-label="成就" title="成就">
+  <svg viewBox="0 0 40 40" aria-hidden="true">
+    <path d="M9 9 C2 9 2 21 11 22" fill="none" stroke="#e8a317" stroke-width="3" stroke-linecap="round"/>
+    <path d="M31 9 C38 9 38 21 29 22" fill="none" stroke="#e8a317" stroke-width="3" stroke-linecap="round"/>
+    <path d="M9 7 H31 V17 C31 25 26 28 20 28 C14 28 9 25 9 17 Z" fill="#ffd34d" stroke="#e8a317" stroke-width="1.6" stroke-linejoin="round"/>
+    <rect x="17.5" y="28" width="5" height="5" fill="#f2b92b"/><rect x="12" y="33" width="16" height="4.5" rx="2" fill="#f2b92b" stroke="#e8a317" stroke-width="1.2"/>
+    <circle cx="15.5" cy="16" r="1.7" fill="#5a3a12"/><circle cx="24.5" cy="16" r="1.7" fill="#5a3a12"/>
+    <path d="M17.5 20 q2.5 2.6 5 0" fill="none" stroke="#5a3a12" stroke-width="1.5" stroke-linecap="round"/>
+    <ellipse cx="12.6" cy="19" rx="2.2" ry="1.4" fill="#ff9aa8" opacity=".85"/><ellipse cx="27.4" cy="19" rx="2.2" ry="1.4" fill="#ff9aa8" opacity=".85"/>
+    <path class="sp" d="M33 2 l1.2 2.8 l2.8 1.2 l-2.8 1.2 l-1.2 2.8 l-1.2 -2.8 l-2.8 -1.2 l2.8 -1.2z" fill="#fff6b0" stroke="#f2b92b" stroke-width=".6"/>
+    <path class="sp sp2" d="M6 1.5 l.9 2 l2 .9 l-2 .9 l-.9 2 l-.9 -2 l-2 -.9 l2 -.9z" fill="#fff6b0" stroke="#f2b92b" stroke-width=".5"/>
+  </svg>
+  <span class="bd" id="achBd" hidden></span>
+</button>
+<div id="achToasts" class="no-print" aria-live="polite"></div>
+<div id="achTip" role="tooltip"></div>
+<div id="achPanel" class="no-print" role="dialog" aria-modal="true" aria-label="成就">
+  <div class="achW">
+    <div class="achH"><h2>成就 <small>Achievements</small></h2>
+      <div class="achCnt"><span id="achCnt"></span><div class="achBar"><i id="achBarI" style="width:0"></i></div>
+        <button class="achIc" id="achSnd" type="button" title="音效开关" aria-label="音效开关">🔊</button>
+        <button class="achIc" id="achX" type="button" title="关闭" aria-label="关闭">✕</button></div></div>
+    <div class="achTabs" id="achTabs" role="tablist"></div>
+    <div class="achView"><div class="achScroll" id="achScroll"><div class="achTree" id="achTree"></div></div>
+      <div class="achHint">鼠标移到图标上（手机点一下）可以看完成要求 ✨ 可以拖动地图</div></div>
+  </div>
+</div>
+
+<script>
+/* 成就系统：自成一体，数据存在 B.S().ach / B.S().achv / B.S().days（跟着备份和同步走）。 */
+(function(){
+try{
+var B=window.__spm;if(!B||!B.setSave)throw new Error("no bridge");
+var ymd=B.ymd,pd=B.pd,dd=B.dd,prog=B.prog,mySubjects=B.mySubjects,toast=B.toast;
+var TABS=[
+ ["learn","冒险之路","🌱","#d9f5dc","#bff0d4"],["streak","坚持不懈","🔥","#ffe6cc","#ffd3d3"],["drill","战斗","⚔️","#e0e4ff","#cdd5ff"],
+ ["exam","下界","🏰","#ffd9e2","#ffc7d6"],["cards","农场","🌾","#f3fbd2","#d7f5c4"],["time","终界","🐉","#e6dcff","#d2c4ff"],["misc","彩蛋","🎁","#d3f3fb","#c4e8ff"]];
+/* [id,tab,x,y,parent,icon,frame,EN,中文,完成要求,统计键,门槛] */
+var N=[
+["L1","learn",0,1,"","🪨","t","Stone Age","石器时代","复习完 1 章笔记（在笔记里勾「已复习」）","ch",1],
+["L2","learn",1,1,"L1","⛏️","t","Getting an Upgrade","获得升级","累计复习完 5 章","ch",5],
+["L3","learn",2,1,"L2","🛡️","g","Acquire Hardware","获得硬件","累计复习完 10 章","ch",10],
+["L4","learn",3,1,"L3","🪓","t","Isn't It Iron Pick","这不是铁镐吗","累计复习完 20 章","ch",20],
+["L5","learn",4,1,"L4","💎","g","Diamonds!","钻石！","累计复习完 35 章","ch",35],
+["L6","learn",5,1,"L5","💠","c","Cover Me with Diamonds","钻石护体","累计复习完 60 章","ch",60],
+["L7","learn",6,1,"L6","🌟","c","Overpowered","超模","累计复习完 100 章","ch",100],
+["L8","learn",2,0,"L3","🏘️","g","Hero of the Village","村庄英雄","有一整科的核心章节全部复习完","sd",1],
+["L9","learn",3,0,"L8","🗺️","g","Adventuring Time","冒险时光","有两整科的核心章节全部复习完","sd",2],
+["L10","learn",4,0,"L9","🔆","c","Full Power!","满功率！","你选的所有科目都复习完（在设置里选科目）","sd",function(){return Math.max(1,my().length)}],
+["L11","learn",2,2,"L3","💨","t","Sprint Mining","疾速挖矿","同一天复习完 3 章","dcb",3],
+["L12","learn",3,2,"L11","⚡","g","Haste","急迫","同一天复习完 6 章","dcb",6],
+
+["S1","streak",0,1,"","🎒","t","Taking Inventory","整理背包","有学习的第 1 天（复习章节、做闪卡、刷题或模拟卷都算）","days",1],
+["S2","streak",1,1,"S1","🛏️","t","Sweet Dreams","甜美的梦","连续 3 天都有学习","streak",3],
+["S3","streak",2,1,"S2","🏡","g","Home Sweet Home","家，甜蜜的家","连续 7 天都有学习","streak",7],
+["S4","streak",3,1,"S3","🌋","g","Hot Stuff","火热","连续 14 天都有学习","streak",14],
+["S5","streak",4,1,"S4","🌈","g","Rainbow Collection","彩虹收藏家","连续 21 天都有学习","streak",21],
+["S6","streak",5,1,"S5","🏆","c","Serious Dedication","严肃的奉献","连续 30 天都有学习","streak",30],
+["S7","streak",2,0,"S2","📦","t","Stocking Up","囤货","累计有 10 天学习（不用连续）","days",10],
+["S8","streak",3,0,"S7","🧺","g","Fully Stocked","满仓","累计有 20 天学习（不用连续）","days",20],
+
+["D1","drill",0,1,"","🗡️","t","Monster Hunter","怪物猎人","刷题答对 1 题","qc",1],
+["D2","drill",1,1,"D1","🏹","t","Take Aim","瞄准","刷题累计答对 25 题","qc",25],
+["D3","drill",2,1,"D2","🎯","g","Sniper Duel","狙击对决","刷题累计答对 100 题","qc",100],
+["D4","drill",3,1,"D3","🎖️","g","Arbalistic","弩手","刷题累计答对 250 题","qc",250],
+["D5","drill",4,1,"D4","👑","c","Over-Overkill","超越强杀","刷题累计答对 500 题","qc",500],
+["D6","drill",1,0,"D1","💥","t","Overkill","强杀","刷题连续答对 5 题","cb",5],
+["D7","drill",2,0,"D6","⭐","g","Oh Shiny","哦，闪亮","刷题连续答对 10 题","cb",10],
+["D8","drill",3,0,"D7","🌠","c","Unstoppable","势不可挡","刷题连续答对 20 题","cb",20],
+["D9","drill",1,2,"D1","🧟","t","Zombie Doctor","僵尸医生","刷题累计作答 50 题（对错都算）","qa",50],
+["D10","drill",2,2,"D9","☠️","g","Fishy Business","可疑的买卖","刷题累计作答 150 题（对错都算）","qa",150],
+
+["E1","exam",0,1,"","🚪","t","We Need to Go Deeper","我们需要更深","完成并交出第 1 套模拟卷","ex",1],
+["E2","exam",1,1,"E1","📨","t","Return to Sender","原路退回","模拟卷拿到 60% 以上","exb",60],
+["E3","exam",2,1,"E2","🌡️","t","Hot Tourist Destinations","炙热的旅游胜地","模拟卷拿到 70% 以上","exb",70],
+["E4","exam",3,1,"E3","🛡️","g","Hero of the Village","村庄的英雄","模拟卷拿到 80% 以上","exb",80],
+["E5","exam",4,1,"E4","🔆","c","Beaconator","信标大师","模拟卷拿到 90% 以上","exb",90],
+["E6","exam",5,1,"E5","💎","c","Diamonds to You!","送你钻石！","模拟卷拿到 100%（满分）","exb",100],
+["E7","exam",1,0,"E1","🫧","t","Subspace Bubble","子空间气泡","累计完成 3 套模拟卷","ex",3],
+["E8","exam",2,0,"E7","🤝","g","Uneasy Alliance","不稳定的同盟","累计完成 5 套模拟卷","ex",5],
+["E9","exam",3,0,"E8","🐲","c","Free the End","解放末地","累计完成 10 套模拟卷","ex",10],
+["E10","exam",1,2,"E1","🐦","t","Two Birds, One Arrow","一箭双雕","至少 2 个不同科目做过模拟卷","exs",2],
+["E11","exam",2,2,"E10","🦴","g","Monsters Hunted","怪物猎手","至少 4 个不同科目做过模拟卷","exs",4],
+["E12","exam",3,2,"E11","🪄","g","Level Up!","升级！","同一科目的模拟卷，比上一次高 10 分（百分点）以上","exi",1],
+
+["F1","cards",0,1,"","🌰","t","A Seedy Place","种子之地","翻看并作答 1 张闪卡","fa",1],
+["F2","cards",1,1,"F1","🐝","t","Bee Our Guest","蜜蜂做客","累计作答 20 张闪卡","fa",20],
+["F3","cards",2,1,"F2","🚜","t","Husbandry","农牧","累计作答 50 张闪卡","fa",50],
+["F4","cards",3,1,"F3","🦜","g","The Parrots and the Bats","鹦鹉与蝙蝠","累计作答 150 张闪卡","fa",150],
+["F5","cards",4,1,"F4","🐱","c","A Complete Catalogue","完整的图鉴","累计作答 400 张闪卡","fa",400],
+["F6","cards",2,0,"F2","🍎","t","A Balanced Diet","均衡饮食","10 张闪卡「已掌握」（连续答对 3 次）","fm",10],
+["F7","cards",3,0,"F6","🐑","g","Two by Two","成双成对","50 张闪卡「已掌握」","fm",50],
+["F8","cards",4,0,"F7","🪏","c","Serious Farmer","勤劳的农夫","150 张闪卡「已掌握」","fm",150],
+["F9","cards",1,2,"F1","🎣","t","Tactical Fishing","战术钓鱼","闪卡连续答对 10 张","fb",10],
+["F10","cards",2,2,"F9","🎯","g","Bullseye","正中靶心","闪卡连续答对 25 张","fb",25],
+
+["T1","time",0,1,"","🐣","t","Early Bird","早起的鸟儿","在距离笔试还有 30 天以上时，有一天学习","f.far",1],
+["T2","time",1,0,"T1","🌅","t","Rise and Shine","起床啦","早上 7 点前开始学习","f.early",1],
+["T3","time",1,2,"T1","🦇","t","Phantom!","幻翼！","晚上 11 点后还在学习（该睡觉啦）","f.night",1],
+["T4","time",1,1,"T1","⚔️","t","Last Stand","最后一战","距离笔试 30 天内，有一天学习","f.n30",1],
+["T5","time",2,1,"T4","🧨","g","Ticking Clock","滴答作响","距离笔试 14 天内，有一天学习","f.n14",1],
+["T6","time",3,1,"T5","🐉","g","Spawning the Dragon","唤醒末影龙","距离笔试 7 天内，有一天学习","f.n7",1],
+["T7","time",4,1,"T6","🏁","c","The End","终结","笔试第一天当天，打开这个本子学习","f.d0",1],
+["T8","time",2,0,"T4","🏖️","g","Weekend Mining","周末挖矿","同一个周末，星期六和星期日都有学习","wk",1],
+["T9","time",2,2,"T4","🧑‍🌾","g","Master Trader","交易大师","同一天内：复习章节 + 做闪卡 + 刷题，三样都做","f.all3",1],
+
+["M1","misc",0,1,"","👋","t","Hello!","初次见面","第一次打开成就页","f.op",1],
+["M2","misc",1,0,"M1","🧱","t","Crafting a New World","建造新世界","在设置 → 壁纸里，开启「方块世界」那一套内置壁纸","f.wm",1],
+["M3","misc",1,1,"M1","🐶","t","Best Friends Forever","永远的好朋友","在设置里开启「线条小狗」壁纸","f.wd",1],
+["M4","misc",1,2,"M1","🖼️","t","Interior Decorator","室内设计师","在设置里使用自己的壁纸（自定义）","f.wc2",1],
+["M5","misc",2,1,"M3","🦴","t","Tame It","驯服","摸小宠物 20 次","pt",20],
+["M6","misc",3,1,"M5","🐺","g","Whole Pack","整个狼群","摸小宠物 100 次","pt",100],
+["M7","misc",2,0,"M2","🔮","t","Enchanter","附魔师","在设置里填好 AI 密钥","aik",1],
+["M8","misc",3,0,"M7","📖","g","Enchanted","附魔完成","用「问答」和 AI 聊过一次","chat",1],
+["M9","misc",4,0,"M8","📚","g","Librarian","图书管理员","生成过 1 份 AI 笔记","ainote",1],
+["M10","misc",2,2,"M4","🛠️","t","Crafting Table","工作台","自己添加 1 张闪卡","own",1],
+["M11","misc",3,2,"M10","📦","t","Ender Chest","末影箱","导出一次备份","f.bk",1],
+["M12","misc",4,2,"M11","📡","g","Beacon","信标","设置好云端同步","sync",1],
+["M13","misc",2,3,"M10","🧹","t","Clean Sweep","大扫除","把错题本清空（有错题 → 全部清掉）","f.wcl",1],
+["M14","misc",4,1,"M6","🏅","c","Achievement Hunter","成就猎人","解锁其余全部成就","all",function(){return N.length-1}]
+];
+var BY={};N.forEach(function(n){BY[n[0]]=n});
+function my(){try{return mySubjects()}catch(e){return []}}
+function A(){if(!B.S().ach||typeof B.S().ach!=="object")B.S().ach={};if(!B.S().achv||typeof B.S().achv!=="object")B.S().achv={};var a=B.S().achv;
+ ["qa","qc","qcur","cb","fa","fcc","fb","pt","dcb"].forEach(function(k){if(typeof a[k]!=="number")a[k]=0});
+ if(!a.f)a.f={};if(!Array.isArray(B.S().days))B.S().days=[];return a}
+var _save=B.getSave();
+function saveRaw(){try{_save()}catch(e){}}
+function tdy(){return ymd(new Date())}
+function streaks(){var d=B.S().days.slice().sort(),best=0,run=0,prev=null;
+ d.forEach(function(x){if(prev&&dd(prev,x)===1)run++;else run=1;if(run>best)best=run;prev=x});return best}
+function weekend(){var s={};B.S().days.forEach(function(x){s[x]=1});for(var i=0;i<B.S().days.length;i++){var d=pd(B.S().days[i]);if(d.getDay()===6){var n=ymd(new Date(d.getTime()+864e5));if(s[n])return 1}}return 0}
+function stats(){var a=A(),st={},f=a.f;
+ st.ch=Object.keys(B.S().done||{}).filter(function(k){return B.S().done[k]}).length;
+ st.sd=0;my().forEach(function(s){try{var p=prog(s.id);if(p.n>0&&p.d>=p.n)st.sd++}catch(e){}});
+ st.dcb=a.dcb;st.days=B.S().days.length;st.streak=streaks();st.qc=a.qc;st.qa=a.qa;st.cb=a.cb;st.fa=a.fa;st.fb=a.fb;
+ st.fm=Object.keys(B.S().box||{}).filter(function(k){return B.S().box[k]>=3}).length;
+ var ex=B.S().exams||[];st.ex=ex.length;st.exb=ex.reduce(function(m,e){return Math.max(m,e.pct||0)},0);
+ var ss={},by={};ex.forEach(function(e){ss[e.sid]=1;(by[e.sid]=by[e.sid]||[]).push(e)});st.exs=Object.keys(ss).length;
+ st.exi=0;Object.keys(by).forEach(function(k){var l=by[k].sort(function(x,y){return(x.at||0)-(y.at||0)});for(var i=1;i<l.length;i++)if((l[i].pct||0)>=(l[i-1].pct||0)+10)st.exi=1});
+ st.wk=weekend();st.pt=a.pt;st.own=(B.S().cards||[]).length;
+ st.aik=(B.S().ai&&B.S().ai.key)?1:0;st.chat=(B.S().chat&&JSON.stringify(B.S().chat).length>30)?1:0;st.ainote=Object.keys(B.S().notes||{}).length;
+ st.sync=(B.S().sync&&B.S().sync.url)?1:0;
+ st.all=Object.keys(B.S().ach).filter(function(k){return k!=="M14"&&BY[k]}).length;
+ return st}
+function val(st,k){if(k.indexOf("f.")===0)return B.S().achv.f[k.slice(2)]?1:0;return st[k]||0}
+function need(n){return typeof n[11]==="function"?n[11]():n[11]}
+function done(){return N.filter(function(n){return B.S().ach[n[0]]}).length}
+/* 弹窗 + 音效 */
+var Q=[],showing=false,ctx=null;
+function snd(){try{return localStorage.getItem("spm-ach-snd")!=="0"}catch(e){return true}}
+function ding(big){if(!snd())return;try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;ctx=ctx||new C();if(ctx.state==="suspended")ctx.resume();
+ var seq=big?[523.25,659.25,783.99,1046.5,1318.5]:[783.99,987.77,1318.5],t=ctx.currentTime+.02;
+ seq.forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.type=big?"triangle":"square";o.frequency.value=f;
+  g.gain.setValueAtTime(0,t+i*.09);g.gain.linearRampToValueAtTime(big?.16:.07,t+i*.09+.015);g.gain.exponentialRampToValueAtTime(.0001,t+i*.09+(i===seq.length-1?.5:.16));
+  o.connect(g);g.connect(ctx.destination);o.start(t+i*.09);o.stop(t+i*.09+.55)})}catch(e){}}
+function pump(){if(showing||!Q.length)return;showing=true;var n=Q.shift(),box=document.getElementById("achToasts"),el=document.createElement("div");
+ el.className="achT "+(n[6]==="c"?"c":"");el.setAttribute("role","status");
+ el.innerHTML='<div class="achT-ic">'+n[5]+'</div><div><div class="achT-h">'+(n[6]==="c"?"Super Star! ⭐":n[6]==="g"?"Great Job! 🎉":"Achievement Unlocked ✨")+'</div><div class="achT-n">'+n[8]+'</div><div class="achT-s">'+n[7]+' · 点一下查看全部</div></div>';
+ el.onclick=function(){openPanel(n[1],n[0])};box.appendChild(el);void el.offsetWidth;el.classList.add("on");ding(n[6]==="c");
+ var b=document.getElementById("achBtn");if(b){b.classList.remove("bump");void b.offsetWidth;b.classList.add("bump")}
+ setTimeout(function(){el.classList.remove("on");setTimeout(function(){el.remove();showing=false;pump()},450)},n[6]==="c"?6200:5000)}
+function badge(){var b=document.getElementById("achBd");if(!b)return;var seen=(B.S().achv&&B.S().achv.seen)||0,c=0;for(var k in B.S().ach)if(B.S().ach[k]>seen&&BY[k])c++;b.hidden=!c;b.textContent=c>9?"9+":c}
+/* 检查 */
+function check(){try{var a=A(),st=stats(),fresh=[],silent=!a.init;
+ for(var pass=0;pass<2;pass++){st.all=Object.keys(B.S().ach).filter(function(k){return k!=="M14"&&BY[k]}).length;
+  N.forEach(function(n){if(B.S().ach[n[0]])return;if(val(st,n[10])>=need(n)){B.S().ach[n[0]]=Date.now();fresh.push(n)}})}
+ if(fresh.length||!a.init){a.init=1;saveRaw()}
+ if(fresh.length){if(silent){if(fresh.length>0)setTimeout(function(){try{toast("已为你补上 "+fresh.length+" 个成就 🏆 点小宠物上面的奖杯看看")}catch(e){}},1200)}
+  else fresh.forEach(function(n){Q.push(n)});pump();if(P.classList.contains("on"))render(curTab)}
+ badge()}catch(e){}}
+var pend=null;function later(ms){clearTimeout(pend);pend=setTimeout(check,ms||350)}
+function touch(kind){try{var a=A(),t=tdy(),h=new Date().getHours(),f=a.f;
+ if(B.S().days.indexOf(t)<0){B.S().days.push(t);B.S().days.sort();if(B.S().days.length>500)B.S().days=B.S().days.slice(-500)}
+ if(h<7)f.early=1;if(h>=23)f.night=1;
+ var left=0;try{left=dd(t,B.S().exam)}catch(e){left=999}
+ if(left>=30)f.far=1;if(left>=0&&left<=30)f.n30=1;if(left>=0&&left<=14)f.n14=1;if(left>=0&&left<=7)f.n7=1;if(left===0)f.d0=1;
+ if(kind){if(!a.dk||a.dk.d!==t)a.dk={d:t,k:[]};if(a.dk.k.indexOf(kind)<0)a.dk.k.push(kind);if(a.dk.k.length>=3)f.all3=1}
+ saveRaw();later()}catch(e){}}
+function ev(type,ok){try{var a=A();
+ if(type==="fc"){a.fa++;if(ok){a.fcc++;if(a.fcc>a.fb)a.fb=a.fcc}else a.fcc=0;touch("fc")}
+ else if(type==="q"){a.qa++;if(ok){a.qc++;a.qcur++;if(a.qcur>a.cb)a.cb=a.qcur}else a.qcur=0;touch("q")}}catch(e){}}
+window.ACH={ev:ev,check:check,open:function(){openPanel()}};
+/* 包装 save：从存档变化里发现「复习章节 / 交卷」 */
+var last=null;
+function snap(){return{d:Object.keys(B.S().done||{}).filter(function(k){return B.S().done[k]}).length,e:(B.S().exams||[]).length,w:(B.S().wrong||[]).length}}
+B.setSave(function(){_save.apply(this,arguments);try{if(!B.S()||!B.S().achv)return;var s=snap(),a=A();
+ if(last){if(s.d>last.d){var t=tdy();if(!a.dc||a.dc.d!==t)a.dc={d:t,n:0};a.dc.n+=s.d-last.d;if(a.dc.n>a.dcb)a.dcb=a.dc.n;touch("ch")}
+  if(s.e>last.e)touch("ex")}
+ if(s.w>0)a.f.hw=1;if(a.f.hw&&s.w===0)a.f.wcl=1;
+ last=s;later()}catch(e){}});
+/* 面板 */
+var P=document.getElementById("achPanel"),TIP=document.getElementById("achTip"),curTab="learn",btn=document.getElementById("achBtn");
+function esc2(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fdate(ts){var d=new Date(ts);return ymd(d)}
+function render(tab,focusId){curTab=tab;var st=stats(),dn=done();
+ document.getElementById("achCnt").textContent="已解锁 "+dn+" / "+N.length;document.getElementById("achBarI").style.width=Math.round(dn/N.length*100)+"%";
+ document.getElementById("achSnd").textContent=snd()?"🔊":"🔇";
+ document.getElementById("achTabs").innerHTML=TABS.map(function(t){var l=N.filter(function(n){return n[1]===t[0]}),c=l.filter(function(n){return B.S().ach[n[0]]}).length;
+  return '<button class="achTab" role="tab" type="button" data-t="'+t[0]+'" aria-selected="'+(t[0]===tab)+'">'+t[2]+' '+t[1]+' <span class="n">'+c+'/'+l.length+'</span></button>'}).join("");
+ var meta=TABS.filter(function(t){return t[0]===tab})[0],list=N.filter(function(n){return n[1]===tab}),G=84,PAD=26,mx=0,my2=0;
+ list.forEach(function(n){mx=Math.max(mx,n[2]);my2=Math.max(my2,n[3])});
+ var W=PAD*2+mx*G+56+40,H=PAD*2+my2*G+56+40,tree=document.getElementById("achTree");
+ tree.style.width=W+"px";tree.style.height=H+"px";var vw=document.querySelector(".achView");vw.style.setProperty("--t1",meta[3]);vw.style.setProperty("--t2",meta[4]);
+ function X(n){return PAD+n[2]*G}function Y(n){return PAD+n[3]*G}
+ var lines="";list.forEach(function(n){if(!n[4])return;var p=BY[n[4]];if(!p||p[1]!==tab)return;var x1=X(p)+56,y1=Y(p)+28,x2=X(n),y2=Y(n)+28,mid=x1+(x2-x1)/2,u=B.S().ach[n[0]];
+  lines+='<path d="M'+x1+' '+y1+' H'+mid+' V'+y2+' H'+x2+'" fill="none" stroke="'+(u?"#ffb347":"rgba(140,120,200,.45)")+'" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"'+(u?"":' stroke-dasharray="1 11"')+'/>'});
+ tree.innerHTML='<svg width="'+W+'" height="'+H+'">'+lines+'</svg>'+list.map(function(n){var u=!!B.S().ach[n[0]];
+  return '<button type="button" class="achN '+n[6]+(u?" on":"")+'" data-id="'+n[0]+'" style="left:'+X(n)+'px;top:'+Y(n)+'px" aria-label="'+esc2(n[8]+(u?"（已解锁）":"（未解锁）"))+'"><span class="f"></span><span class="in"></span><span class="i">'+n[5]+'</span></button>'}).join("");
+ if(focusId){var el=tree.querySelector('[data-id="'+focusId+'"]');if(el){el.classList.add("pop");var sc=document.getElementById("achScroll");sc.scrollLeft=Math.max(0,el.offsetLeft-sc.clientWidth/2+28);sc.scrollTop=Math.max(0,el.offsetTop-sc.clientHeight/2+28)}}}
+function tipShow(el){var n=BY[el.dataset.id],st=stats(),u=B.S().ach[n[0]],cur=Math.min(val(st,n[10]),need(n)),nd=need(n);
+ TIP.innerHTML='<div class="tt '+(n[6]==="c"?"c ":"g ")+(u?"u":"")+'">'+esc2(n[8])+'<small>'+esc2(n[7])+'</small></div><div class="rq">完成要求：'+esc2(n[9])+'</div>'+
+  (nd>1&&!u?'<div class="pg">进度 '+cur+' / '+nd+'</div>':"")+(u?'<div class="st u">✔ 已解锁 · '+fdate(u)+'</div>':'<div class="st">🔒 还没解锁</div>');
+ TIP.classList.add("on");var r=el.getBoundingClientRect(),w=TIP.offsetWidth,h=TIP.offsetHeight,x=r.right+10,y=r.top+r.height/2-h/2;
+ if(x+w>innerWidth-8)x=r.left-w-10;if(x<8){x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2));y=r.bottom+10;if(y+h>innerHeight-8)y=r.top-h-10}
+ y=Math.max(8,Math.min(innerHeight-h-8,y));TIP.style.left=x+"px";TIP.style.top=y+"px"}
+function tipHide(){TIP.classList.remove("on");TIP.style.display=""}
+function openPanel(tab,focusId){try{A();B.S().achv.f.op=1;B.S().achv.seen=Date.now();saveRaw();check();P.classList.add("on");render(tab||curTab,focusId);badge();document.getElementById("achX").focus()}catch(e){}}
+function closePanel(){P.classList.remove("on");tipHide();badge();try{btn.focus()}catch(e){}}
+P.addEventListener("click",function(e){var t=e.target;
+ if(t===P||t.closest("#achX")){closePanel();return}
+ var tb=t.closest(".achTab");if(tb){tipHide();render(tb.dataset.t);return}
+ if(t.closest("#achSnd")){try{localStorage.setItem("spm-ach-snd",snd()?"0":"1")}catch(x){}render(curTab);if(snd())ding(false);return}
+ var nd=t.closest(".achN");if(nd){tipShow(nd);e.stopPropagation();return}
+ tipHide()});
+P.addEventListener("mouseover",function(e){var nd=e.target.closest&&e.target.closest(".achN");if(nd)tipShow(nd)});
+P.addEventListener("mouseout",function(e){var nd=e.target.closest&&e.target.closest(".achN");if(nd&&!(e.relatedTarget&&nd.contains(e.relatedTarget)))tipHide()});
+P.addEventListener("focusin",function(e){var nd=e.target.closest&&e.target.closest(".achN");if(nd)tipShow(nd)});
+P.addEventListener("focusout",function(){tipHide()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&P.classList.contains("on"))closePanel()});
+/* 拖动地图 */
+(function(){var sc=document.getElementById("achScroll"),d=null,moved=0;
+ sc.addEventListener("pointerdown",function(e){if(e.pointerType!=="mouse"||e.target.closest(".achN"))return;d={x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:sc.scrollTop};moved=0;sc.classList.add("drag");try{sc.setPointerCapture(e.pointerId)}catch(x){}});
+ sc.addEventListener("pointermove",function(e){if(!d)return;sc.scrollLeft=d.l-(e.clientX-d.x);sc.scrollTop=d.t-(e.clientY-d.y);tipHide()});
+ function up(){d=null;sc.classList.remove("drag")}sc.addEventListener("pointerup",up);sc.addEventListener("pointercancel",up)})();
+/* 小奖杯：跟着小宠物走，永远在它头顶 */
+var pb=document.getElementById("petBox"),pk=document.getElementById("petBack");
+function pos(){try{var el=(pb&&!pb.hidden)?pb:((pk&&!pk.hidden)?pk:null),w=btn.offsetWidth||40;
+ if(el){var r=el.getBoundingClientRect(),cx=r.left+r.width/2;btn.style.right=Math.max(6,Math.min(innerWidth-w-6,innerWidth-cx-w/2))+"px";btn.style.bottom=Math.max(6,innerHeight-r.top+(el===pb?-8:6))+"px"}
+ else{btn.style.right="16px";btn.style.bottom="16px"}
+ btn.hidden=false}catch(e){}}
+btn.addEventListener("click",function(){openPanel()});
+if(window.MutationObserver){var mo=new MutationObserver(function(){requestAnimationFrame(pos)});[pb,pk].forEach(function(el){if(el)mo.observe(el,{attributes:true,attributeFilter:["style","hidden","class"]})})}
+addEventListener("resize",pos);addEventListener("orientationchange",pos);setInterval(pos,3000);pos();
+/* 其他小事件 */
+document.addEventListener("click",function(e){try{var t=e.target;if(!t.closest)return;var a=A();
+ if(t.closest("#petDog")){a.pt++;clearTimeout(ev.pt);ev.pt=setTimeout(function(){saveRaw();later()},600)}
+ if(t.closest("#bkOut")){a.f.bk=1;saveRaw();later()}
+ if(t.closest("[data-wp]"))setTimeout(function(){try{var m=localStorage.getItem("spm-wp-mode")||"";if(m==="minecraft")a.f.wm=1;else if(m==="dogs")a.f.wd=1;else if(m==="custom")a.f.wc2=1;saveRaw();check()}catch(x){}},500)}catch(x){}},true);
+setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mode")||"";if(m==="minecraft")B.S().achv.f.wm=1;else if(m==="dogs")B.S().achv.f.wd=1;else if(m==="custom")B.S().achv.f.wc2=1;
+ (B.S().exams||[]).forEach(function(e){if(e.date&&B.S().days.indexOf(e.date)<0)B.S().days.push(e.date)});B.S().days.sort();
+ if((B.S().wrong||[]).length)B.S().achv.f.hw=1;check();pos()}catch(e){}},1500);
+}catch(err){try{console.warn("成就模块没能启动",err)}catch(x){}}
+})();
+</script>
+
 <script src="music.js?v=2026-10-20d" defer></script>
 </body>
 </html>
