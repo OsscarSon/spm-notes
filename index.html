@@ -236,6 +236,11 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.aurora i,.spin{animation:none}}
+.ig-credit{margin:0 0 8px;text-align:center;font-size:13px;font-weight:700;letter-spacing:.06em}
+.ig-credit a{background:linear-gradient(90deg,#ff8a3d,#ff4d8d,#b44cff,#4d8dff,#19c3a6,#ff8a3d);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-decoration:none;animation:igflow 8s linear infinite}
+.ig-credit a:hover{filter:brightness(1.15)}
+@keyframes igflow{to{background-position:200% center}}
+@media (prefers-reduced-motion:reduce){.ig-credit a{animation:none}}
 @media print{.aurora,.top,.subjects,.tabs,#petBox,#petBack,.no-print{display:none!important}.sheet{box-shadow:none;border:0;background:#fff}}
 .fig{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin:10px 0;overflow-x:auto;text-align:center}.fig svg{max-width:100%;height:auto}.fig.fine{padding:10px 12px;background:var(--sheet)}
 /* PPT 播放器 */
@@ -3225,8 +3230,9 @@ function rSet(){
   <div id="syncStatus" class="fine" style="margin-top:6px">${S.sync.url?(S.sync.ts?"上次同步："+fmtAt(S.sync.ts):"尚未同步"):"未启用"}</div>
   ${S.sync.url?'<div class="row" style="margin-top:6px"><button class="btn small" id="syncNow">立即同步</button><button class="btn small badb" id="syncOff">关闭同步</button></div>':""}</div>
   <h3>备份</h3><p class="fine muted">进度、AI 笔记和错题都只在这个浏览器里。换设备或清缓存前先导出 (导出文件不含 API key，也不含上传的文件)。</p>
-  <div class="row"><button class="btn" id="bkOut">导出 JSON</button><label class="btn">导入 JSON<input type="file" id="bkIn" accept=".json" hidden></label><button class="btn badb" id="bkRs">清空全部进度</button></div>
-  <p class="fine muted" style="margin:26px 0 4px;text-align:center;opacity:.55;letter-spacing:.04em">SPM 备考本 · Made by Osscarson</p>`;
+  <div class="row"><button class="btn" id="bkOut">导出 JSON</button><label class="btn">导入 JSON<input type="file" id="bkIn" accept=".json" hidden></label></div>
+  <p class="fine muted" style="margin:26px 0 4px;text-align:center;opacity:.55;letter-spacing:.04em">SPM 备考本 · Made by Osscarson</p>
+  <p class="ig-credit"><a href="https://www.instagram.com/stz_0506" target="_blank" rel="noopener noreferrer">Creator's IG: stz_0506 ↗</a></p>`;
   $("#sKeyOk").onclick=()=>{S.ai.key=$("#sKey").value.trim();S.ai.model=$("#sMd").value;save();$("#sKeyMsg").innerHTML=S.ai.key?'<span style="color:var(--ok)">已保存 ✓</span>':"已清除 key";toast(S.ai.key?"已保存":"已清除 key")};
   keyTools();
   $("#pvSave").onclick=()=>{S.ai.provider=$("#pvMain").value;S.ai.fallback=$("#pvFb").checked;S.ai.route=$("#pvAuto").checked?"auto":"manual";S.ai.imgModel=$("#sImgM").value.trim()||"gemini-3.1-flash-image-preview";$$("[data-pk]").forEach(i=>{S.ai.alt[i.dataset.pk].key=i.value.trim()});$$("[data-pm]").forEach(i=>{S.ai.alt[i.dataset.pm].model=i.value.trim()||PROVS[i.dataset.pm].model});save();$("#pvMsg").innerHTML='<span style="color:var(--ok)">已保存 ✓</span>';toast("已保存")};
@@ -3240,7 +3246,7 @@ function rSet(){
   $$("[data-cf]").forEach(c=>c.onchange=()=>{S.conf[c.dataset.cf]=+c.value;save()});
   $("#bkOut").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(Object.assign({},S,{ai:Object.assign({},S.ai,{key:"",alt:{}}),draft:null}),null,1)],{type:"application/json"}));a.download="spm-notes-backup.json";a.click()};
   $("#bkIn").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const keepAI=S.ai;S=Object.assign({},DEF,JSON.parse(t));S.ai=keepAI;bust();save();toast("已导入");render()}catch(x){toast("文件格式不对")}})};
-  $("#bkRs").onclick=()=>{if(confirm("确定清空所有进度、AI 笔记和错题？这个操作不能撤销。(API key 会保留)")){const k=S.ai;S=Object.assign({},DEF,{since:today(),ai:k});bust();save();go("today")}}}
+  }
 
 /* ---- 事件 ---- */
 document.addEventListener("click",e=>{
