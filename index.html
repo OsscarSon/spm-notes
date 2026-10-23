@@ -3368,6 +3368,11 @@ window.__spm={S:()=>S,go,getSave:()=>save,setSave:f=>{save=f},toast,prog,mySubje
 #pwaBar.show{display:flex}
 #pwaBar button{border:0;border-radius:9px;padding:6px 12px;font:inherit;font-weight:600;background:#fff;color:#17263f;cursor:pointer}
 #pwaBar .x{background:transparent;color:inherit;opacity:.7;padding:6px 4px}
+.iab p{line-height:1.75;margin:8px 0}
+.iab .stp{display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px 12px;border-radius:14px;background:var(--blue-soft)}
+.iab .stp i{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
+.iab .stp div{line-height:1.65;font-size:14.5px}
+.iab .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 </style>
 <script>
 (function(){
@@ -3386,16 +3391,37 @@ window.__spm={S:()=>S,go,getSave:()=>save,setSave:f=>{save=f},toast,prog,mySubje
     b.innerHTML='<span aria-hidden="true">📲</span>';
     bell.insertAdjacentElement("afterend",b);
     b.onclick=function(){
+      if(inApp()){showIab();return}
       if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;});return;}
       showHelp();
     };
   }
+  /* ---- 在 Instagram / Facebook / TikTok 等内置浏览器里装不了 App：教人改用浏览器打开 ---- */
+  function inApp(){return /Instagram|FBAN|FBAV|FB_IAB|FBIOS|MicroMessenger|TikTok|musical_ly|Bytedance|Snapchat|\bLine\//i.test(navigator.userAgent)}
+  function appName(){var u=navigator.userAgent;return /Instagram/i.test(u)?"Instagram":/FBAN|FBAV|FB_IAB|FBIOS/i.test(u)?"Facebook":/TikTok|musical_ly|Bytedance/i.test(u)?"TikTok":/MicroMessenger/i.test(u)?"微信":/Snapchat/i.test(u)?"Snapchat":/Line\//i.test(u)?"LINE":"这个 App"}
+  function copyUrl(done){var u=location.href.split("#")[0];function fb(){var t=document.createElement("textarea");t.value=u;t.style.cssText="position:fixed;opacity:0";document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(e){}t.remove();done(true)}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(function(){done(true)},fb);else fb()}
+  function showIab(){
+    var ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua),and=/android/i.test(ua),nm=appName();
+    var old=document.getElementById("pwaHelp");if(old)old.remove();
+    var s1=ios?'点右上角 (或右下角) 的 <b>⋯</b>，选 <b>在 Safari 中打开</b> (有的写「在外部浏览器打开」)':and?'点右上角的 <b>⋯</b>，选 <b>在 Chrome 中打开</b> (或「在浏览器中打开」)':'点右上角的 <b>⋯</b>，选 <b>在浏览器中打开</b>';
+    var s2=ios?'打开后，点底部中间的 <b>分享</b> 按钮 → <b>添加到主屏幕</b> → <b>添加</b>':and?'打开后，点浏览器右上角的 <b>⋮</b> → <b>安装应用</b> (或「添加到主屏幕」)':'打开后，在浏览器菜单里选 <b>安装</b> 或 <b>添加到主屏幕</b>';
+    var chrome=and?'<a class="btn pri small" href="intent://'+location.host+location.pathname+'#Intent;scheme=https;package=com.android.chrome;end">用 Chrome 打开</a>':"";
+    var back=document.createElement("div");back.className="upd-back no-print";back.id="pwaHelp";
+    back.innerHTML='<div class="upd iab" role="dialog" aria-label="装 App 要先用浏览器打开"><div class="row"><h2 style="margin:0">🌐 装 App 要先用浏览器打开</h2></div><p>你现在是在 <b>'+nm+'</b> 里打开的。它自带的小浏览器<b>不能安装 App</b>，填好的 API key 也可能下次就不见了。</p><div class="stp"><i>1</i><div>'+s1+'</div></div><div class="stp"><i>2</i><div>'+s2+'</div></div><p class="fine muted" style="margin:6px 0 0">找不到「在浏览器中打开」？点下面的「复制网址」，再到 '+(ios?"Safari":and?"Chrome":"浏览器")+' 的网址栏粘贴。</p><div class="btns"><button class="btn pri small" id="iabCopy">复制网址</button>'+chrome+'<button class="btn small" id="pwaHelpX">知道了</button></div></div>';
+    document.body.appendChild(back);
+    var close=function(){back.remove()};back.onclick=function(e){if(e.target===back)close()};
+    document.getElementById("pwaHelpX").onclick=close;
+    var cb=document.getElementById("iabCopy");cb.onclick=function(){copyUrl(function(){cb.textContent="已复制 ✓"})};
+  }
+  if(!standalone&&inApp()){try{if(!sessionStorage.getItem("spmIab")){sessionStorage.setItem("spmIab","1");setTimeout(showIab,1500)}}catch(e){}}
   function showHelp(){
+    if(inApp()){showIab();return}
     var ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
     var safari=/safari/i.test(ua)&&!/crios|fxios|edgios|chrome|android/i.test(ua);
     var steps;
     if(ios&&safari)steps="1. 点屏幕最下面中间的 <b>分享按钮</b> (方框加向上的箭头)<br>2. 往下滑，点 <b>添加到主屏幕</b><br>3. 点右上角 <b>添加</b>";
-    else if(ios)steps="iPhone 只有 <b>Safari</b> 才能安装。请用 Safari 打开这个网址，再点底部的分享按钮 → <b>添加到主屏幕</b>。";
+    else if(ios)steps="iPhone 上，<b>Safari</b> 最稳。如果你用的是 Chrome 等其他浏览器：点右上角 (或底部) 的 <b>分享</b> 或 <b>⋯</b> → <b>添加到主屏幕</b> → <b>添加</b> (需要 iOS 16.4 以上)。找不到这个选项的话，就用 Safari 打开这个网址，再点底部的分享按钮 → <b>添加到主屏幕</b>。";
     else if(/android/i.test(ua))steps="点浏览器右上角的 <b>⋮</b> → <b>安装应用</b> (或 <b>添加到主屏幕</b>)。";
     else steps="Chrome / Edge：看地址栏最右边的 <b>安装图标</b>，或菜单里的 <b>安装 SPM备考本</b>。";
     var old=document.getElementById("pwaHelp");if(old)old.remove();
