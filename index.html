@@ -2183,7 +2183,7 @@ function chapHTML(c,sid,open){
 function bindChaps(){
   $$("[data-done]").forEach(c=>c.onchange=()=>{S.done[c.dataset.done]=c.checked||undefined;save();const p=prog(c.dataset.done.split("|")[0]);toast(c.checked?`已复习 ✓ (${p.d}/${p.n})`:"取消标记");renderNav()});
   $$("[data-req]").forEach(t=>t.onchange=()=>{S.req[t.dataset.req]=t.value.trim()||undefined;save();toast("章节要求已保存")});
-  $$("details.chap[data-k]").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)S.openChap=d.dataset.k;else if(S.openChap===d.dataset.k)S.openChap=null}));}
+  $$("details.chap[data-k]").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)S.openChap=d.dataset.k;else if(S.openChap===d.dataset.k)S.openChap=null}));ngPaint();}
 function findChap(sid,k){return chapsOf(sid).find(c=>c.k===k)}
 const FIGRULE="【作图规则】是否需要图由你自己判断：凡是看图比看文字更容易懂、或 SPM 常考看图作答的内容 (如生物的细胞、器官、系统结构图，食物链和各种循环图，实验装置图，化学仪器和分子结构，电路图、光线图、受力图，几何图形，函数图像，地理或历史示意图，流程图)，即使学生没要求也主动画出来，不要只用文字描述；一句话能讲清楚的就不画。生物结构图画简化的示意即可，每个部分用引线加文字标出名称，图后再用文字列出各部分的功能。用三个反引号代码块，有三种写法：\n(1) 函数图像：```plot 代码块，每行一项。例如 y = x^2 - 4x + 3 (可以多条)；可选 x: -2..6 和 y: -4..10 设定范围；points: (1,0) A; (3,0) B 标出点；x = 2 画竖虚线 (如对称轴)；title: 标题。\n(2) 其他示意图 (装置图、几何、电路)：```svg 代码块，写完整的 <svg viewBox=\"0 0 600 400\" xmlns=\"http://www.w3.org/2000/svg\">，不要填背景色，线条和文字用深色 (#222)，文字 font-size 14-16，每个部件都标上名称 (如「烧瓶」「冷凝管」)；不要用 script、image、style 或外部链接。画不准的细节宁可简化，并说明这是示意图。\n(3) 写实插图：```image 代码块，里面用一句英文写画面描述 (画什么、什么风格)。只在需要「看起来像真的」而且不需要精确文字标注时才用 (如器官外观、显微镜下的样子、地貌)；有标注的结构图一律用 svg。学生点一下按钮才会生成，所以不要滥用。\n代码块前后照常用文字讲解。";
 const MARKRULE=`【SPM 给分对照】SPM 按「得分点」给分：一个正确的关键点 (keyword / fact) 得 1 分，要解释的题再加 1 分解释。State / Nyatakan = 只写点，每点 1 分；Explain / Terangkan / Jelaskan = 一个点加一个解释算一组；Compare / Banding = 相同点和不同点都要有，各至少 3 点；Describe / Huraikan = 按步骤或特征逐点写；历史科 (Sejarah 1249) 的评分：Kertas 1 是 40 题选择题；Kertas 2 Bahagian A 共 4 题全答，每题 10 分，分成 (a) 2 分、(b) 4 分、(c) 4 分；Bahagian B 共 5 题答 3 题，每题 20 分，常见分成 (a)(b) 各约 6 分、(c) 8 分。评分表里每个正确的事实 (F) 或阐述 (H) 各 1 分，写「mana-mana N x 1m」，所以 6 分的问题至少要写 6 个得分点，笔记里每个小章节要列出 8 个以上 F/H 要点 (事实 + 阐述成组写)；(c) 8 分的 KBAT 按四个层级给分 (1–2、3–4、5–6、7–8)，要有清楚的知识、合适的证据、正确的推断，而且题目有两个任务时两个都要答 (只答一个最多 4 分，照抄原文只有 2 分)；数学科的评分表用 K (方法分)、N (答案分)、P 这类记号，写出每一步才拿得到方法分；道德科 = 价值 + 定义 + 情境 + 后果。所以笔记里每一个小节都要把课本中考试会问的「得分点」写全：凡是列表型内容 (功能、特点、原因、影响、步骤、例子、用途、优缺点) 要列出课本给出的全部要点，至少 4 点，不要只挑两三个；每个要点写成可以直接抄上答卷的完整句子，关键词用粗体；计算题写出方法步骤并标明哪一步拿方法分。每个小节最后用一行「💯 给分对照」写出：这一节常见的问法 → 分数 → 需要写几个得分点。`;
@@ -2201,13 +2201,43 @@ function salvageJSON(s,depth){const st=[];let inS=false,esc=false,cut=-1,stk=nul
 /* ---- 生成进度 (流式)：只更新按钮/提示文字，不碰笔记内容 ---- */
 function progFn(label,show){let last=0;return t=>{const n=Date.now();if(n-last<250)return;last=n;try{show(label+" "+t.length+" 字")}catch(e){}}}
 function notePrompt(sid,c){const s=subj(sid);return `请为 SPM「${s.name}」生成这一章的复习笔记。\n章节：${c.t}\n${chapText(c,3000)}\n\n要求：\n1. 每个小章节单独成一节 (用二级标题)，${c.subs.length?"依据上面给出的小章节，一个都不要合并、不要省略，再小的小章节也要单独写":"如果你不能确定课本的小章节名称，先按 DSKP 常见划分列出并注明『按 DSKP 推测』，每个小章节单独成一节，不要合并"}。\n2. 每个小章节依次写：术语与定义 / 得分点清单 (课本里考试会问的要点要写全，列表型内容至少 4 点，每点一句完整的话，关键词粗体) / 过程、比较或公式 (需要时用表格) / 易错点 / 「💯 给分对照」一行 (常见问法 → 分数 → 需要几个得分点)。\n3. 最后给：5 行以内的速记表，和 5 道自测题，每题写明分数，答案连同评分要点放在最后。\n4. 若学生提供了章节要求或上传了资料，以它们为准，资料里没有的不要编。\n5. 语言按系统提示里的【语言规则】(考试语言 + 每个要点后的「华文：」翻译与解释，不要为了省篇幅把要点合并或删掉)；用 Markdown 小标题和列表。`}
-async function genNote(sid,k,btn){
-  const c=findChap(sid,k),s=subj(sid);if(!c)return;setBusy(btn,true,"生成中…");skelOn(btn);
+/* ===== 笔记生成：抗切页 / 抗刷新 / 抗手机切走 ===== */
+let NG=null,WL=null;const JOBK="spm-notejob";
+function jobGet(){try{const j=JSON.parse(localStorage.getItem(JOBK)||"null");return j&&j.k&&j.sid&&Date.now()-j.t<30*60000?j:null}catch(e){return null}}
+function jobSet(j){try{localStorage.setItem(JOBK,JSON.stringify(j))}catch(e){}}
+function jobClear(){try{localStorage.removeItem(JOBK)}catch(e){}}
+async function wlOn(){try{if(navigator.wakeLock&&!WL){WL=await navigator.wakeLock.request("screen");WL.addEventListener("release",()=>{WL=null})}}catch(e){}}
+function wlOff(){try{if(WL){WL.release();WL=null}}catch(e){}}
+function ngChip(txt){let d=document.getElementById("ngChip");if(!txt){if(d)d.remove();return}
+  if(!d){d=document.createElement("div");d.id="ngChip";d.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9990;max-width:92vw;padding:9px 16px;border-radius:999px;background:var(--sheet,#16202e);color:var(--ink,#fff);border:1px solid var(--line,#456);box-shadow:var(--shadow,0 6px 20px rgba(0,0,0,.35));font-size:13px;display:flex;gap:8px;align-items:center;pointer-events:none";document.body.appendChild(d)}
+  d.innerHTML='<span class="spin"></span><span>'+txt+'</span>'}
+function ngBtn(){return NG?document.querySelector('[data-act="gennote"][data-k="'+CSS.escape(NG.k)+'"]'):null}
+function ngPaint(){const b=ngBtn();if(b&&!b.disabled){setBusy(b,true,"\u751f\u6210\u4e2d\u2026");skelOn(b)}}
+function ngResume(){if(NG)return;const j=jobGet();if(!j)return;if(j.tries>=3||!aiOK()){jobClear();return}toast("\u7ee7\u7eed\u751f\u6210\u7b14\u8bb0\u2026");genNote(j.sid,j.k,null,true)}
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){if(NG)NG.hid=true;return}
+  if(NG){wlOn();
+    if(Date.now()-NG.last>60000){const j=NG;NG=null;ngChip("");skelOff();jobSet({sid:j.sid,k:j.k,t:Date.now(),tries:j.tries});ngResume()}  /* \u88ab\u7cfb\u7edf\u51bb\u4f4f\u592a\u4e45\uff0c\u91cd\u65b0\u6765 */
+  }else ngResume()});
+window.addEventListener("online",()=>ngResume());
+async function genNote(sid,k,btn,resume){
+  const c=findChap(sid,k),s=subj(sid);if(!c){jobClear();return}
+  if(NG){toast("\u5df2\u7ecf\u6709\u4e00\u7ae0\u5728\u751f\u6210\u4e86\uff0c\u7b49\u5b83\u5b8c\u6210");return}
+  const old=jobGet(),tries=resume&&old&&old.k===k?old.tries+1:0;
+  const me=NG={sid,k,tries,hid:document.hidden,last:Date.now()};
+  jobSet({sid,k,t:Date.now(),tries});wlOn();
+  setBusy(btn,true,"\u751f\u6210\u4e2d\u2026");skelOn(btn);ngChip("\u6b63\u5728\u751f\u6210\u7b14\u8bb0\uff1a"+esc(c.t)+" (\u5207\u9875\u3001\u5237\u65b0\u90fd\u4e0d\u4f1a\u4e22)");
   try{const fp=await fileParts(sid);
     const prompt=notePrompt(sid,c);
-    const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000,{onProgress:progFn("生成中…",s=>{if(btn&&btn.isConnected)btn.innerHTML='<span class="spin"></span>'+s})});
-    skelOff();putNote(k,out);save();toast(lastTrunc?"笔记已生成，但内容很长，结尾可能不完整，可以再点一次重新生成":S.notes[k].hist.length?"已生成新版本，旧版本在「历史版本」里":"笔记已生成");if(S.tab==="notes"){S.openChap=k;rNotes()}}
-  catch(e){skelOff();toast(e.message.slice(0,80));setBusy(btn,false);const m=$("#bulkMsg");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}}
+    const out=await gem([{role:"user",parts:[...fp.parts,{text:prompt}]}],noteSystem(sid),16000,{onProgress:progFn("\u751f\u6210\u4e2d\u2026",x=>{me.last=Date.now();const b=ngBtn();if(b)b.innerHTML='<span class="spin"></span>'+x;ngChip("\u7b14\u8bb0\uff1a"+esc(c.t)+" \xb7 "+x)})});
+    if(NG!==me)return;
+    NG=null;jobClear();wlOff();ngChip("");skelOff();putNote(k,out);save();toast(lastTrunc?"\u7b14\u8bb0\u5df2\u751f\u6210\uff0c\u4f46\u5185\u5bb9\u5f88\u957f\uff0c\u7ed3\u5c3e\u53ef\u80fd\u4e0d\u5b8c\u6574\uff0c\u53ef\u4ee5\u518d\u70b9\u4e00\u6b21\u91cd\u65b0\u751f\u6210":S.notes[k].hist.length?"\u5df2\u751f\u6210\u65b0\u7248\u672c\uff0c\u65e7\u7248\u672c\u5728\u300c\u5386\u53f2\u7248\u672c\u300d\u91cc":"\u7b14\u8bb0\u5df2\u751f\u6210");if(S.tab==="notes"){S.openChap=k;rNotes()}}
+  catch(e){if(NG!==me)return;
+    NG=null;wlOff();ngChip("");skelOff();
+    const transient=me.hid||document.hidden||/\u7f51\u7edc\u8bf7\u6c42\u5931\u8d25|Failed to fetch|NetworkError|network|Load failed|terminated|aborted|stream/i.test(e.message||"");
+    setBusy(btn,false);
+    if(transient&&tries<3){jobSet({sid,k,t:Date.now(),tries});toast("\u8fde\u63a5\u4e2d\u65ad\u4e86\uff0c\u56de\u5230\u8fd9\u4e2a\u9875\u9762\u4f1a\u81ea\u52a8\u7ee7\u7eed\u751f\u6210");if(S.tab==="notes")rNotes();return}
+    jobClear();toast(e.message.slice(0,80));const m=$("#bulkMsg");if(m)m.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`;if(S.tab==="notes")rNotes()}}
 async function bulkGen(sid){
   const todo=chapsOf(sid).filter(c=>c.core&&!S.notes[c.k]);if(!todo.length){toast("这一科的章节都有笔记了");return}
   if(!confirm(`会连续请求 ${todo.length} 次 AI（自动在你填了 key 的服务之间分配），每章一次，可能用掉不少免费额度。继续吗？(随时可停止)`))return;
@@ -3357,6 +3387,7 @@ function printSubj(sid){
 load();applyTheme();
 const h0=(location.hash||"").slice(1);if(TABS.some(t=>t[0]===h0))S.tab=h0;else if(!TABS.some(t=>t[0]===S.tab)&&S.tab!=="set")S.tab="today";
 render();
+setTimeout(()=>{try{ngResume()}catch(e){}},1500);
 /* marked / DOMPurify 是 defer 载入的，比这段启动代码晚；刷新时若笔记已先用纯文字画出来，等库载入后补画一次 */
 if(md.fb){const fixMd=()=>{if(md.fb&&window.marked&&window.DOMPurify){md.fb=false;try{bust();render()}catch(e){}}};document.addEventListener("DOMContentLoaded",fixMd);window.addEventListener("load",fixMd);setTimeout(fixMd,1500);setTimeout(fixMd,4000)}
 if(syncOn())setTimeout(()=>syncPull(false),1200);
