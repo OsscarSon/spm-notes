@@ -2464,6 +2464,12 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-23a",date:"2026-10-23",title:"云端同步新增申请教程 ☁️",
+   items:[
+    "📖 设置 → 云端同步 上方多了一个可展开的教程：从注册 Cloudflare、建 KV、建 Worker，到把网址贴进来，一步一步教你自己申请，不用借别人的 workers.dev。",
+    "📋 教程第 3 步的「Edit code」后面有个复制图标，点一下就复制好 Worker 代码，直接贴进去就行。",
+    "🔑 同步说明重新整理了：不同设备的资料默认各自独立，开了同步才会共用；同步是靠 API key 认人的，所以每台设备要填同一个 key。"
+   ]},
 {v:"2026-10-22b",date:"2026-10-22",title:"小细节美化 ✨",
    items:[
     "👆 按钮有手感了：鼠标放上去会轻轻浮起，按下去会缩小一点，松手弹回来。",
@@ -3082,6 +3088,7 @@ async function ensureRemote(f,mime){
 
 /* ---- Cloudflare 云端同步 (同你原来那份的 Worker 协议：PUT/GET {base}/s/{id}) ---- */
 const SYNC_SALT="spm-notes-sync-v1";
+const SYNC_WORKER_CODE="// SPM 同步 Worker —— 配合 KV 使用\n// 协议：PUT/GET  {你的网址}/s/{64位十六进制id}\n// 数据在手机/电脑上已用 API key 加密，这里只存密文，Worker 看不到内容。\n// 需要绑定一个 KV，变量名必须叫 SYNC\n\nconst CORS = {\n  'Access-Control-Allow-Origin': '*',\n  'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',\n  'Access-Control-Allow-Headers': 'Content-Type',\n  'Access-Control-Max-Age': '86400',\n};\n\nconst MAX_BYTES = 20 * 1024 * 1024; // KV 单个值上限 25MB，这里留点余量\n\nconst reply = (body, status = 200, extra = {}) =>\n  new Response(body, { status, headers: { ...CORS, ...extra } });\n\nexport default {\n  async fetch(req, env) {\n    if (req.method === 'OPTIONS') return reply(null, 204);\n\n    const m = new URL(req.url).pathname.match(/^\\/s\\/([0-9a-f]{64})$/);\n    if (!m) return reply('SPM sync worker is running', 404);\n    const id = m[1];\n\n    if (!env.SYNC) return reply('KV binding \"SYNC\" is missing', 500);\n\n    if (req.method === 'GET') {\n      const v = await env.SYNC.get(id);\n      if (v === null) return reply('not found', 404);\n      return reply(v, 200, {\n        'Content-Type': 'application/json',\n        'Cache-Control': 'no-store',\n      });\n    }\n\n    if (req.method === 'PUT') {\n      const body = await req.text();\n      if (body.length > MAX_BYTES) return reply('too large', 413);\n      try { JSON.parse(body); } catch { return reply('bad json', 400); }\n      await env.SYNC.put(id, body);\n      return reply('ok');\n    }\n\n    return reply('method not allowed', 405);\n  },\n};\n";
 let syncTimer=null,syncBusy=false,lastPull=0;
 function copyText(txt){
   const ok=()=>toast("已复制"),fail=()=>{try{const ta=document.createElement("textarea");ta.value=txt;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();const r=document.execCommand("copy");ta.remove();toast(r?"已复制":"复制失败，请手动选取")}catch(e){toast("复制失败，请手动选取")}};
@@ -3225,7 +3232,44 @@ function rSet(){
     <div class="row" style="margin-top:10px"><button class="btn pri" id="pvSave">保存</button><span id="pvMsg" class="fine"></span></div><p class="fine muted">下面的模型名可以改：免费模型的名字常常变，如果提示「找不到模型」，到该服务的网站查最新名字再填进来。</p></div>
   <h3>我考的科目 & 信心</h3><p class="fine muted">信心 1 = 没把握，5 = 很稳。越没把握，越常排进每日重点。</p>
   <div class="grid g3">${SUBJECTS.map(s=>`<div class="card"><label class="chk" style="color:var(--ink);font-size:15px"><input type="checkbox" data-my="${s.id}" ${S.my.includes(s.id)?"checked":""}> <b>${esc(s.name)}</b></label><div class="row" style="margin-top:6px"><span class="fine muted">信心</span><select data-cf="${s.id}">${[1,2,3,4,5].map(n=>`<option ${(S.conf[s.id]||3)===n?"selected":""}>${n}</option>`).join("")}</select></div></div>`).join("")}</div>
-  <div class="card" style="margin-top:14px"><h3 style="margin-top:0">云端同步 (Cloudflare)</h3><p class="fine muted">把全部内容同步到你的 Cloudflare Worker，手机和电脑共用：进度、AI 笔记 (含历史版本)、自己划的重点、AI 生成的图片、上传的资料文件、错题、闪卡、模拟卷、问答记录、备用 AI 设置和各项设置。内容用你的 API key 加密，换设备时填同一个 key 才能读取。只有「当前打开的章节」和同步网址留在本机。图片和资料文件较大，第一次上传要久一点，请保持页面开着。可以和「考前助手」共用同一个 Worker，数据分开存，不会互相覆盖。</p>
+  <div class="card" style="margin-top:14px"><h3 style="margin-top:0">云端同步 (Cloudflare)</h3><p class="fine muted">默认情况下，每台设备的资料是各自独立的：在手机上生成的内容，电脑和平板上看不到。如果你想让电脑、手机、平板连同一个系统，就开启这个同步，把进度、AI 笔记 (含历史版本)、自己划的重点、AI 生成的图片、上传的资料文件、错题、闪卡、模拟卷、问答记录、备用 AI 设置和各项设置，全部同步到你的 Cloudflare Worker。同步是靠 API key 认人的，所以每台设备都必须填<b>同一个 key</b>，内容也用它加密，key 不同就读不出来。只有「当前打开的章节」和同步网址留在本机。图片和资料文件较大，第一次上传要久一点，请保持页面开着。</p>
+  <details class="chap" style="margin:10px 0"><summary><span class="t">📖 还没有同步网址？看这里：自己申请 Cloudflare (详细步骤)</span></summary><div class="body fine">
+<p class="muted" style="margin-top:0">同步靠「API key」认人：电脑和手机填同一个 API key，就能对上同一份数据。每个人用自己的 Cloudflare 账号和自己的 API key，数据互不相干，不需要别人的 workers.dev。免费套餐就够用，不用绑信用卡。</p>
+<p><b>第 1 步：注册 Cloudflare 账号</b></p>
+<ol style="margin:4px 0 10px;padding-left:1.3em">
+<li>打开 <a href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener noreferrer">dash.cloudflare.com/sign-up</a>，用邮箱和密码注册。</li>
+<li>去邮箱点验证链接。</li>
+</ol>
+<p><b>第 2 步：建 KV 存储空间</b></p>
+<ol style="margin:4px 0 10px;padding-left:1.3em">
+<li>登录后，左侧菜单找到 <b>Storage &amp; Databases → Workers KV</b>。</li>
+<li>点 <b>Create a KV namespace</b>，名字随便填，例如 <code>spm-sync</code>，然后创建。</li>
+</ol>
+<p><b>第 3 步：建 Worker</b></p>
+<ol style="margin:4px 0 10px;padding-left:1.3em">
+<li>左侧菜单先点 <b>Compute</b>，再点 <b>Workers &amp; Pages → Create → Create Worker</b>。</li>
+<li>名字填 <code>spm-sync</code>（会成为网址的一部分），点 <b>Deploy</b>。第一次可能要你选一个 xxx.workers.dev 子域名，随便取一个。</li>
+<li>部署完点 <b>Edit code</b><button type="button" class="btn small" id="wkCopy" title="复制 Worker 代码" aria-label="复制 Worker 代码" style="padding:2px 7px;vertical-align:middle;margin-left:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button> （点右边的复制图标，就是复制要贴的代码）。把编辑器里原有的代码全部删掉，贴上刚复制的代码，再点右上角 <b>Deploy</b>。</li>
+</ol>
+<p><b>第 4 步：把 KV 绑定到 Worker（最容易漏）</b></p>
+<ol style="margin:4px 0 10px;padding-left:1.3em">
+<li>进入这个 Worker 的 <b>Settings → Bindings → Add</b>。</li>
+<li>选 <b>KV namespace</b>。</li>
+<li><b>Variable name 必须填 <code>SYNC</code></b>（大写），KV namespace 选第 2 步建的那个，保存并部署。</li>
+</ol>
+<p><b>第 5 步：拿到网址并测试</b></p>
+<ol style="margin:4px 0 10px;padding-left:1.3em">
+<li>在 Worker 页面找到网址，形如 <code>https://spm-sync.你的子域名.workers.dev</code>。</li>
+<li>浏览器打开它，看到 <code>SPM sync worker is running</code> 就成功了。如果出现 <code>KV binding "SYNC" is missing</code>，说明第 4 步没绑好。</li>
+</ol>
+<p><b>第 6 步：在这里填写</b></p>
+<ol style="margin:4px 0 10px;padding-left:1.3em">
+<li>电脑和手机都在上面的「Gemini API key」填<b>同一个 key</b>。</li>
+<li>把第 5 步的网址贴到下面的输入框，结尾不要带 /，点「保存并同步」。</li>
+<li>到另一台设备同样填好网址，点「立即同步」，数据就过去了。</li>
+</ol>
+<p class="muted" style="margin-bottom:0"><b>提醒：</b>两台设备的 API key 必须一模一样，多一个空格都不行；换了 key 就等于换了新的同步空间。Cloudflare KV 更新到各地最多有约 1 分钟延迟，刚在一台同步完，另一台等一会再点，不要连点。免费额度是每天 1000 次写入、10 万次读取，上传很多图片或资料文件时同步次数会变多。</p>
+</div></details>
   <div class="row"><input type="text" id="syncUrl" placeholder="https://xxxx.workers.dev" value="${esc(S.sync.url)}" style="flex:1;min-width:220px" autocomplete="off"><button class="btn pri" id="syncSave">保存并同步</button></div>
   <div id="syncStatus" class="fine" style="margin-top:6px">${S.sync.url?(S.sync.ts?"上次同步："+fmtAt(S.sync.ts):"尚未同步"):"未启用"}</div>
   ${S.sync.url?'<div class="row" style="margin-top:6px"><button class="btn small" id="syncNow">立即同步</button><button class="btn small badb" id="syncOff">关闭同步</button></div>':""}</div>
@@ -3237,6 +3281,7 @@ function rSet(){
   keyTools();
   $("#pvSave").onclick=()=>{S.ai.provider=$("#pvMain").value;S.ai.fallback=$("#pvFb").checked;S.ai.route=$("#pvAuto").checked?"auto":"manual";S.ai.imgModel=$("#sImgM").value.trim()||"gemini-3.1-flash-image-preview";$$("[data-pk]").forEach(i=>{S.ai.alt[i.dataset.pk].key=i.value.trim()});$$("[data-pm]").forEach(i=>{S.ai.alt[i.dataset.pm].model=i.value.trim()||PROVS[i.dataset.pm].model});save();$("#pvMsg").innerHTML='<span style="color:var(--ok)">已保存 ✓</span>';toast("已保存")};
   $("#syncSave").onclick=()=>{S.sync.url=$("#syncUrl").value.trim().replace(/\/+$/,"");save();if(!S.sync.url){syncSet("未启用");rSet();return}syncPull(true)};
+  if($("#wkCopy"))$("#wkCopy").onclick=e=>{e.preventDefault();e.stopPropagation();copyText(SYNC_WORKER_CODE)};
   if($("#syncNow"))$("#syncNow").onclick=()=>syncPull(true);
   if($("#syncOff"))$("#syncOff").onclick=()=>{S.sync={url:"",ts:0,hash:""};save();rSet()};
   $("#sEx").onchange=e=>{if(e.target.value){S.exam=e.target.value;save();renderNav();toast("已更新")}};
