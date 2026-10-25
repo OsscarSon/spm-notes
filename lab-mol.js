@@ -20,7 +20,7 @@ const CSS=`.lab-mol .mo-tabs,.lab-mol .mo-row{display:flex;gap:8px;flex-wrap:wra
 .lab-mol .mo-tabs button,.lab-mol .mo-chip{border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:12.5px;background:var(--sheet2)}
 .lab-mol .mo-tabs button.on,.lab-mol .mo-chip.on{background:var(--blue-soft);border-color:var(--blue);font-weight:700}
 .lab-mol input[type=text]{flex:1;min-width:150px}
-.lab-mol .mo-cv{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:12px}
+.lab-mol .mo-cv{width:100%!important;max-width:100%!important;height:auto!important;aspect-ratio:420/320;display:block;box-sizing:border-box;background:#fff;border:1px solid var(--line);border-radius:12px}
 .lab-mol .mo-3d{position:relative;width:100%;height:300px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .lab-mol .mo-msg{font-size:13px;min-height:20px;color:var(--bad)}`;
 function render(host){
@@ -60,7 +60,7 @@ function render(host){
     catch(e){msg.style.color="var(--bad)";msg.textContent=e.message==="nf"?"PubChem 没有找到这个名字的 3D 结构，试试英文名，或用上面的内置分子。":"查询失败（可能没有网络）。"}
   }
   function need(m){
-    if(m==="2"&&!ok2){ok2=true;window.Labs.lib(L2).then(()=>{drawer=new window.SmilesDrawer.Drawer({width:420,height:320});draw2()}).catch(()=>{ok2=false;msg.textContent="结构式库没加载成功（可能没有网络），联网后重新展开即可。"})}
+    if(m==="2"&&!ok2){ok2=true;window.Labs.lib(L2).then(()=>{drawer=new window.SmilesDrawer.Drawer({width:420,height:320,padding:70,bondLength:26});draw2()}).catch(()=>{ok2=false;msg.textContent="结构式库没加载成功（可能没有网络），联网后重新展开即可。"})}
     if(m==="3"&&!ok3){ok3=true;window.Labs.lib(L3).then(init3).catch(()=>{ok3=false;msg.textContent="3D 库没加载成功（可能没有网络），联网后重新展开即可。"})}
   }
   host.addEventListener("click",e=>{
