@@ -347,47 +347,75 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
 .skelBox{margin:12px 0;padding:14px 16px;border:1px dashed var(--line);border-radius:14px}
 .skel{height:14px;border-radius:8px;margin:10px 0;background:linear-gradient(90deg,var(--sheet2) 0%,var(--line) 50%,var(--sheet2) 100%);background-size:220% 100%;animation:skel 1.4s ease-in-out infinite}
 .skel.t{height:22px;width:42%}
-/* 生成进度：小宠物跑向终点 */
-.nrun{position:relative;margin:12px 0;padding:12px 14px 10px;border-radius:18px;border:1px solid var(--glass-line,var(--line));background:linear-gradient(180deg,rgba(150,205,255,.16),rgba(255,214,235,.14) 72%,rgba(255,255,255,0));overflow:hidden;transition:opacity .35s,transform .35s}
+/* 生成进度：小宠物跑向终点 (早上 / 夜晚随机) */
+.nrun{position:relative;margin:12px 0;padding:12px 14px 10px;border-radius:18px;border:1px solid var(--glass-line,var(--line));background:linear-gradient(180deg,rgba(150,205,255,.16),rgba(255,214,235,.14) 72%,rgba(255,255,255,0));overflow:hidden;transition:opacity .35s,transform .35s;--cl:#fff}
+.nrun.night{--cl:#8d97e6;background:linear-gradient(180deg,rgba(90,100,200,.2),rgba(150,100,190,.14) 72%,rgba(255,255,255,0))}
 .nrun.out{opacity:0;transform:translateY(6px)}
 .nrun.nr-float{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));width:min(92vw,420px);margin:0;z-index:9991;box-shadow:0 8px 28px rgba(0,0,0,.28);background:linear-gradient(180deg,rgba(150,205,255,.16),rgba(255,214,235,.14) 72%,rgba(255,255,255,0)),var(--sheet,#fff)}
+.nrun.nr-float.night{background:linear-gradient(180deg,rgba(90,100,200,.2),rgba(150,100,190,.14) 72%,rgba(255,255,255,0)),var(--sheet,#16202e)}
 .nrun.nr-float.out{transform:translate(-50%,8px)}
 body.nr-floating #ngChip{display:none}
 .nr-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .nr-msg{font-weight:600;font-size:14px;line-height:1.45;min-width:0;word-break:break-word}
 .nr-pct{font-variant-numeric:tabular-nums;font-size:13px;opacity:.75;flex:none}
-/* 一小片草地：天空会随着进度从清晨的蓝慢慢变成黄昏的粉橘，太阳在终点那头升起来 */
+/* 一小片草地：早上的天空会随进度慢慢变成黄昏，夜晚的月亮随进度升起来 */
 .nr-track{position:relative;height:96px;margin:8px 0 2px;overflow:hidden;border-radius:14px;background:linear-gradient(180deg,#bfe4ff 0%,#e9f6ff 74%)}
-.nrun.nr-float .nr-track{height:82px}
+.nrun.night .nr-track{background:linear-gradient(180deg,#141b4d 0%,#2c3173 74%)}
 .nr-sky{position:absolute;inset:0;background:linear-gradient(180deg,#ffc3d8 0%,#ffe6c6 74%);opacity:var(--p,0);transition:opacity .6s linear}
+.nrun.night .nr-sky{background:linear-gradient(180deg,#3a2d78 0%,#9a62a8 74%);opacity:calc(var(--p,0)*.7)}
 .nr-sun{position:absolute;right:15%;bottom:36px;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,#fffbe0 0 36%,#ffe08a 58%,rgba(255,224,138,0) 72%);opacity:calc(.2 + var(--p,0)*.8);transform:translateY(calc((1 - var(--p,0))*22px));transition:opacity .6s linear,transform .6s linear}
-.nr-c1,.nr-c2{position:absolute;left:-100px;border-radius:14px;background:#fff}
-.nr-c1{top:12px;width:44px;height:13px;box-shadow:15px -6px 0 3px #fff,32px 1px 0 -1px #fff;opacity:.88;animation:nrCloud 30s linear infinite}
-.nr-c2{top:34px;width:28px;height:9px;box-shadow:10px -4px 0 2px #fff,22px 1px 0 -1px #fff;opacity:.6;animation:nrCloud 46s linear -16s infinite}
+.nr-moon,.nr-stars,.nr-fly{display:none}
+.nrun.night .nr-sun{display:none}
+.nrun.night .nr-moon,.nrun.night .nr-stars,.nrun.night .nr-fly{display:block}
+.nr-moon{position:absolute;right:15%;bottom:38px;width:26px;height:26px;border-radius:50%;box-shadow:inset -9px -3px 0 0 #fff4c6;filter:drop-shadow(0 0 6px rgba(255,244,198,.75));opacity:calc(.4 + var(--p,0)*.6);transform:translateY(calc((1 - var(--p,0))*22px)) rotate(-18deg);transition:opacity .6s linear,transform .6s linear}
+.nr-stars{position:absolute;left:0;right:0;top:0;height:62%;background-image:radial-gradient(circle at 10% 24%,#fff 1px,transparent 1.8px),radial-gradient(circle at 24% 58%,#fff 1.2px,transparent 2px),radial-gradient(circle at 41% 18%,#fff 1px,transparent 1.8px),radial-gradient(circle at 63% 46%,#fff 1.3px,transparent 2px),radial-gradient(circle at 78% 14%,#fff 1px,transparent 1.8px),radial-gradient(circle at 92% 52%,#fff 1.1px,transparent 1.9px);animation:nrTwinkle 3.4s ease-in-out infinite alternate}
+.nr-stars::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 17% 40%,#ffeaa8 1.2px,transparent 2px),radial-gradient(circle at 34% 30%,#fff 1px,transparent 1.8px),radial-gradient(circle at 54% 22%,#ffeaa8 1.3px,transparent 2.1px),radial-gradient(circle at 71% 60%,#fff 1px,transparent 1.8px),radial-gradient(circle at 86% 34%,#ffeaa8 1.2px,transparent 2px);animation:nrTwinkle 2.4s ease-in-out -1.2s infinite alternate}
+.nr-fly i{position:absolute;width:4px;height:4px;border-radius:50%;background:#f7ffb8;box-shadow:0 0 7px 2px rgba(240,255,150,.75);animation:nrFly 5.5s ease-in-out infinite}
+.nr-fly i:nth-child(1){left:22%;bottom:24px}
+.nr-fly i:nth-child(2){left:52%;bottom:34px;animation-delay:-2s;animation-duration:6.5s}
+.nr-fly i:nth-child(3){left:80%;bottom:27px;animation-delay:-3.6s;animation-duration:5s}
+.nr-c1,.nr-c2{position:absolute;left:-100px;border-radius:14px;background:var(--cl)}
+.nr-c1{top:12px;width:44px;height:13px;box-shadow:15px -6px 0 3px var(--cl),32px 1px 0 -1px var(--cl);opacity:.88;animation:nrCloud 30s linear infinite}
+.nr-c2{top:34px;width:28px;height:9px;box-shadow:10px -4px 0 2px var(--cl),22px 1px 0 -1px var(--cl);opacity:.6;animation:nrCloud 46s linear -16s infinite}
+.nrun.night .nr-c1{opacity:.3}
+.nrun.night .nr-c2{opacity:.22}
 .nr-hills{position:absolute;left:0;right:0;bottom:12px;height:40px;background:radial-gradient(70px 30px at 12% 100%,#c4e8b4 97%,transparent 100%),radial-gradient(110px 40px at 46% 100%,#addb9f 97%,transparent 100%),radial-gradient(80px 28px at 84% 100%,#c4e8b4 97%,transparent 100%)}
+.nrun.night .nr-hills{background:radial-gradient(70px 30px at 12% 100%,#3d6f78 97%,transparent 100%),radial-gradient(110px 40px at 46% 100%,#315f6c 97%,transparent 100%),radial-gradient(80px 28px at 84% 100%,#3d6f78 97%,transparent 100%)}
 .nr-ground{position:absolute;left:0;right:0;bottom:0;height:18px;border-radius:12px 12px 0 0;background:radial-gradient(circle at 17px 11px,#fff 1.8px,transparent 2.4px) 0 0/38px 18px,radial-gradient(circle at 9px 5px,#ff9fbd 2.2px,transparent 2.8px) 0 0/38px 18px,radial-gradient(circle at 28px 8px,#ffe27a 2.2px,transparent 2.8px) 0 0/38px 18px,linear-gradient(#bfeab4,#98d493)}
+.nrun.night .nr-ground{background:radial-gradient(circle at 17px 11px,#dfe4ff 1.6px,transparent 2.2px) 0 0/38px 18px,radial-gradient(circle at 9px 5px,#d98ab0 2px,transparent 2.6px) 0 0/38px 18px,radial-gradient(circle at 28px 8px,#e6cf75 2px,transparent 2.6px) 0 0/38px 18px,linear-gradient(#3f8a63,#2f6e52)}
 /* 走过的路会变成一条小径，就是进度 */
-.nr-trail{position:absolute;left:6px;bottom:4px;height:9px;width:32px;border-radius:9px;background:linear-gradient(90deg,#ffd9bd,#ffc3d6);box-shadow:inset 0 -2px 0 rgba(255,255,255,.35);transition:width .5s linear}
+.nr-trail{position:absolute;left:6px;bottom:4px;height:9px;width:36px;border-radius:9px;background:linear-gradient(90deg,#ffd9bd,#ffc3d6);box-shadow:inset 0 -2px 0 rgba(255,255,255,.35);transition:width .5s linear}
+.nrun.night .nr-trail{background:linear-gradient(90deg,#ffe3b0,#ffc4dc);box-shadow:0 0 8px rgba(255,226,170,.55),inset 0 -2px 0 rgba(255,255,255,.35)}
 .nr-goal{position:absolute;right:6px;bottom:9px;display:flex;align-items:flex-end;gap:2px}
 .g-flag{font-size:26px;line-height:1;transform-origin:20% 100%;animation:nrFlag 1.8s ease-in-out infinite}
 .g-treat{font-size:21px;line-height:1;margin-bottom:1px}
 .nrun.ok .g-treat{animation:nrNom .7s ease-out forwards}
-.nr-pet{position:absolute;left:0;bottom:10px;width:50px;height:50px;transition:left .5s linear;z-index:3}
+/* 宠物：侧面奔跑的 Q 版小跑者，四条腿交替摆动，耳朵和尾巴会甩 */
+.nr-pet{position:absolute;left:0;bottom:9px;width:58px;height:50px;transition:left .5s linear;z-index:3}
+.nr-pet::before{content:"";position:absolute;left:16%;right:6%;bottom:-2px;height:6px;border-radius:50%;background:rgba(40,30,20,.2);animation:nrShadow .46s ease-in-out infinite}
+.nr-pet:not(.run):not(.fin)::before{animation:none}
 .nr-hop{width:100%;height:100%;transform-origin:50% 100%;animation:nrHop .46s ease-in-out infinite}
-.nr-hop svg{width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 3px 3px rgba(0,0,0,.16))}
-.nr-emo{display:block;font-size:38px;line-height:50px;text-align:center}
-.nr-pet .pet-body,.nr-pet .pet-head{animation:none}
-.nr-pet.run .pet-tail,.nr-pet.fin .pet-tail{animation:petWag .24s ease-in-out infinite}
-.nr-pet.run .pet-eye-open,.nr-pet.fin .pet-eye-open{display:none}
-.nr-pet.run .pet-eye-happy,.nr-pet.fin .pet-eye-happy{display:inline}
-.nr-pet.run .pet-tongue,.nr-pet.fin .pet-tongue{display:inline}
+.nr-hop svg{width:100%;height:100%;overflow:visible;display:block}
+.nrun.night .nr-hop svg{filter:drop-shadow(0 0 2px rgba(255,255,255,.5))}
+.rp-happy,.rp-tongue{display:none}
+.nr-pet.run .rp-open,.nr-pet.fin .rp-open{display:none}
+.nr-pet.run .rp-happy,.nr-pet.fin .rp-happy,.nr-pet.run .rp-tongue,.nr-pet.fin .rp-tongue{display:inline}
+.rp-leg,.rp-tail,.rp-ear{transform-box:fill-box}
+.rp-leg{transform-origin:50% 0}
+.rp-tail{transform-origin:100% 80%}
+.rp-ear{transform-origin:50% 100%}
+.rp-ear.rp-hang{transform-origin:50% 0}
+.nr-pet.run .rp-A,.nr-pet.fin .rp-A{animation:rpLeg .46s ease-in-out infinite}
+.nr-pet.run .rp-B,.nr-pet.fin .rp-B{animation:rpLeg .46s ease-in-out -.23s infinite}
+.nr-pet.run .rp-tail,.nr-pet.fin .rp-tail{animation:rpTail .23s ease-in-out infinite alternate}
+.nr-pet.run .rp-ear,.nr-pet.fin .rp-ear{animation:rpEar .46s ease-in-out infinite alternate}
 .nr-pet.fin .nr-hop{animation:nrCheer .55s ease-in-out 3}
 .nr-pet.trip .nr-hop{animation:nrTrip .9s ease-out 1}
-.nr-pet.sad .nr-hop{animation:none;transform:rotate(-9deg) translateY(2px)}
-.nr-pet.sad::after{content:"💦";position:absolute;right:-6px;top:-4px;font-size:15px}
+.nr-pet.sad .nr-hop{animation:none;transform:rotate(-6deg) translateY(2px)}
+.nr-pet.sad::after{content:"💦";position:absolute;right:-2px;top:-2px;font-size:15px}
 /* 宠物偶尔说一句话 (和右下角那只一样的叫声) */
-.nr-say{position:absolute;left:64%;bottom:78%;white-space:nowrap;padding:3px 9px;border-radius:12px;background:#fff;color:#4a4a58;font:700 12px/1.3 var(--sans,sans-serif);box-shadow:0 2px 8px rgba(0,0,0,.14);opacity:0;transform:translateY(4px) scale(.92);transition:opacity .25s,transform .25s;pointer-events:none;z-index:5}
-.nr-say::after{content:"";position:absolute;left:9px;bottom:-4px;width:8px;height:8px;background:#fff;transform:rotate(45deg)}
+.nr-say{position:absolute;left:0;bottom:calc(100% + 10px);white-space:nowrap;padding:3px 9px;border-radius:12px;background:#fff;color:#4a4a58;font:700 12px/1.3 var(--sans,sans-serif);box-shadow:0 2px 8px rgba(0,0,0,.14);opacity:0;transform:translateY(4px) scale(.92);transition:opacity .25s,transform .25s;pointer-events:none;z-index:5}
+.nr-say::after{content:"";position:absolute;left:24px;bottom:-4px;width:8px;height:8px;background:#fff;transform:rotate(45deg)}
 .nr-say.on{opacity:1;transform:none}
 .nr-paw{position:absolute;bottom:var(--y,6px);font-size:11px;opacity:0;transform:rotate(90deg);pointer-events:none;animation:nrPaw 2.2s ease-out forwards;z-index:2}
 .nrun.bad .nr-track{filter:saturate(.45) brightness(.96)}
@@ -398,7 +426,11 @@ body.nr-floating #ngChip{display:none}
 .nr-hint{margin-top:4px;font-size:12.5px}
 .nr-act{display:flex;gap:8px;margin-top:8px}
 .nr-conf{position:absolute;right:34px;bottom:30px;width:7px;height:10px;border-radius:2px;opacity:0;pointer-events:none;animation:nrConf 1.2s ease-out forwards;z-index:6}
-@keyframes nrHop{0%,100%{transform:translateY(0) scale(1.07,.9) rotate(5deg)}35%{transform:translateY(-13px) scale(.95,1.07) rotate(6deg)}60%{transform:translateY(-12px) scale(.96,1.05) rotate(3deg)}}
+@keyframes nrHop{0%,100%{transform:translateY(0) scale(1.05,.92) rotate(3deg)}35%{transform:translateY(-12px) scale(.96,1.06) rotate(4deg)}60%{transform:translateY(-11px) scale(.97,1.04) rotate(2deg)}}
+@keyframes nrShadow{0%,100%{transform:scale(1);opacity:1}35%,60%{transform:scale(.78);opacity:.55}}
+@keyframes rpLeg{0%,100%{transform:rotate(30deg)}50%{transform:rotate(-30deg)}}
+@keyframes rpTail{from{transform:rotate(-10deg)}to{transform:rotate(14deg)}}
+@keyframes rpEar{from{transform:rotate(-9deg)}to{transform:rotate(7deg)}}
 @keyframes nrCheer{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px) rotate(-6deg)}}
 @keyframes nrTrip{0%{transform:rotate(0)}20%{transform:rotate(22deg) scale(1.1,.85)}55%{transform:rotate(-8deg)}100%{transform:rotate(0)}}
 @keyframes nrPaw{0%{opacity:0}12%{opacity:.6}100%{opacity:0}}
@@ -406,7 +438,9 @@ body.nr-floating #ngChip{display:none}
 @keyframes nrCloud{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 200px))}}
 @keyframes nrConf{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--r))}}
 @keyframes nrNom{0%{transform:scale(1)}40%{transform:scale(1.6) rotate(-10deg)}100%{transform:scale(0);opacity:0}}
-@media (prefers-reduced-motion:reduce){.nr-hop,.g-flag,.nr-c1,.nr-c2,.nr-pet .pet-tail,.nr-paw,.nr-conf{animation:none!important}.nr-pet,.nr-trail,.nr-sky,.nr-sun{transition:none}}
+@keyframes nrTwinkle{from{opacity:.35}to{opacity:1}}
+@keyframes nrFly{0%,100%{transform:translate(0,0);opacity:.15}30%{opacity:1}50%{transform:translate(9px,-10px);opacity:.9}80%{transform:translate(-6px,-3px);opacity:.4}}
+@media (prefers-reduced-motion:reduce){.nr-hop,.g-flag,.nr-c1,.nr-c2,.nr-pet::before,.nr-pet .rp-leg,.nr-pet .rp-tail,.nr-pet .rp-ear,.nr-paw,.nr-conf,.nr-stars,.nr-stars::before,.nr-fly i{animation:none!important}.nr-pet,.nr-trail,.nr-sky,.nr-sun,.nr-moon{transition:none}}
 @media print{.nrun{display:none!important}}
 
 @keyframes skel{from{background-position:120% 0}to{background-position:-120% 0}}
@@ -2306,6 +2340,7 @@ document.addEventListener("visibilitychange",()=>{
   }else ngResume()});
 window.addEventListener("online",()=>ngResume());
 /* ---- 生成进度：小宠物一路跑向终点旗 (用的是你在右下角选的那只) ---- */
+const NR_PETS={dog:`<g class="rp-leg rp-A"><path d="M22 57 L22 70" stroke="#7a4a28" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M22 57 L22 70" stroke="#e2b277" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M22 67.8 L22 70" stroke="#fff0d4" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-B"><path d="M52 57 L52 70" stroke="#7a4a28" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M52 57 L52 70" stroke="#e2b277" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M52 67.8 L52 70" stroke="#fff0d4" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-tail"><path d="M19 46 Q3 46 7 29" stroke="#7a4a28" stroke-width="9.9" stroke-linecap="round" fill="none"/><path d="M19 46 Q3 46 7 29" stroke="#f6c88e" stroke-width="5.5" stroke-linecap="round" fill="none"/></g><ellipse cx="42" cy="49" rx="25" ry="15" fill="#f6c88e" stroke="#7a4a28" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="44" cy="56.5" rx="15" ry="6.5" fill="#fff0d4"/><g class="rp-leg rp-B"><path d="M33 58 L33 70" stroke="#7a4a28" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M33 58 L33 70" stroke="#f6c88e" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M33 67.8 L33 70" stroke="#fff0d4" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-A"><path d="M63 58 L63 70" stroke="#7a4a28" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M63 58 L63 70" stroke="#f6c88e" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M63 67.8 L63 70" stroke="#fff0d4" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-ear rp-hang"><path d="M76 19 Q85 9 91 18 Q92 27 85 29 Q78 27 76 19 Z" fill="#dd9a52" stroke="#7a4a28" stroke-width="2.2" stroke-linejoin="round" /></g><circle cx="70" cy="33" r="17.5" fill="#f6c88e" stroke="#7a4a28" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="82.5" cy="38.5" rx="9.5" ry="7.6" fill="#fff3dc" stroke="#7a4a28" stroke-width="2" stroke-linejoin="round" /><circle cx="74" cy="21.5" r="2.1" fill="#dd9a52"/><circle cx="80.5" cy="22.5" r="1.7" fill="#dd9a52"/><ellipse cx="71" cy="40" rx="4.6" ry="2.9" fill="#ff9fb4" fill-opacity="0.6"/><g class="rp-open"><ellipse cx="77" cy="30" rx="3.2" ry="4" fill="#3a2a35"/><circle cx="78.2" cy="28.3" r="1.3" fill="#fff"/><circle cx="76" cy="31.8" r="0.6" fill="#fff"/></g><g class="rp-happy"><path d="M73 31.5 Q77 26 81 31.5" stroke="#3a2a35" stroke-width="2.6" stroke-linecap="round" fill="none"/></g><ellipse cx="90.2" cy="35" rx="3.3" ry="2.6" fill="#3a2a2a"/><circle cx="91" cy="34.2" r=".8" fill="#fff" fill-opacity=".8"/><path d="M84.5 42 Q88 45.5 92 41.5" stroke="#7a4a28" stroke-width="1.9" stroke-linecap="round" fill="none"/><g class="rp-tongue"><path d="M87.5 43.5 Q87 50 91 49 Q94 47 92 42.5 Z" fill="#ff8fa6" stroke="#c4546d" stroke-width="1.2" stroke-linejoin="round"/></g><g class="rp-ear rp-hang"><path d="M64 19 Q50 15 50 31 Q51 43 60.5 38 Q67 33 66.5 21 Z" fill="#dd9a52" stroke="#7a4a28" stroke-width="2.2" stroke-linejoin="round" /></g>`,cat:`<g class="rp-leg rp-A"><path d="M22 57 L22 70" stroke="#4d587a" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M22 57 L22 70" stroke="#a3aec8" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M22 67.8 L22 70" stroke="#fff" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-B"><path d="M52 57 L52 70" stroke="#4d587a" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M52 57 L52 70" stroke="#a3aec8" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M52 67.8 L52 70" stroke="#fff" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-tail"><path d="M19 50 Q0 54 3 33 Q5 24 13 26" stroke="#4d587a" stroke-width="9.4" stroke-linecap="round" fill="none"/><path d="M19 50 Q0 54 3 33 Q5 24 13 26" stroke="#b8c2d9" stroke-width="5" stroke-linecap="round" fill="none"/></g><ellipse cx="42" cy="49" rx="25" ry="15" fill="#b8c2d9" stroke="#4d587a" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="44" cy="56.5" rx="15" ry="6.5" fill="#f6f8fc"/><path d="M30 36 L31 42 M36 34.5 L37 41 M42 34 L42.5 40.5" stroke="#8e9abd" stroke-width="2.2" stroke-linecap="round" fill="none"/><g class="rp-leg rp-B"><path d="M33 58 L33 70" stroke="#4d587a" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M33 58 L33 70" stroke="#b8c2d9" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M33 67.8 L33 70" stroke="#fff" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-A"><path d="M63 58 L63 70" stroke="#4d587a" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M63 58 L63 70" stroke="#b8c2d9" stroke-width="7.5" stroke-linecap="round" fill="none"/><path d="M63 67.8 L63 70" stroke="#fff" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-ear"><path d="M77 18 L87 5 L90 25 Z" fill="#b8c2d9" stroke="#4d587a" stroke-width="2.2" stroke-linejoin="round" /></g><circle cx="70" cy="33" r="17.5" fill="#b8c2d9" stroke="#4d587a" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="82" cy="39" rx="6.5" ry="5.2" fill="#f6f8fc"/><path d="M67 17.5 L67.5 23 M72 16.5 L72.5 22 M77 17.5 L77 22.5" stroke="#8e9abd" stroke-width="2" stroke-linecap="round" fill="none"/><ellipse cx="71" cy="40" rx="4.6" ry="2.9" fill="#ff9fb4" fill-opacity="0.6"/><g class="rp-open"><ellipse cx="77" cy="30" rx="3.2" ry="4" fill="#3a2a35"/><circle cx="78.2" cy="28.3" r="1.3" fill="#fff"/><circle cx="76" cy="31.8" r="0.6" fill="#fff"/></g><g class="rp-happy"><path d="M73 31.5 Q77 26 81 31.5" stroke="#3a2a35" stroke-width="2.6" stroke-linecap="round" fill="none"/></g><path d="M84 38 L97 34.5 M84 40 L97 41" stroke="#4d587a" stroke-width="1" stroke-linecap="round" fill="none" opacity=".55"/><path d="M86.6 35 L91.4 35 L89 38.2 Z" fill="#ffb5c6" stroke="#4d587a" stroke-width="1.2" stroke-linejoin="round"/><path d="M89 38.2 L89 40.5 M84.6 42 Q89 45 93 41" stroke="#4d587a" stroke-width="1.7" stroke-linecap="round" fill="none"/><g class="rp-ear"><path d="M58 24 L60 3 L74 16 Z" fill="#b8c2d9" stroke="#4d587a" stroke-width="2.2" stroke-linejoin="round" /><path d="M61.5 19 L62.3 9.5 L69.5 15.8 Z" fill="#ffb5c6"/></g>`,rabbit:`<g class="rp-leg rp-A"><path d="M22 57 L22 70" stroke="#8a6f80" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M22 57 L22 70" stroke="#f1e6e6" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-B"><path d="M52 57 L52 70" stroke="#8a6f80" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M52 57 L52 70" stroke="#f1e6e6" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-tail"><circle cx="15.5" cy="45" r="7" fill="#fffaf6" stroke="#8a6f80" stroke-width="2.2" stroke-linejoin="round" /></g><ellipse cx="42" cy="49" rx="25" ry="15" fill="#fffaf6" stroke="#8a6f80" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="44" cy="56.5" rx="15" ry="6.5" fill="#ffeef2"/><ellipse cx="31" cy="52" rx="9.5" ry="8.5" fill="#fffaf6" stroke="#8a6f80" stroke-width="1.8" stroke-linejoin="round" /><g class="rp-leg rp-B"><path d="M33 58 L33 70" stroke="#8a6f80" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M33 58 L33 70" stroke="#fffaf6" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-A"><path d="M63 58 L63 70" stroke="#8a6f80" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M63 58 L63 70" stroke="#fffaf6" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-ear"><ellipse cx="78" cy="11.5" rx="4.8" ry="11.5" transform="rotate(14 78 11.5)" fill="#fffaf6" stroke="#8a6f80" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="78" cy="12.5" rx="2.2" ry="7.6" transform="rotate(14 78 12.5)" fill="#ffc2d1"/></g><circle cx="70" cy="33" r="17.5" fill="#fffaf6" stroke="#8a6f80" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="83" cy="39" rx="7" ry="5.6" fill="#ffeef2"/><ellipse cx="71" cy="40" rx="4.6" ry="2.9" fill="#ff9fb4" fill-opacity="0.6"/><g class="rp-open"><ellipse cx="77" cy="30" rx="3.2" ry="4" fill="#3a2a35"/><circle cx="78.2" cy="28.3" r="1.3" fill="#fff"/><circle cx="76" cy="31.8" r="0.6" fill="#fff"/></g><g class="rp-happy"><path d="M73 31.5 Q77 26 81 31.5" stroke="#3a2a35" stroke-width="2.6" stroke-linecap="round" fill="none"/></g><ellipse cx="89.3" cy="35.6" rx="2.6" ry="2" fill="#ff8fa8"/><path d="M89.3 37.6 L89.3 39.6 M85.2 41 Q89.3 44.5 93.4 41" stroke="#8a6f80" stroke-width="1.8" stroke-linecap="round" fill="none"/><g class="rp-ear"><ellipse cx="63" cy="10.5" rx="5.2" ry="12.2" transform="rotate(-16 63 10.5)" fill="#fffaf6" stroke="#8a6f80" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="63" cy="11.5" rx="2.4" ry="8.2" transform="rotate(-16 63 11.5)" fill="#ffc2d1"/></g>`,panda:`<g class="rp-leg rp-A"><path d="M22 57 L22 70" stroke="#2b2b36" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M22 57 L22 70" stroke="#2a2a33" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-B"><path d="M52 57 L52 70" stroke="#2b2b36" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M52 57 L52 70" stroke="#2a2a33" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-tail"><circle cx="16" cy="46" r="5.4" fill="#ffffff" stroke="#2b2b36" stroke-width="2.2" stroke-linejoin="round" /></g><ellipse cx="42" cy="49" rx="25" ry="15" fill="#ffffff" stroke="#2b2b36" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="50" cy="49" rx="6.5" ry="14.3" fill="#34343f"/><ellipse cx="42" cy="49" rx="25" ry="15" fill="none" stroke="#2b2b36" stroke-width="2.2"/><g class="rp-leg rp-B"><path d="M33 58 L33 70" stroke="#2b2b36" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M33 58 L33 70" stroke="#34343f" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-A"><path d="M63 58 L63 70" stroke="#2b2b36" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M63 58 L63 70" stroke="#34343f" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-ear"><circle cx="81" cy="19" r="6.6" fill="#34343f" stroke="#2b2b36" stroke-width="2.2" stroke-linejoin="round" /></g><circle cx="70" cy="33" r="17.5" fill="#ffffff" stroke="#2b2b36" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="82.5" cy="38.5" rx="9.5" ry="7.6" fill="#ffffff" stroke="#2b2b36" stroke-width="2" stroke-linejoin="round" /><ellipse cx="76" cy="30.5" rx="6.3" ry="7.6" transform="rotate(-18 76 30.5)" fill="#34343f"/><ellipse cx="71" cy="40" rx="4.6" ry="2.9" fill="#ff9fb4" fill-opacity="0.6"/><g class="rp-open"><ellipse cx="77" cy="30" rx="2.6" ry="3.3" fill="#fff"/><circle cx="77.7" cy="30.5" r="1.7" fill="#2a2a33"/><circle cx="78.2" cy="29.3" r="0.9" fill="#fff"/></g><g class="rp-happy"><path d="M73 31.5 Q77 26 81 31.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" fill="none"/></g><ellipse cx="89.5" cy="36" rx="3.3" ry="2.5" fill="#2a2a33"/><circle cx="90.3" cy="35.2" r=".8" fill="#fff" fill-opacity=".7"/><path d="M84.5 42 Q88 45.5 92 41.5" stroke="#2b2b36" stroke-width="1.9" stroke-linecap="round" fill="none"/><g class="rp-ear"><circle cx="60" cy="19.5" r="6.8" fill="#34343f" stroke="#2b2b36" stroke-width="2.2" stroke-linejoin="round" /></g>`,bear:`<g class="rp-leg rp-A"><path d="M22 57 L22 70" stroke="#6b4025" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M22 57 L22 70" stroke="#b78452" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-B"><path d="M52 57 L52 70" stroke="#6b4025" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M52 57 L52 70" stroke="#b78452" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-tail"><circle cx="16" cy="46" r="5.2" fill="#c99562" stroke="#6b4025" stroke-width="2.2" stroke-linejoin="round" /></g><ellipse cx="42" cy="49" rx="25" ry="15" fill="#c99562" stroke="#6b4025" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="44" cy="56.5" rx="15" ry="6.5" fill="#e9cba4"/><g class="rp-leg rp-B"><path d="M33 58 L33 70" stroke="#6b4025" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M33 58 L33 70" stroke="#c99562" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-leg rp-A"><path d="M63 58 L63 70" stroke="#6b4025" stroke-width="11.9" stroke-linecap="round" fill="none"/><path d="M63 58 L63 70" stroke="#c99562" stroke-width="7.5" stroke-linecap="round" fill="none"/></g><g class="rp-ear"><circle cx="81" cy="19" r="6.6" fill="#c99562" stroke="#6b4025" stroke-width="2.2" stroke-linejoin="round" /><circle cx="81" cy="19.5" r="3.2" fill="#e7bd90"/></g><circle cx="70" cy="33" r="17.5" fill="#c99562" stroke="#6b4025" stroke-width="2.2" stroke-linejoin="round" /><ellipse cx="82.5" cy="38.5" rx="9.5" ry="7.6" fill="#f1d6b5" stroke="#6b4025" stroke-width="2" stroke-linejoin="round" /><ellipse cx="71" cy="40" rx="4.6" ry="2.9" fill="#ff9fb4" fill-opacity="0.6"/><g class="rp-open"><ellipse cx="77" cy="30" rx="3.2" ry="4" fill="#3a2a35"/><circle cx="78.2" cy="28.3" r="1.3" fill="#fff"/><circle cx="76" cy="31.8" r="0.6" fill="#fff"/></g><g class="rp-happy"><path d="M73 31.5 Q77 26 81 31.5" stroke="#3a2a35" stroke-width="2.6" stroke-linecap="round" fill="none"/></g><ellipse cx="90" cy="35" rx="3.5" ry="2.7" fill="#3a2a2a"/><circle cx="90.9" cy="34.1" r=".8" fill="#fff" fill-opacity=".8"/><path d="M84.5 42 Q88 45.5 92 41.5" stroke="#6b4025" stroke-width="1.9" stroke-linecap="round" fill="none"/><g class="rp-ear"><circle cx="60" cy="19.5" r="6.8" fill="#c99562" stroke="#6b4025" stroke-width="2.2" stroke-linejoin="round" /><circle cx="60" cy="20" r="3.3" fill="#e7bd90"/></g>`};   /* 跑道专用：侧面奔跑的 Q 版小宠物 (面朝右)，跟着你选的宠物变 */
 const NR_SAY={dog:["汪！","汪汪！"],cat:["喵~","喵呜~"],rabbit:["蹦蹦~","噗噗~"],panda:["嗷呜~","加油~"],bear:["嗷~","冲呀~"]};
 const NR_CHEER={dog:"汪汪！到啦！",cat:"喵~ 到啦！",rabbit:"蹦蹦~ 到啦！",panda:"嗷呜~ 到啦！",bear:"嗷~ 到啦！"};
 const NR_TREAT={dog:"🦴",cat:"🐟",rabbit:"🥕",panda:"🎋",bear:"🍯"};   /* 终点等着的小奖励，跟着你选的宠物变 */
@@ -2314,16 +2349,15 @@ function NoteRun(find,opt){
   document.querySelectorAll(".nrun").forEach(x=>x.remove());document.body.classList.remove("nr-floating");
   const t0=Date.now();
   let total=opt.total||1,idx=0,title="",expect=opt.expect||8000,chars=0,p=0,tc=t0,lastGrow=t0,phMsg="",phUntil=0,fin=false,failed=false,dead=false,floating=false,lastSay=t0-6500,sayT=0,pawN=0,lastPaw=0;
-  const el=document.createElement("div");el.className="nrun";el.id="noteRun";el.setAttribute("role","status");el.setAttribute("aria-live","polite");
-  let inner="";try{const sv=document.getElementById("petSvg");if(sv&&sv.innerHTML.length>80)inner=sv.innerHTML}catch(e){}
+  const el=document.createElement("div");const night=opt.night!=null?!!opt.night:Math.random()<.5;el.className="nrun"+(night?" night":"");el.id="noteRun";el.setAttribute("role","status");el.setAttribute("aria-live","polite");
   let kind="dog";try{const j=JSON.parse(localStorage.getItem("spm-pet")||"{}");if(j&&NR_SAY[j.kind])kind=j.kind}catch(e){}
   el.innerHTML='<div class="nr-top"><span class="nr-msg"></span><b class="nr-pct">0%</b></div>'+
-    '<div class="nr-track"><div class="nr-sky"></div><div class="nr-sun"></div><div class="nr-c1"></div><div class="nr-c2"></div><div class="nr-hills"></div><div class="nr-ground"></div><div class="nr-trail"></div>'+
+    '<div class="nr-track"><div class="nr-sky"></div><div class="nr-sun"></div><div class="nr-moon"></div><div class="nr-stars"></div><div class="nr-c1"></div><div class="nr-c2"></div><div class="nr-hills"></div><div class="nr-ground"></div><div class="nr-trail"></div><div class="nr-fly"><i></i><i></i><i></i></div>'+
     '<div class="nr-goal" aria-hidden="true"><span class="g-flag">🏁</span><span class="g-treat">'+NR_TREAT[kind]+'</span></div>'+
-    '<div class="nr-pet run"><div class="nr-say"></div><div class="nr-hop">'+(inner?'<svg viewBox="0 0 120 120" aria-hidden="true">'+inner+'</svg>':'<span class="nr-emo">🐶</span>')+'</div></div></div>'+
+    '<div class="nr-pet run"><div class="nr-say"></div><div class="nr-hop"><svg viewBox="0 -6 100 86" aria-hidden="true">'+(NR_PETS[kind]||NR_PETS.dog)+'</svg></div></div></div>'+
     '<div class="nr-sub"></div>';
   const q=s=>el.querySelector(s),msg=q(".nr-msg"),pct=q(".nr-pct"),pet=q(".nr-pet"),track=q(".nr-track"),trail=q(".nr-trail"),sayEl=q(".nr-say"),sub=q(".nr-sub");
-  const pos=v=>"calc((100% - 96px) * "+v.toFixed(4)+")";
+  const pos=v=>"calc((100% - 112px) * "+v.toFixed(4)+")";
   const fmt=s=>s<60?s+" 秒":Math.floor(s/60)+" 分 "+(s%60)+" 秒";
   function kill(){dead=true;fin=true;clearInterval(timer);el.remove();document.body.classList.remove("nr-floating")}
   /* 有可见的位置就放在按钮下面；切到别的页面 / 章节收起来了，就浮在屏幕下方中间继续跑 */
@@ -2339,14 +2373,14 @@ function NoteRun(find,opt){
     return true}
   function chapP(){if(!chars)return Math.min(.06,(Date.now()-tc)/90000*.06);const r=chars/expect;return r<=1?.06+.84*r:.9+.05*(1-Math.exp(-(r-1)*1.5))}
   function tip(cp){return cp<.08?"小跑鞋穿好啦，AI 在热身…":cp<.3?"正在整理术语和定义":cp<.58?"正在写得分点清单":cp<.82?"在补易错点和速记表":"出自测题啦，快到终点了！"}
-  function paw(){const i=document.createElement("i");i.className="nr-paw";i.textContent="🐾";i.style.left="calc((100% - 96px) * "+p.toFixed(4)+" + 2px)";i.style.setProperty("--y",(pawN++%2?"5px":"10px"));i.addEventListener("animationend",()=>i.remove());track.appendChild(i);const ps=track.querySelectorAll(".nr-paw");if(ps.length>10)ps[0].remove()}
+  function paw(){const i=document.createElement("i");i.className="nr-paw";i.textContent="🐾";i.style.left="calc((100% - 112px) * "+p.toFixed(4)+" + 2px)";i.style.setProperty("--y",(pawN++%2?"5px":"10px"));i.addEventListener("animationend",()=>i.remove());track.appendChild(i);const ps=track.querySelectorAll(".nr-paw");if(ps.length>10)ps[0].remove()}
   function talk(txt,ms){sayEl.textContent=txt;sayEl.classList.add("on");clearTimeout(sayT);sayT=setTimeout(()=>sayEl.classList.remove("on"),ms||2000)}
   function paint(){
     if(failed){mount();return}
     if(fin)return;
     mount();
     const now=Date.now(),cp=chapP(),P=(idx+cp)/total;if(P>p)p=P;
-    const pc=Math.min(99,Math.round(p*100));pct.textContent=pc+"%";trail.style.width="calc((100% - 96px) * "+p.toFixed(4)+" + 32px)";el.style.setProperty("--p",p.toFixed(3));pet.style.left=pos(p);
+    const pc=Math.min(99,Math.round(p*100));pct.textContent=pc+"%";trail.style.width="calc((100% - 112px) * "+p.toFixed(4)+" + 36px)";el.style.setProperty("--p",p.toFixed(3));pet.style.left=pos(p);
     let m=now<phUntil?phMsg:(chars>0&&now-lastGrow>25000)?"AI 想得有点久，小宠物陪你等一下…":tip(cp);
     if(total>1)m="第 "+(idx+1)+"/"+total+" 章 · "+m;
     msg.textContent=m;
@@ -2658,9 +2692,9 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
-{v:"2026-10-24c",date:"2026-10-24",title:"生成笔记更稳了，还有小宠物陪跑 🐾",
+{v:"2026-10-24d",date:"2026-10-24",title:"生成笔记更稳了，还有小宠物陪跑 🐾",
    items:[
-    "🐾 生成笔记时，下面会出现一条跑道：你选的小宠物会在一片小草地上一路跑向终点：走过的路会变成小径，天空从清晨慢慢变成黄昏，终点的太阳随着进度升起，终点还等着它爱吃的小零食。偶尔还会叫一声。跑到终点就是写好了，不用再对着转圈圈干等。",
+    "🐾 生成笔记时，下面会出现一条跑道：一只 Q 版小宠物（跟着你选的那只变）在小草地上一路跑向终点，走过的路会变成小径，终点等着它爱吃的小零食。场景是早上或夜晚随机：早上天空慢慢变成黄昏、太阳升起；夜晚有星星、萤火虫，月亮升起。不用再对着转圈圈干等。",
     "🔌 写到一半网络断了、手机切到后台，不再整篇作废：已经写出来的内容会保留，并自动接着往下写；还没写出多少就断了，会自动重试。",
     "🔁 生成笔记时切页、刷新、切到别的 App 都不会丢，回到页面会自动接着生成。",
     "📌 生成中切到别的页面，跑道会跟着浮在屏幕下方中间，一路看得到进度，笔记照常继续写。",
