@@ -1839,10 +1839,30 @@ function infoHTML(){
   <details class="chap"><summary><span class="t">备考原则</span></summary><div class="body"><ul style="margin:0;padding-left:1.2em">${TIPS.map(t=>`<li style="margin:6px 0">${esc(t)}</li>`).join("")}</ul></div></details>`}
 
 /* ---- 笔记 ---- */
+/* ---- 笔记搜索：先用原来的“包含”匹配，再用 MiniSearch（前缀 / 容错 / 多词）补充；库加载失败就只用原来的 ---- */
+const MS_URL="https://cdn.jsdelivr.net/npm/minisearch@7.1.0/dist/umd/index.min.js";
+let msState=0,msIdx=null,msSig="";
+function msLoad(){if(msState)return;msState=1;const e=document.createElement("script");e.src=MS_URL;e.onload=()=>{msState=window.MiniSearch?2:3;if(msState===2&&nQ&&$("#nq"))refreshSearch()};e.onerror=()=>{msState=3};document.head.appendChild(e)}
+function refreshSearch(){const i=$("#nq");if(!i)return;const pos=i.selectionStart;rNotes();const j=$("#nq");if(j){j.focus();try{j.setSelectionRange(pos,pos)}catch(e){}}}
+function msTok(t){return String(t).toLowerCase().match(/[\u3400-\u9fff]|[a-z0-9\u00c0-\u024f]+/g)||[]}
+function noteSearch(q){
+  const all=SUBJECTS.flatMap(x=>chapsOf(x.id).map(c=>({...c,sid:x.id})));
+  const text=c=>(c.t+" "+c.subs.join(" ")+" "+plain(c.n)+" "+(S.notes[c.k]?S.notes[c.k].md:"")).toLowerCase();
+  const hit=all.filter(c=>text(c).includes(q));
+  msLoad();if(msState!==2)return hit;
+  try{
+    const sig=all.length+"|"+Object.keys(S.notes).length+"|"+Object.values(S.notes).reduce((a,n)=>a+((n&&n.md)||"").length,0);
+    if(!msIdx||sig!==msSig){msIdx=new window.MiniSearch({fields:["t","subs","body"],storeFields:[],tokenize:msTok,searchOptions:{boost:{t:3,subs:2},prefix:true,fuzzy:t=>t.length>4?0.2:false,combineWith:"AND"}});
+      msIdx.addAll(all.map(c=>({id:c.sid+"|"+c.k,t:c.t,subs:c.subs.join(" "),body:plain(c.n)+" "+(S.notes[c.k]?S.notes[c.k].md:"")})));msSig=sig}
+    const seen=new Set(hit.map(c=>c.sid+"|"+c.k)),by=new Map(all.map(c=>[c.sid+"|"+c.k,c]));
+    msIdx.search(q).forEach(r=>{if(!seen.has(r.id)&&by.has(r.id)){seen.add(r.id);hit.push(by.get(r.id))}});
+  }catch(e){console.warn("minisearch",e)}
+  return hit;
+}
 let nQ="",bulk={on:false,stop:false};
 function rNotes(){
   const sid=S.sub,s=subj(sid),p=prog(sid);let cs=chapsOf(sid);
-  const q=nQ.toLowerCase();if(q)cs=SUBJECTS.flatMap(x=>chapsOf(x.id).map(c=>({...c,sid:x.id}))).filter(c=>(c.t+" "+c.subs.join(" ")+" "+plain(c.n)+" "+(S.notes[c.k]?S.notes[c.k].md:"")).toLowerCase().includes(q));
+  const q=nQ.toLowerCase();if(q)cs=noteSearch(q);
   const gen=chapsOf(sid).filter(c=>S.notes[c.k]).length;
   $("#sheet").innerHTML=`${needKey()}
   <div class="row" style="margin-bottom:10px"><h2 style="margin:0">${esc(s.name)} 笔记</h2><span class="tag">${esc(s.ms)} · ${esc(s.code)}</span>${s.must?'<span class="tag red">必须及格</span>':""}<span class="spacer"></span>
@@ -2539,6 +2559,14 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-25d",date:"2026-10-25",title:"笔记搜索更聪明 + 3 个新实验室 ✨",
+   items:[
+    "🔎 笔记搜索：除了原来的关键词匹配，现在还支持多个词一起搜、输入一半也能找到（前缀）、轻微拼写错误也能找到。搜索库联网时自动加载，没网络就用原来的搜索。",
+    "✍️ 数学公式输入（数学、附加数学、物理、化学、科学）：用可视键盘写公式，自动得到 LaTeX，一键复制。",
+    "🧮 代数核对（数学、附加数学）：展开、因式分解、化简、求导、积分、解方程；还能核对「我的答案」和「标准答案」是不是相等。",
+    "🧬 化学结构编辑器（化学、科学）：鼠标画结构式，导出 SMILES / MOL，也能载入 SMILES。",
+    "这三个新工具都在展开卡片时才从网络加载，第一次需要联网。"
+   ]},
 {v:"2026-10-25c",date:"2026-10-25",title:"互动实验室加了 5 个新工具 🧪",
    items:[
     "🎛️ PhET 互动模拟：科罗拉多大学的官方模拟（物理、化学、生物、数学），选一个点「开始模拟」就能玩，比如抛体运动、配平化学方程式、pH 值、直流电路、二次函数图像。需要联网；手机里显示空白的话点「新窗口」。",
@@ -3467,7 +3495,7 @@ setTimeout(()=>{try{ngResume()}catch(e){}},1500);
 /* marked / DOMPurify 是 defer 载入的，比这段启动代码晚；刷新时若笔记已先用纯文字画出来，等库载入后补画一次 */
 if(md.fb){const fixMd=()=>{if(md.fb&&window.marked&&window.DOMPurify){md.fb=false;try{bust();render()}catch(e){}}};document.addEventListener("DOMContentLoaded",fixMd);window.addEventListener("load",fixMd);setTimeout(fixMd,1500);setTimeout(fixMd,4000)}
 if(syncOn())setTimeout(()=>syncPull(false),1200);
-window.__spm={S:()=>S,nQ:()=>nQ,subj,chapsOf,esc,go,getSave:()=>save,setSave:f=>{save=f},toast,prog,mySubjects,ymd,pd,dd,exam:()=>S.exam};
+window.__spm={S:()=>S,nQ:()=>nQ,subj,chapsOf,esc,go,getSave:()=>save,setSave:f=>{save=f},toast,prog,mySubjects,ymd,pd,dd,exam:()=>S.exam,gem,gemOK};
 })();
 
 </script>
@@ -4168,7 +4196,7 @@ setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mod
 
 <script src="music.js?v=2026-10-20d" defer></script>
 <script src="starmap.js?v=2026-10-25c" defer></script>
-<script src="labs.js?v=2026-10-25c" defer></script>
+<script src="labs.js?v=2026-10-26a" defer></script>
 
 </body>
 </html>
