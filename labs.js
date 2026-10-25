@@ -2,13 +2,18 @@
    本文件只负责「放哪里、什么时候加载」；每个工具是单独的文件，点开卡片才下载。 */
 (function(){
 const X=window.__spm||{},nQv=()=>X.nQ?X.nQ():"",S=new Proxy({},{get:(_,k)=>X.S()[k]});
-const V="2026-10-25a";
+const V="2026-10-25c";
 const LABS={
   ptable:{ico:"🧪",t:"互动周期表",tag:"可点击",f:"lab-ptable.js"},
   plot:{ico:"📈",t:"函数图像实验室",tag:"可调参数",f:"lab-plot.js"},
-  physics:{ico:"🎯",t:"物理小实验",tag:"可拖滑块",f:"lab-physics.js"}
+  physics:{ico:"🎯",t:"物理小实验",tag:"可拖滑块",f:"lab-physics.js"},
+  geo:{ico:"📐",t:"几何画板",tag:"可拖动点",f:"lab-geo.js"},
+  mol:{ico:"⚛️",t:"分子结构 2D / 3D",tag:"可旋转",f:"lab-mol.js"},
+  phet:{ico:"🎛️",t:"PhET 互动模拟",tag:"需联网",f:"lab-phet.js"},
+  mmap:{ico:"🗺️",t:"笔记思维导图",tag:"一键生成",f:"lab-mmap.js"},
+  ocr:{ico:"📷",t:"拍照识字 (OCR)",tag:"本机识别",f:"lab-ocr.js"}
 };
-const MAP={kim:["ptable"],sains:["ptable","physics"],mat:["plot"],am:["plot"],fiz:["physics"]};
+const MAP={kim:["ptable","mol","phet","mmap","ocr"],sains:["ptable","physics","mol","phet","mmap","ocr"],mat:["plot","geo","phet","mmap","ocr"],am:["plot","geo","phet","mmap","ocr"],fiz:["physics","phet","mmap","ocr"],bio:["phet","mmap","ocr"],bm:["mmap","ocr"],bi:["mmap","ocr"],bc:["mmap","ocr"],sej:["mmap","ocr"],moral:["mmap","ocr"]};
 const mods={},loads={};
 function loadJS(src){return loads[src]||(loads[src]=new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>{delete loads[src];no(new Error("load "+src))};document.head.appendChild(s)}))}
 function reg(id,mod){mods[id]=mod}
@@ -30,6 +35,7 @@ function mount(sid,searching){
   });
   list.parentNode.insertBefore(wrap,list.nextSibling);
 }
-window.Labs={mount,reg,lib:loadJS};
+const cssd={};function loadCSS(h){if(cssd[h])return;cssd[h]=1;const l=document.createElement("link");l.rel="stylesheet";l.href=h;document.head.appendChild(l)}
+window.Labs={mount,reg,lib:loadJS,css:loadCSS};
 try{if(X.S&&document.getElementById("chapList")&&!nQv())mount(S.sub,false)}catch(e){console.warn("labs",e)}
 })();
