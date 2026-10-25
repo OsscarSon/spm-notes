@@ -2,7 +2,7 @@
 (function(){var st=document.createElement('style');st.id='starmap-style';st.textContent=`
 #starMap{margin:0 0 14px;border-radius:22px;overflow:hidden;position:relative;color:#eaf0ff;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 26px 50px -26px rgba(20,20,80,.7);background:#0c1030}
 #starMap .sm-stage{position:relative;aspect-ratio:1000/460;background:radial-gradient(ellipse 55% 60% at 18% 12%,var(--sm),transparent 70%),radial-gradient(ellipse 50% 55% at 88% 85%,rgba(140,90,220,.5),transparent 70%),radial-gradient(ellipse 60% 50% at 62% 30%,rgba(60,100,230,.38),transparent 70%),linear-gradient(160deg,#060a22,#0f1544 55%,#1b1043)}
-@media(max-width:640px){#starMap .sm-stage{aspect-ratio:1000/700}}
+@media(max-width:640px){#starMap:not(.col) .sm-stage{aspect-ratio:1000/700}}
 #starMap svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 #starMap .sm-top{position:absolute;left:0;right:0;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:12px 14px;pointer-events:none}
 #starMap .sm-top b{font:700 18px/1.2 var(--kai,serif);letter-spacing:.08em;text-shadow:0 0 14px rgba(160,190,255,.7)}
@@ -11,7 +11,9 @@
 #starMap .sm-cap{display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 14px;font-size:13.5px;background:rgba(6,9,30,.82);border-top:1px solid rgba(255,255,255,.08)}
 #starMap .sm-cap .t{flex:1;min-width:0}
 #starMap .sm-cap button{border:0;border-radius:999px;padding:6px 13px;font-weight:600;background:#ffd98a;color:#3a2800;white-space:nowrap}
-#starMap.col .sm-stage,#starMap.col .sm-cap{display:none}
+#starMap.col .sm-cap,#starMap.col .sm-stage svg,#starMap.col .sm-shoot{display:none}
+#starMap.col .sm-stage{aspect-ratio:auto}
+#starMap.col .sm-top{position:relative;pointer-events:auto}
 #starMap .ln{stroke:rgba(165,185,255,.6);stroke-width:2.4;stroke-dasharray:4 8;fill:none}
 #starMap .ln.on{stroke:#ffd98a;stroke-width:3.4;stroke-dasharray:none;filter:drop-shadow(0 0 5px rgba(255,200,100,.85))}
 #starMap .dc{stroke:rgba(170,190,255,.16);stroke-width:1.2;fill:none}
