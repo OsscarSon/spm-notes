@@ -79,7 +79,7 @@ let sel=null;
 function mount(sid,searching){
   const old=document.getElementById("starMap"),list=document.getElementById("chapList");if(old)old.remove();
   if(searching||!list)return;
-  const cs=chapsOf(sid).filter(c=>c.core);if(cs.length<3)return;
+  const cs=chapsOf(sid);if(cs.length<3)return;
   const b=build(sid,cs),el=document.createElement("section");el.id="starMap";el.dataset.sid=sid;if(LS("sm_col"))el.className="col";
   const full=b.done===b.N;
   el.innerHTML=`<div class="sm-stage" style="--sm:${b.s.color}b0"><i class="sm-shoot"></i><svg viewBox="0 0 ${W} 460" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(b.s.name)}章节星座图">${b.g}</svg><div class="sm-top"><b>${esc(b.s.name.split(" ")[0])} 星座</b><span>${esc(b.name)} · ${b.done}/${b.N} 颗已点亮</span><button class="sm-tg" type="button">${el.className?"展开":"收起"}</button></div></div><div class="sm-cap"><span class="t">${full?"✨ 星座完成！全部章节都点亮了":"点一颗星，看看是哪一章。金色 = 已复习，蓝色 = 有 AI 笔记，灰色 = 还没开始"}</span></div>`;
