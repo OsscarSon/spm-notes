@@ -20,7 +20,8 @@ const CSS=`.lab-mol .mo-tabs,.lab-mol .mo-row{display:flex;gap:8px;flex-wrap:wra
 .lab-mol .mo-tabs button,.lab-mol .mo-chip{border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:12.5px;background:var(--sheet2)}
 .lab-mol .mo-tabs button.on,.lab-mol .mo-chip.on{background:var(--blue-soft);border-color:var(--blue);font-weight:700}
 .lab-mol input[type=text]{flex:1;min-width:150px}
-.lab-mol .mo-cv{width:100%!important;max-width:100%!important;height:auto!important;aspect-ratio:420/320;display:block;box-sizing:border-box;background:#fff;border:1px solid var(--line);border-radius:12px}
+.lab-mol .mo-cvw{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.lab-mol .mo-cv{display:block;margin:0 auto}
 .lab-mol .mo-3d{position:relative;width:100%;height:300px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .lab-mol .mo-msg{font-size:13px;min-height:20px;color:var(--bad)}`;
 function render(host){
@@ -30,7 +31,7 @@ function render(host){
   host.innerHTML=`<div class="mo-tabs"><button type="button" data-m="2" class="on">2D 结构式</button><button type="button" data-m="3">3D 分子</button></div>
   <div class="mo-p2"><div class="mo-row">${S2.map((x,i)=>`<button type="button" class="mo-chip" data-i="${i}">${x[0]}</button>`).join("")}</div>
    <div class="mo-row"><label class="fine muted">SMILES</label><input type="text" class="mo-in" value="CCO" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="例如 CC(=O)O"></div>
-   <canvas class="mo-cv" id="${uid}c" width="420" height="320"></canvas></div>
+   <div class="mo-cvw"><canvas class="mo-cv" id="${uid}c"></canvas></div></div>
   <div class="mo-p3" style="display:none"><div class="mo-row">${M3.map((x,i)=>`<button type="button" class="mo-chip" data-j="${i}">${x[0]}</button>`).join("")}</div>
    <div class="mo-row"><input type="text" class="mo-q" placeholder="英文名从 PubChem 取，如 aspirin / glucose（需联网）" autocapitalize="off" autocomplete="off" spellcheck="false"><button type="button" class="btn small" data-a="q">搜索</button></div>
    <div class="mo-row"><button type="button" class="btn small" data-s="ball">球棍</button><button type="button" class="btn small" data-s="fill">空间填充</button><button type="button" class="btn small" data-s="line">线</button><button type="button" class="btn small" data-s="spin">⟳ 自转</button></div>
@@ -38,11 +39,13 @@ function render(host){
   <div class="mo-msg" role="status"></div>
   <p class="fine muted" style="margin:6px 0 0">2D：SmilesDrawer；3D：3Dmol.js。内置 3D 坐标为近似值，仅作示意。</p>`;
   const msg=host.querySelector(".mo-msg"),inp=host.querySelector(".mo-in"),p2=host.querySelector(".mo-p2"),p3=host.querySelector(".mo-p3"),box=host.querySelector(".mo-3d");
-  let drawer=null,v=null,sty="ball",spin=false,ok2=false,ok3=false;
+  let lib2=false,v=null,sty="ball",spin=false,ok2=false,ok3=false;
   function draw2(){
-    if(!drawer)return;msg.textContent="";const s=inp.value.replace(/\s+/g,"");
-    const c=host.querySelector(".mo-cv");c.getContext("2d").clearRect(0,0,c.width,c.height);if(!s)return;
-    try{window.SmilesDrawer.parse(s,t=>{try{drawer.draw(t,uid+"c","light",false)}catch(e){msg.textContent="这个 SMILES 画不出来，检查一下写法。"}},()=>{msg.textContent="SMILES 写法不对，检查括号、数字和大小写。"})}
+    if(!lib2)return;msg.textContent="";const s=inp.value.replace(/\s+/g,"");
+    const wrap=host.querySelector(".mo-cvw"),c=host.querySelector(".mo-cv"),w=Math.max(200,Math.floor(wrap.clientWidth)||320),h=Math.round(w*.76);
+    c.width=w;c.height=h;c.style.width=w+"px";c.style.height=h+"px";if(!s)return;
+    try{const dr=new window.SmilesDrawer.Drawer({width:w,height:h,padding:60,bondLength:26});
+      window.SmilesDrawer.parse(s,t=>{try{dr.draw(t,uid+"c","light",false)}catch(e){msg.textContent="这个 SMILES 画不出来，检查一下写法。"}},()=>{msg.textContent="SMILES 写法不对，检查括号、数字和大小写。"})}
     catch(e){msg.textContent="这个 SMILES 画不出来，检查一下写法。"}
   }
   function style(){if(!v)return;const m={ball:{stick:{radius:.15},sphere:{scale:.28}},fill:{sphere:{}},line:{line:{}}}[sty];v.setStyle({},m);v.render()}
@@ -60,7 +63,7 @@ function render(host){
     catch(e){msg.style.color="var(--bad)";msg.textContent=e.message==="nf"?"PubChem 没有找到这个名字的 3D 结构，试试英文名，或用上面的内置分子。":"查询失败（可能没有网络）。"}
   }
   function need(m){
-    if(m==="2"&&!ok2){ok2=true;window.Labs.lib(L2).then(()=>{drawer=new window.SmilesDrawer.Drawer({width:420,height:320,padding:70,bondLength:26});draw2()}).catch(()=>{ok2=false;msg.textContent="结构式库没加载成功（可能没有网络），联网后重新展开即可。"})}
+    if(m==="2"&&!ok2){ok2=true;window.Labs.lib(L2).then(()=>{lib2=true;draw2()}).catch(()=>{ok2=false;msg.textContent="结构式库没加载成功（可能没有网络），联网后重新展开即可。"})}
     if(m==="3"&&!ok3){ok3=true;window.Labs.lib(L3).then(init3).catch(()=>{ok3=false;msg.textContent="3D 库没加载成功（可能没有网络），联网后重新展开即可。"})}
   }
   host.addEventListener("click",e=>{
@@ -73,6 +76,7 @@ function render(host){
   });
   inp.oninput=()=>{host.querySelectorAll(".mo-chip[data-i]").forEach(b=>b.classList.remove("on"));draw2()};
   host.querySelector(".mo-q").onkeydown=e=>{if(e.key==="Enter")pub()};
+  let rz=0;window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{if(host.isConnected&&p2.style.display!=="none")draw2()},250)});
   need("2");
 }
 Labs.reg("mol",{render});
