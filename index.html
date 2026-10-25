@@ -2559,6 +2559,14 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-26b",date:"2026-10-26",title:"航天 3D 模型 + 学习环境音 🚀🎧",
+   items:[
+    "🚀 NASA 三维模型（科学 · 航天章节）：可以用手指旋转、缩放国际空间站、哈勃太空望远镜、毅力号火星车，每个模型旁边有几条考试用得上的小知识；手机上还能用 AR 把模型放进真实房间里看大小。模型要点「载入模型」才会下载，建议用 Wi-Fi。",
+    "🎧 学习环境音（所有科目）：咖啡馆、风扇 / 冷气、白噪音、粉红噪音、棕色噪音、夜晚虫鸣，全部由程序现场合成，不下载音频。可以自己混音、设睡眠定时，也有一键场景。",
+    "🍅 环境音卡片里还有番茄钟：专注 25 分钟 → 休息 5 分钟，换阶段有轻轻的钟声，休息时环境音会自动调小。",
+    "🎵 它和顶部的「读书音乐」是两套独立的声音，可以一起开，各调各的音量。",
+    "📁 更新时记得上传 index.html、sw.js、labs.js、lab-space.js、lab-ambient.js；3D 模型文件放进 models 文件夹（iss.glb、hubble.glb、perseverance.glb）。"
+   ]},
 {v:"2026-10-25d",date:"2026-10-25",title:"笔记搜索更聪明 + 3 个新实验室 ✨",
    items:[
     "🔎 笔记搜索：除了原来的关键词匹配，现在还支持多个词一起搜、输入一半也能找到（前缀）、轻微拼写错误也能找到。搜索库联网时自动加载，没网络就用原来的搜索。",
@@ -4196,7 +4204,7 @@ setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mod
 
 <script src="music.js?v=2026-10-20d" defer></script>
 <script src="starmap.js?v=2026-10-25c" defer></script>
-<script src="labs.js?v=2026-10-26a" defer></script>
+<script src="labs.js?v=2026-10-26b" defer></script>
 
 </body>
 </html>
