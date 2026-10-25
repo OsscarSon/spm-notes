@@ -1,6 +1,7 @@
 /* 实验室：笔记页底部的互动小工具卡片（周期表 / 函数图像 / 物理小实验）。
    本文件只负责「放哪里、什么时候加载」；每个工具是单独的文件，点开卡片才下载。 */
 (function(){
+const X=window.__spm||{},nQv=()=>X.nQ?X.nQ():"",S=new Proxy({},{get:(_,k)=>X.S()[k]});
 const V="2026-10-25a";
 const LABS={
   ptable:{ico:"🧪",t:"互动周期表",tag:"可点击",f:"lab-ptable.js"},
@@ -30,5 +31,5 @@ function mount(sid,searching){
   list.parentNode.insertBefore(wrap,list.nextSibling);
 }
 window.Labs={mount,reg,lib:loadJS};
-try{if(document.getElementById("chapList")&&!nQ)mount(S.sub,false)}catch(e){}
+try{if(X.S&&document.getElementById("chapList")&&!nQv())mount(S.sub,false)}catch(e){console.warn("labs",e)}
 })();

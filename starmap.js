@@ -12,11 +12,11 @@
 #starMap .sm-cap .t{flex:1;min-width:0}
 #starMap .sm-cap button{border:0;border-radius:999px;padding:6px 13px;font-weight:600;background:#ffd98a;color:#3a2800;white-space:nowrap}
 #starMap.col .sm-stage,#starMap.col .sm-cap{display:none}
-#starMap .ln{stroke:rgba(165,185,255,.42);stroke-width:1.4;stroke-dasharray:3 7;fill:none}
-#starMap .ln.on{stroke:#ffd98a;stroke-width:2.2;stroke-dasharray:none;filter:drop-shadow(0 0 5px rgba(255,200,100,.85))}
+#starMap .ln{stroke:rgba(165,185,255,.6);stroke-width:2.4;stroke-dasharray:4 8;fill:none}
+#starMap .ln.on{stroke:#ffd98a;stroke-width:3.4;stroke-dasharray:none;filter:drop-shadow(0 0 5px rgba(255,200,100,.85))}
 #starMap .dc{stroke:rgba(170,190,255,.16);stroke-width:1.2;fill:none}
 #starMap .st{cursor:pointer;outline:none}
-#starMap .core{fill:#8091c8;opacity:.75}
+#starMap .core{fill:#9fb0e6;opacity:.95}
 #starMap .halo,#starMap .spark,#starMap .selring,#starMap .ring{display:none}
 #starMap .s1 .core{fill:#d6e4ff;opacity:1;filter:drop-shadow(0 0 4px #9bb8ff)}
 #starMap .s1 .halo{display:block;fill:rgba(160,190,255,.2)}
@@ -37,6 +37,7 @@
 @media print{#starMap{display:none}}
 `;document.head.appendChild(st)})();
 (function(){
+const X=window.__spm||{},subj=X.subj,chapsOf=X.chapsOf,esc=X.esc,nQv=()=>X.nQ?X.nQ():"",S=new Proxy({},{get:(_,k)=>X.S()[k]});
 const W=1000,CX=500,CY=230,PI=Math.PI,rad=d=>d*PI/180;
 const samp=(f,n)=>{const a=[];for(let i=0;i<=n;i++)a.push(f(i/n));return a};
 const rot=(p,d)=>{const c=Math.cos(rad(d)),s=Math.sin(rad(d));return p.map(([x,y])=>[CX+(x-CX)*c-(y-CY)*s,CY+(x-CX)*s+(y-CY)*c])};
@@ -71,7 +72,7 @@ function build(sid,cs){
   const stt=cs.map(c=>S.done[c.k]?2:S.notes[c.k]?1:0);
   for(let i=0;i<N-(closed?0:1);i++){const a=pts[i],b=pts[(i+1)%N];g+=`<path class="ln ${stt[i]==2&&stt[(i+1)%N]==2?"on":""}" d="M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}"/>`}
   cs.forEach((c,i)=>{const [x,y]=pts[i],t=stt[i];if(t==2)lit.push(c.k);const nova=t==2&&seen&&!seen.includes(c.k);
-    g+=`<g class="st s${t}${nova?" nova":""}" data-i="${i}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="--d:${(R()*3).toFixed(1)}s" tabindex="0" role="button" aria-label="${esc(c.t)}"><circle class="halo" r="24"/><circle class="ring" r="10"/><path class="spark" d="M0-17L3-3 17 0 3 3 0 17-3 3-17 0-3-3Z"/><circle class="core" r="${t==2?5.5:t?5:3.6}"/><circle class="selring" r="21"/><circle r="28" fill="transparent"/></g>`});
+    g+=`<g class="st s${t}${nova?" nova":""}" data-i="${i}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="--d:${(R()*3).toFixed(1)}s" tabindex="0" role="button" aria-label="${esc(c.t)}"><circle class="halo" r="24"/><circle class="ring" r="10"/><path class="spark" d="M0-17L3-3 17 0 3 3 0 17-3 3-17 0-3-3Z"/><circle class="core" r="${t==2?9:t?8:6}"/><circle class="selring" r="21"/><circle r="28" fill="transparent"/></g>`});
   LS("sm_lit_"+sid,lit);
   return{g,N,done:stt.filter(x=>x==2).length,name:sh.name,s}
 }
@@ -94,5 +95,5 @@ function mount(sid,searching){
 }
 document.addEventListener("change",e=>{const t=e.target;if(t&&t.matches&&t.matches("[data-done]")){const m=document.getElementById("starMap");if(m)setTimeout(()=>mount(m.dataset.sid,false),0)}});
 window.StarMap={mount};
-try{if(document.getElementById("chapList")&&!nQ)mount(S.sub,false)}catch(e){}
+try{if(X.S&&document.getElementById("chapList")&&!nQv())mount(S.sub,false)}catch(e){console.warn("starmap",e)}
 })();

@@ -3453,7 +3453,7 @@ setTimeout(()=>{try{ngResume()}catch(e){}},1500);
 /* marked / DOMPurify 是 defer 载入的，比这段启动代码晚；刷新时若笔记已先用纯文字画出来，等库载入后补画一次 */
 if(md.fb){const fixMd=()=>{if(md.fb&&window.marked&&window.DOMPurify){md.fb=false;try{bust();render()}catch(e){}}};document.addEventListener("DOMContentLoaded",fixMd);window.addEventListener("load",fixMd);setTimeout(fixMd,1500);setTimeout(fixMd,4000)}
 if(syncOn())setTimeout(()=>syncPull(false),1200);
-window.__spm={S:()=>S,go,getSave:()=>save,setSave:f=>{save=f},toast,prog,mySubjects,ymd,pd,dd,exam:()=>S.exam};
+window.__spm={S:()=>S,nQ:()=>nQ,subj,chapsOf,esc,go,getSave:()=>save,setSave:f=>{save=f},toast,prog,mySubjects,ymd,pd,dd,exam:()=>S.exam};
 })();
 
 </script>
@@ -4153,8 +4153,8 @@ setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mod
 </script>
 
 <script src="music.js?v=2026-10-20d" defer></script>
-<script src="starmap.js?v=2026-10-25a" defer></script>
-<script src="labs.js?v=2026-10-25a" defer></script>
+<script src="starmap.js?v=2026-10-25b" defer></script>
+<script src="labs.js?v=2026-10-25b" defer></script>
 
 </body>
 </html>
