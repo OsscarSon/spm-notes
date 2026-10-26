@@ -208,6 +208,7 @@
         o.start(w); o2.start(w); o.stop(w + 1.9); o2.stop(w + 1.9);
       });
     }
+    function pomoEvt() { try { document.dispatchEvent(new Event("spm-pomo")); } catch (e) {} }
     function pomoRest() { return +st.pf === 50 ? 10 : 5; }
     function pomoUI() {
       var box = panel.querySelector("#mzPomo"); if (!box) return;
@@ -227,13 +228,13 @@
       if (!init()) { toastMsg("这个浏览器不支持音频"); return; }
       try { ctx.resume(); } catch (e) {}
       pomo = { phase: "focus", end: Date.now() + (+st.pf) * 60000, n: 0 };
-      chime(false);
+      chime(false); pomoEvt();
       var any = ALLK.some(function (k) { return st[k] > .02; }) || st.music !== "off";
       if (!playing && any) play(); else applyVol();
       pomoUI();
     }
     function pomoStop() {
-      pomo = null; applyVol(); pomoUI();
+      pomo = null; applyVol(); pomoUI(); pomoEvt();
       setTimeout(function () { if (!playing && !pomo && ctx && ctx.state === "running") ctx.suspend(); }, 1500);
     }
     setInterval(function () {
@@ -241,7 +242,7 @@
       if (Date.now() >= pomo.end) {
         var toRest = pomo.phase === "focus", rm = pomoRest();
         pomo = { phase: toRest ? "rest" : "focus", end: Date.now() + (toRest ? rm : +st.pf) * 60000, n: pomo.n + (toRest ? 1 : 0) };
-        chime(toRest); applyVol(); toastMsg(toRest ? "专注完成，休息 " + rm + " 分钟 ☕" : "休息结束，开始下一轮专注 🍅");
+        chime(toRest); applyVol(); pomoEvt(); toastMsg(toRest ? "专注完成，休息 " + rm + " 分钟 ☕" : "休息结束，开始下一轮专注 🍅");
       }
       pomoUI();
     }, 1000);
@@ -432,6 +433,6 @@
       ui();
     }
     mountBtn();
-    window.SPMMusic = { play: play, pause: pause, toggle: toggle, pomoStart: pomoStart, pomoStop: pomoStop, state: function () { return { playing: playing, st: st, ctx: ctx && ctx.state }; } };
+    window.SPMMusic = { play: play, pause: pause, toggle: toggle, pomoStart: pomoStart, pomoStop: pomoStop, pomo: function () { return pomo ? { phase: pomo.phase, end: pomo.end, n: pomo.n } : null; }, state: function () { return { playing: playing, st: st, ctx: ctx && ctx.state }; } };
   } catch (err) { try { console.warn("music.js", err); } catch (e) {} }
 })();
