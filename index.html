@@ -332,21 +332,6 @@ table.t th{color:var(--muted);font-weight:700;font-size:13px}
   #printArea .md,#printArea .note{overflow:visible}
   #printArea a{color:inherit;text-decoration:none}
 }
-
-/* ---- PDF 阅读器 ---- */
-.pdfv{position:fixed;inset:0;z-index:3000;background:#1c2029;display:flex;flex-direction:column;color:#e9edf5;font-family:var(--sans)}
-.pdfv-bar{display:flex;align-items:center;gap:8px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top,0px));background:#252b38;flex-wrap:wrap}
-.pdfv-t{flex:1;min-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:700}
-.pdfv-bar .btn{min-height:34px;padding:4px 12px;background:#323a4c;color:#e9edf5;border-color:#3d465b;font-size:13px}
-.pdfv-bar .pdfv-n{width:46px;height:34px;border-radius:10px;border:1px solid #3d465b;background:#1c2029;color:#e9edf5;text-align:center;font-size:14px}
-.pdfv-bar .pdfv-c{font-size:13px;color:#aab4c8}
-.pdfv-sc{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 0 60px;position:relative}
-.pdfv-pages{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:min-content}
-.pdfv-p{background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.45);position:relative;flex:none}
-.pdfv-p canvas{display:block;width:100%;height:100%}
-.pdfv.inv .pdfv-p canvas{filter:invert(1) hue-rotate(180deg)}
-.pdfv-msg{position:absolute;left:0;right:0;top:40%;text-align:center;padding:0 24px;color:#aab4c8;font-size:14px;line-height:1.7;pointer-events:none}
-.pdfv-msg.bad{color:#ff9d94}
 </style>
 <style id="polish">
 /* ===== 小细节美化：按钮手感 / 页面过渡 / 骨架屏 / 启动画面 / 毛玻璃卡片 / 滚动条 / 进度条光泽 ===== */
@@ -2617,21 +2602,14 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
-{v:"2026-10-27a",date:"2026-10-27",title:"资料里的 PDF 可以直接在应用里看了 📖",
-   items:[
-    "📖 「资料」里上传的 PDF（课本、历届试卷、Trial 卷）旁边多了「打开」按钮，直接在应用里翻看，不用再跳去别的阅读器，手机上也能用。",
-    "🔎 可以输入页码跳转、放大缩小、一键适应宽度；🌙 夜间反色，晚上看白底试卷不刺眼。",
-    "🔖 会记住每份 PDF 看到第几页，下次打开自动回到那一页。",
-    "📶 第一次用需要联网加载阅读器，之后离线也能看已上传的 PDF。"
-   ]},
 {v:"2026-10-26g",date:"2026-10-26",title:"右上角多了「在线名单」👥",
    items:[
-    "👥 右上角新增在线名单：点开能看到现在有多少人在读书、各科各有几个人、谁正在专注计时。",
-    "🕶️ 默认不显示你。要自己打开「让别人看到我」才会出现在名单里，关掉就消失。",
-    "🦊 别人只能看到你的昵称、头像、正在学的科目和专注状态（学习中 / 专注中 / 休息中），不会有真名、学校或笔记内容。昵称和头像可以随时换，🎲 能随机一个。",
+    "👥 右上角新增在线名单：点开能看到现在有多少人在线、各科各有几个人、谁正在专注计时。",
+    "🕶️ 默认会显示你（匿名）。不想被看到，随时取消勾选「让别人看到我」，关掉就消失。",
+    "🦊 别人只能看到你的昵称、头像、正在学的科目和状态（学习中 / 专注中 / 休息中 / Idle），名字可以放你自己喜欢的。昵称和头像可以随时换，🎲 能随机一个。",
     "🍅 开了读书音乐里的专注计时，你的状态会自动变成「专注中」，休息时变成「休息中」。",
-    "📶 需要联网。名单满了或连不上时只是看不到名单，其他功能不受影响。",
-    "📁 更新时记得上传 index.html、sw.js、music.js、online.js。"
+    "💤 没开专注计时时，标签页切到后台超过 5 分钟，或 10 分钟没有任何操作，会显示 Idle，回来一动就恢复。",
+    "📶 需要联网。人数满了会自动排队，连不上时只是看不到名单，其他功能不受影响。"
    ]},
 {v:"2026-10-26e",date:"2026-10-26",title:"3D 细胞与人体 · 认部件 🫀🧬",
    items:[
@@ -3268,107 +3246,17 @@ async function renderUploads(sid){
   const box=$("#upBox");if(!box)return;let files=[],err="";try{files=(await DB.all()).filter(f=>f.sid===sid)}catch(e){err="这个浏览器不支持保存文件 (可能是无痕模式)。"}
   box.innerHTML=`<h3>我上传的资料</h3><p class="muted fine">把课本 PDF、老师的笔记、Trial 卷或照片放进来，勾选后，生成笔记、出题、模拟卷和问答都会参考它们。文件只保存在这个浏览器里，只在你使用 AI 时发给 Google Gemini。14 MB 以内的文件直接发给 Gemini；更大的 (例如整本课本 PDF，最大 300 MB) 会在用到时上传到 Google 文件服务，48 小时内有效，过期后自动重新上传。注意：勾选的整本书每次提问都会一起发送，会消耗不少免费额度，建议只勾选当前要用的那一本。</p>
    ${err?`<div class="notice error">${esc(err)}</div>`:`<div class="drop" id="drop"><div><b>点这里选择文件，或拖进来</b></div><div class="fine muted">PDF、图片 (png/jpg/webp)、txt / md / csv</div><input type="file" id="upIn" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,.csv,image/*,application/pdf" hidden></div>`}
-   <div style="margin-top:10px">${files.length?files.map(f=>`<div class="card" style="margin-bottom:8px"><div class="row"><label class="chk" style="color:var(--ink);font-size:15px"><input type="checkbox" data-use="${f.id}" ${S.use[f.id]?"checked":""}> ${esc(f.name)}</label><span class="tag">${(f.size/1048576).toFixed(1)} MB</span>${f.size>INLINE_MAX?`<span class="tag blue">大文件</span>${f.remote&&f.remote.expires>Date.now()?`<span class="tag ok">已上传，有效至 ${fmtAt(f.remote.expires)}</span>`:'<span class="tag warn">用到时自动上传</span>'}`:""}<span class="spacer"></span>${/\.pdf$/i.test(f.name)||f.type==="application/pdf"?`<button class="btn small" data-pdfopen="${f.id}">📖 打开</button>`:""}<button class="btn small" data-updel="${f.id}">删除</button></div></div>`).join(""):`<div class="fine muted">这一科还没有上传资料。</div>`}</div>`;
+   <div style="margin-top:10px">${files.length?files.map(f=>`<div class="card" style="margin-bottom:8px"><div class="row"><label class="chk" style="color:var(--ink);font-size:15px"><input type="checkbox" data-use="${f.id}" ${S.use[f.id]?"checked":""}> ${esc(f.name)}</label><span class="tag">${(f.size/1048576).toFixed(1)} MB</span>${f.size>INLINE_MAX?`<span class="tag blue">大文件</span>${f.remote&&f.remote.expires>Date.now()?`<span class="tag ok">已上传，有效至 ${fmtAt(f.remote.expires)}</span>`:'<span class="tag warn">用到时自动上传</span>'}`:""}<span class="spacer"></span><button class="btn small" data-updel="${f.id}">删除</button></div></div>`).join(""):`<div class="fine muted">这一科还没有上传资料。</div>`}</div>`;
   const drop=$("#drop"),inp=$("#upIn");
   if(drop){drop.onclick=()=>inp.click();drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};drop.ondragleave=()=>drop.classList.remove("over");
     drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");addFiles(sid,e.dataTransfer.files)};inp.onchange=()=>addFiles(sid,inp.files)}
   $$("[data-use]").forEach(c=>c.onchange=()=>{S.use[c.dataset.use]=c.checked||undefined;save()});
-  $$("[data-pdfopen]").forEach(b=>b.onclick=()=>openPdf(b.dataset.pdfopen));
   $$("[data-updel]").forEach(b=>b.onclick=async()=>{await DB.del(b.dataset.updel);delete S.use[b.dataset.updel];save();renderUploads(sid)})}
 async function addFiles(sid,list){let n=0;for(const f of list){const ok=/\.(pdf|png|jpe?g|webp|txt|md|csv)$/i.test(f.name)||/^image\//.test(f.type)||f.type==="application/pdf";if(!ok){toast("不支持："+f.name+"（PPT/Word 请先另存为 PDF）");continue}
     if(f.size>300*1048576){toast("太大了 (上限 300 MB)："+f.name);continue}
     try{const id="f"+Date.now()+Math.random().toString(36).slice(2,6);const rec={id,sid,name:f.name,type:f.type,size:f.size,blob:f};await DB.put(rec);S.use[id]=true;n++;
       if(f.size>INLINE_MAX&&gemOK())ensureRemote(rec,guessMime(rec)).then(()=>{toast("已上传到 Google ✓");renderUploads(sid)},e=>toast(e.message.slice(0,90)))}catch(e){toast("保存失败："+f.name)}}
   save();if(n)toast("已添加 "+n+" 个文件，并勾选为 AI 参考");renderUploads(sid)}
-/* ---- PDF 阅读器 (PDF.js)：直接在应用里翻看已上传的 PDF，例如历届试卷 ---- */
-const PDFJS_BASE="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
-let pdfjsP=null;
-function loadPdfjs(){
-  if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);
-  if(pdfjsP)return pdfjsP;
-  pdfjsP=new Promise((ok,no)=>{const sc=document.createElement("script");sc.src=PDFJS_BASE+"pdf.min.js";
-    sc.onload=()=>{try{window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS_BASE+"pdf.worker.min.js";ok(window.pdfjsLib)}catch(e){pdfjsP=null;no(e)}};
-    sc.onerror=()=>{pdfjsP=null;no(new Error("PDF 阅读器要联网加载一次，之后离线也能用。"))};document.head.appendChild(sc)});
-  return pdfjsP}
-const PV={el:null,doc:null,rec:null,scale:1,fit:true,divs:[],dims:[],obs:null,gen:0,cur:1,raf:0,hist:false};
-function pdfPos(id,set){try{const m=JSON.parse(localStorage.getItem("spm-pdfpos")||"{}");if(set===undefined)return m[id]||1;m[id]=set;const ks=Object.keys(m);if(ks.length>60)delete m[ks[0]];localStorage.setItem("spm-pdfpos",JSON.stringify(m))}catch(e){return 1}}
-function pvMsg(t,bad){const m=PV.el&&PV.el.querySelector(".pdfv-msg");if(!m)return;m.textContent=t||"";m.classList.toggle("bad",!!bad)}
-function closePdf(fromPop){
-  if(!PV.el)return;
-  try{PV.obs&&PV.obs.disconnect()}catch(e){}
-  try{PV.doc&&PV.doc.destroy()}catch(e){}
-  PV.el.remove();PV.el=null;PV.doc=null;PV.rec=null;PV.divs=[];PV.dims=[];PV.gen++;
-  document.removeEventListener("keydown",pvKey);
-  if(PV.hist&&!fromPop){PV.hist=false;try{history.back()}catch(e){}}else PV.hist=false}
-function pvKey(e){if(e.key==="Escape")closePdf()}
-function pvLayout(){
-  const sc=PV.el.querySelector(".pdfv-sc"),d0=PV.dims[0]||[595,842];
-  if(PV.fit)PV.scale=Math.max(.3,Math.min(4,(sc.clientWidth-16)/d0[0]));
-  PV.gen++;
-  PV.divs.forEach((d,i)=>{const dm=PV.dims[i]||d0;d.style.width=dm[0]*PV.scale+"px";d.style.height=dm[1]*PV.scale+"px";if(d.dataset.r==="1"||d.dataset.r==="p"){const c=d.querySelector("canvas");if(c){c.width=c.height=0}d.dataset.r="0"}});
-  try{PV.obs.disconnect()}catch(e){}
-  PV.divs.forEach(d=>PV.obs.observe(d));
-  const z=PV.el.querySelector("[data-pv=z]");if(z)z.textContent=Math.round(PV.scale*100)+"%"}
-async function pvRender(i){
-  const d=PV.divs[i];if(!d||d.dataset.r==="1"||d.dataset.r==="p"||!PV.doc)return;
-  const gen=PV.gen,doc=PV.doc;d.dataset.r="p";
-  try{
-    const page=await doc.getPage(i+1);if(gen!==PV.gen||doc!==PV.doc){d.dataset.r="0";return}
-    const v1=page.getViewport({scale:1});
-    if(!PV.dims[i]||PV.dims[i][0]!==v1.width||PV.dims[i][1]!==v1.height){PV.dims[i]=[v1.width,v1.height]}
-    const vp=page.getViewport({scale:PV.scale});
-    d.style.width=vp.width+"px";d.style.height=vp.height+"px";
-    let k=Math.min(window.devicePixelRatio||1,2);const MAXPX=14e6;if(vp.width*vp.height*k*k>MAXPX)k=Math.sqrt(MAXPX/(vp.width*vp.height));
-    let cv=d.querySelector("canvas");if(!cv){cv=document.createElement("canvas");d.appendChild(cv)}
-    cv.width=Math.floor(vp.width*k);cv.height=Math.floor(vp.height*k);
-    await page.render({canvasContext:cv.getContext("2d"),viewport:vp,transform:k!==1?[k,0,0,k,0,0]:null}).promise;
-    if(gen!==PV.gen||doc!==PV.doc){d.dataset.r="0";return}
-    d.dataset.r="1"
-  }catch(e){d.dataset.r="0";if(e&&e.name==="RenderingCancelledException")return;pvMsg("这一页读不出来："+String(e&&e.message||e).slice(0,80),true)}}
-function pvScroll(){
-  if(PV.raf)return;PV.raf=requestAnimationFrame(()=>{PV.raf=0;if(!PV.el)return;
-    const sc=PV.el.querySelector(".pdfv-sc"),mid=sc.getBoundingClientRect().top+sc.clientHeight*.35;let n=PV.cur;
-    for(let i=0;i<PV.divs.length;i++){const r=PV.divs[i].getBoundingClientRect();if(r.bottom>=mid){n=i+1;break}}
-    if(n!==PV.cur){PV.cur=n;const inp=PV.el.querySelector(".pdfv-n");if(inp&&document.activeElement!==inp)inp.value=n;pdfPos(PV.rec.id,n)}})}
-function pvGo(n){const d=PV.divs[Math.max(0,Math.min(PV.divs.length-1,n-1))];if(!d)return;const sc=PV.el.querySelector(".pdfv-sc");sc.scrollTop+=d.getBoundingClientRect().top-sc.getBoundingClientRect().top-8}
-async function openPdf(id){
-  if(PV.el)closePdf();
-  let rec=null;try{rec=await DB.get(id)}catch(e){}
-  if(!rec||!rec.blob){toast("找不到这个文件");return}
-  const el=document.createElement("div");el.className="pdfv";if(localStorage.getItem("spm-pdfinv")==="1")el.classList.add("inv");
-  el.innerHTML=`<div class="pdfv-bar"><button class="btn small" data-pv="x">✕ 关闭</button><span class="pdfv-t"></span><input class="pdfv-n" type="number" min="1" inputmode="numeric" aria-label="跳到页码"><span class="pdfv-c">/ –</span><button class="btn small" data-pv="m" aria-label="缩小">－</button><button class="btn small" data-pv="z" aria-label="适应宽度">适应</button><button class="btn small" data-pv="p" aria-label="放大">＋</button><button class="btn small" data-pv="i" title="夜间反色">🌙</button><button class="btn small" data-pv="o" title="用浏览器自带阅读器打开">↗</button></div><div class="pdfv-sc"><div class="pdfv-pages"></div><div class="pdfv-msg">加载中…</div></div>`;
-  el.querySelector(".pdfv-t").textContent=rec.name;
-  document.body.appendChild(el);PV.el=el;PV.rec=rec;PV.fit=true;PV.dims=[];PV.divs=[];PV.cur=1;
-  document.addEventListener("keydown",pvKey);
-  try{history.pushState({spmpdf:1},"");PV.hist=true}catch(e){PV.hist=false}
-  const q=s=>el.querySelector(s);
-  q("[data-pv=x]").onclick=()=>closePdf();
-  q("[data-pv=m]").onclick=()=>{PV.fit=false;PV.scale=Math.max(.3,PV.scale/1.25);pvLayout()};
-  q("[data-pv=p]").onclick=()=>{PV.fit=false;PV.scale=Math.min(4,PV.scale*1.25);pvLayout()};
-  q("[data-pv=z]").onclick=()=>{PV.fit=true;pvLayout()};
-  q("[data-pv=i]").onclick=()=>{const on=el.classList.toggle("inv");try{localStorage.setItem("spm-pdfinv",on?"1":"0")}catch(e){}};
-  q("[data-pv=o]").onclick=()=>{try{window.open(URL.createObjectURL(rec.blob),"_blank")}catch(e){toast("打不开")}};
-  q(".pdfv-n").onchange=e=>pvGo(parseInt(e.target.value,10)||1);
-  q(".pdfv-sc").addEventListener("scroll",pvScroll,{passive:true});
-  let lib;try{lib=await loadPdfjs()}catch(e){if(PV.el!==el)return;pvMsg(e.message+" 你也可以点右上角 ↗ 用浏览器自带的阅读器打开。",true);return}
-  if(PV.el!==el)return;
-  try{
-    const buf=await rec.blob.arrayBuffer();if(PV.el!==el)return;
-    const task=lib.getDocument({data:buf,isEvalSupported:false});
-    task.onPassword=(upd,why)=>{const pw=window.prompt(why===2?"密码不对，再试一次：":"这个 PDF 有密码，请输入：");if(pw)upd(pw);else closePdf()};
-    const doc=await task.promise;if(PV.el!==el){try{doc.destroy()}catch(e){}return}
-    PV.doc=doc;
-    const p1=await doc.getPage(1),v1=p1.getViewport({scale:1});PV.dims=[[v1.width,v1.height]];
-    const box=q(".pdfv-pages");
-    for(let i=0;i<doc.numPages;i++){const d=document.createElement("div");d.className="pdfv-p";d.dataset.r="0";d.dataset.i=i;box.appendChild(d);PV.divs.push(d)}
-    PV.obs=new IntersectionObserver(es=>{es.forEach(en=>{const i=+en.target.dataset.i;if(en.isIntersecting)pvRender(i);else if(en.target.dataset.r==="1"){const c=en.target.querySelector("canvas");if(c){c.width=c.height=0}en.target.dataset.r="0"}})},{root:q(".pdfv-sc"),rootMargin:"1400px 0px"});
-    q(".pdfv-c").textContent="/ "+doc.numPages;q(".pdfv-n").max=doc.numPages;
-    pvMsg("");pvLayout();
-    const last=Math.min(pdfPos(rec.id),doc.numPages);PV.cur=last;q(".pdfv-n").value=last;
-    if(last>1)requestAnimationFrame(()=>pvGo(last))
-  }catch(e){if(PV.el!==el)return;pvMsg((e&&e.name==="PasswordException"?"需要密码才能打开":"这个 PDF 打不开（可能已损坏）")+"。可以点 ↗ 试试浏览器自带的阅读器。",true)}}
-window.addEventListener("popstate",()=>{if(PV.el){PV.hist=false;closePdf(true)}});
-
 function resLinks(sid,s,yrs){
   const tb=TB[sid]||[];
   return `<h3>官方入口</h3><div class="grid g3">${link("https://lp.moe.gov.my","Lembaga Peperiksaan (LP)","官方 SPM 时间表、考试通告、格式文件，每年更新。",["官方","ok"])}
@@ -3576,7 +3464,8 @@ function rSet(){
 </ol>
 <p><b>第 3 步：建 Worker</b></p>
 <ol style="margin:4px 0 10px;padding-left:1.3em">
-<li>左侧菜单先点 <b>Compute</b>，再点 <b>Workers &amp; Pages → Create → Create Worker</b>。</li>
+<li>左侧菜单先点 <b>Compute</b>，再点 <b>Workers &amp; Pages</b>，然后点 <b>Create</b>（有些版本叫 Create application）。</li>
+<li>在模板列表里找到 <b>Start with Hello World!</b>，点它旁边的 <b>Get started</b>。（先用最简单的 Hello World 模板建一个空 Worker，下一小步再把里面的代码换成我们的。别选其他模板，也别选「Import a repository」。）</li>
 <li>名字填 <code>spm-sync</code>（会成为网址的一部分），点 <b>Deploy</b>。第一次可能要你选一个 xxx.workers.dev 子域名，随便取一个。</li>
 <li>部署完点 <b>Edit code</b><button type="button" class="btn small" id="wkCopy" title="复制 Worker 代码" aria-label="复制 Worker 代码" style="padding:2px 7px;vertical-align:middle;margin-left:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button> （点右边的复制图标，就是复制要贴的代码）。把编辑器里原有的代码全部删掉，贴上刚复制的代码，再点右上角 <b>Deploy</b>。</li>
 </ol>

@@ -1,5 +1,5 @@
 // 改了网站内容后，把版本号 +1 (spm-v6、v7...)，用户就会收到「有新版本」提示
-const CACHE = 'spm-v60';
+const CACHE = 'spm-v58';
 const PRECACHE = ['./', './index.html', './music.js', './online.js', './starmap.js', './labs.js', './lab-ptable.js', './lab-plot.js', './lab-physics.js', './lab-geo.js', './lab-mol.js', './lab-phet.js', './lab-mmap.js', './lab-ocr.js', './lab-mathin.js', './lab-cas.js', './lab-mermaid.js', './lab-space.js', './lab-m3d.js', './lab-bio3d.js', './data/sej.js', './data/bio.js', './data/kim.js', './data/fiz.js', './data/mat.js', './data/sci.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
