@@ -49,23 +49,77 @@ function pushRoom(){const o=OB();if(o&&run.inRoom)try{o.setRoom(P.scene,goalText
 function toast(t){try{if(window.__spm&&window.__spm.toast)window.__spm.toast(t)}catch(e){}}
 function chime(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const a=new C();[660,880].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+i*.22;o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.9);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+1)});setTimeout(()=>{try{a.close()}catch(e){}},2000)}catch(e){}}
 
+/* ---------- 持久化：刷新 / 手机杀后台后恢复计时 ---------- */
+const RK="spm-focus-run";
+function saveRun(){
+  try{
+    if(run.st==="idle"){localStorage.removeItem(RK);return}
+    localStorage.setItem(RK,JSON.stringify({st:run.st,end:run.end,left:run.left,total:run.total,ts:Date.now()}));
+  }catch(e){}
+}
+function restore(){
+  try{
+    const j=JSON.parse(localStorage.getItem(RK)||"null");
+    if(!j||(j.st!=="running"&&j.st!=="paused"))return;
+    const now=Date.now(),total=+j.total>0?+j.total:P.dur*60000;
+    if(j.st==="paused"){
+      if(now-(+j.ts||0)>6*3600e3){localStorage.removeItem(RK);return}
+      run.st="paused";run.left=Math.max(1000,+j.left||total);run.total=total;run.inRoom=true;return;
+    }
+    const end=+j.end||0;
+    if(end>now){run.st="running";run.end=end;run.left=end-now;run.total=total;run.inRoom=true;return}
+    /* 关掉页面期间已经到点：3 小时内算完成，更久就当没发生 */
+    if(now-end<3*3600e3){
+      const mins=Math.round(total/60000);
+      if(mins>0){if(P.day!==ymd()){P.day=ymd();P.min=0}P.min+=mins;save();setTimeout(()=>toast("🎉 上一轮专注已完成，+"+mins+" 分钟"),800)}
+    }
+    localStorage.removeItem(RK);
+  }catch(e){}
+}
+
+/* ---------- 屏幕常亮 / 到点提醒 ---------- */
+let wl=null,endT=0;
+async function wlOn(){
+  try{
+    if(!navigator.wakeLock||wl||document.hidden||run.st!=="running")return;
+    const l=await navigator.wakeLock.request("screen");
+    if(run.st!=="running"){try{l.release()}catch(e){}return}
+    wl=l;l.addEventListener("release",()=>{if(wl===l)wl=null});
+  }catch(e){}
+}
+function wlOff(){try{if(wl){const l=wl;wl=null;l.release()}}catch(e){}}
+function arm(){clearTimeout(endT);if(run.st==="running")endT=setTimeout(tick,remain()+60)}
+function notify(mins){
+  try{if(navigator.vibrate)navigator.vibrate([200,100,200,100,400])}catch(e){}
+  try{
+    if(!("Notification" in window)||Notification.permission!=="granted")return;
+    const title="🎉 本轮专注完成",opt={body:"+"+mins+" 分钟 · "+(P.goal.trim()||"休息一下吧"),icon:"icons/icon-192.png",tag:"spm-focus",renotify:true,vibrate:[200,100,200]};
+    const plain=()=>{try{new Notification(title,opt)}catch(e){}};
+    if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification(title,opt)).catch(plain);
+    else plain();
+  }catch(e){}
+}
+
 function start(){
   if(run.st==="idle"){run.left=P.dur*60000;run.total=run.left}
   run.end=Date.now()+run.left;run.st="running";run.inRoom=true;
+  try{if("Notification" in window&&Notification.permission==="default")Notification.requestPermission()}catch(e){}
   const o=OB();if(o)try{o.setRoom(P.scene,goalText(),"focus")}catch(e){}
-  tick();
+  saveRun();arm();wlOn();
+  tick();people();
 }
-function pause(){run.left=remain();run.st="paused";pushRoom();tick()}
+function pause(){run.left=remain();run.st="paused";clearTimeout(endT);wlOff();saveRun();pushRoom();tick()}
 function finish(manual){
   const spent=run.total-remain();
   const mins=manual?Math.floor(spent/60000):Math.round(run.total/60000);
   if(mins>0){if(P.day!==ymd()){P.day=ymd();P.min=0}P.min+=mins;save()}
   const was=run.st!=="idle";
   run.st="idle";run.left=P.dur*60000;run.total=0;
+  clearTimeout(endT);wlOff();saveRun();
   pushRoom();tick();
   if(was){
     try{document.dispatchEvent(new CustomEvent("spm-focus-done",{detail:{min:mins,scene:P.scene,goal:P.goal,manual:!!manual}}))}catch(e){}
-    if(!manual){chime();toast("🎉 本轮专注完成，+"+mins+" 分钟")}
+    if(!manual){chime();notify(mins);toast("🎉 本轮专注完成，+"+mins+" 分钟")}
   }
 }
 function leave(){
@@ -153,6 +207,17 @@ const CSS=`#btnFocus{flex:none;white-space:nowrap;padding-left:10px;padding-righ
 .fc-net{font-size:11.5px;color:var(--muted,#5d6b7c);text-align:center;margin-top:auto;line-height:1.6}
 .fc-x{position:absolute;z-index:5;right:12px;top:12px;width:34px;height:34px;border-radius:50%;border:0;background:var(--sheet2,#f1f4fb);color:var(--ink,#17263f);cursor:pointer;font-size:14px;transition:transform .25s}
 .fc-x:hover{transform:rotate(90deg)}
+.fc-bub{position:absolute;inset:0;z-index:2;pointer-events:none}
+.fc-b{position:absolute;width:0;height:0;animation:fcBubIn .55s cubic-bezier(.3,1.4,.5,1) backwards;transition:opacity .45s,transform .45s}
+.fc-b.out{opacity:0;transform:scale(.4)}
+.fc-bi{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto;animation:fcFloat var(--fd,5s) ease-in-out var(--fl,0s) infinite}
+.fc-ba{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #fff;box-shadow:0 0 0 2.5px var(--ring,#6f8dff),0 8px 16px -6px rgba(0,0,0,.45)}
+.fc-bn{display:none;max-width:76px;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.92);color:#1d2a40;box-shadow:0 2px 6px -2px rgba(0,0,0,.3)}
+.fc-b.me .fc-bn,.fc-bi:hover .fc-bn{display:block}
+.fc-b.me .fc-ba{width:42px;height:42px}
+@keyframes fcBubIn{from{opacity:0;transform:scale(.3) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fcFloat{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(calc(-50% + var(--fx,3px)),calc(-50% - 7px))}}
+@media (max-width:860px){.fc-ba{width:32px;height:32px;font-size:17px}.fc-b.me .fc-ba{width:36px;height:36px}}
 @keyframes fcFade{from{opacity:0}to{opacity:1}}
 @keyframes fcPop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:none}}
 @keyframes fcSwap{from{opacity:0;transform:translate(-50%,-48%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%)}}
@@ -183,7 +248,7 @@ function build(){
   <button type="button" class="fc-x" aria-label="关闭">✕</button>
   <div class="fc-main">
     <div class="fc-top"><div class="fc-pill"><span class="fc-sname"></span></div><div class="fc-pill fc-live" style="margin-right:44px"><span class="fc-avs"></span><span class="fc-livet"></span></div></div>
-    <div class="fc-view"><div class="fc-bg"></div><img class="fc-hero" alt="" draggable="false"><div class="fc-fx" aria-hidden="true"></div></div>
+    <div class="fc-view"><div class="fc-bg"></div><img class="fc-hero" alt="" draggable="false"><div class="fc-fx" aria-hidden="true"></div><div class="fc-bub"></div></div>
     <div class="fc-timer">
       <div class="fc-ring"><svg viewBox="0 0 72 72" aria-hidden="true"><circle class="bg" cx="36" cy="36" r="31"/><circle class="fg" cx="36" cy="36" r="31"/></svg><b class="fc-clock">25:00</b></div>
       <div class="fc-tt"><small>专注计时</small><b class="fc-gt"></b><span class="fc-sub"></span></div>
@@ -301,7 +366,11 @@ function people(){
   if(o)try{list=o.list();conn=o.conn()}catch(e){}
   const cnt={};list.forEach(x=>{if(x.r)cnt[x.r]=(cnt[x.r]||0)+1});
   root.querySelectorAll(".fc-sn").forEach(b=>{const n=cnt[b.dataset.id]||0;b.querySelector(".n").textContent=n?n+" 人":""});
-  const here=list.filter(x=>x.r===P.scene).sort((a,b)=>(b.me-a.me)||a.n.localeCompare(b.n,"zh"));
+  const here=list.filter(x=>x.r===P.scene);
+  /* 已经在房间里，但在线服务还没连上 / 排队中：也先显示自己 */
+  if(run.inRoom&&o&&!here.some(x=>x.me)){try{const m=o.me();here.push({k:m.dev,n:m.nick,a:m.av,s:"",st:run.st==="paused"?"rest":"focus",g:goalText(),r:P.scene,me:true})}catch(e){}}
+  here.sort((a,b)=>(b.me-a.me)||a.n.localeCompare(b.n,"zh"));
+  bubbles(here);
   const avs=$(".fc-avs");avs.textContent="";
   here.slice(0,5).forEach(u=>{const i=el("i","",ANI[u.a]);i.style.background=PAST[u.a]||"#eee";avs.appendChild(i)});
   $(".fc-livet").textContent=here.length?here.length+" 人正在专注":"还没有人，你来当第一个";
@@ -321,7 +390,39 @@ function people(){
   tot.textContent=all?"共 "+all+" 人在房间里":"";
   net.textContent=!o?"在线服务未加载，当前是单人专注模式。":conn==="on"?"🟢 已连接 · 在线 "+list.length+" 人":conn==="loading"?"连接中…":conn==="queue"?"🎟️ 在线人数已满，排队第 "+(o.qpos?o.qpos():"?")+" 位。排队期间可以单人专注。":conn==="err"?"暂时连不上在线服务，仍可单人专注，计时不受影响。":"在线服务待连接。";
 }
-function boot(){try{build()}catch(e){console.warn("focus.js",e)}}
+/* ---------- 场景里漂浮的头像气泡 ---------- */
+const BS=[[12,74],[24,86],[38,90],[52,91],[66,88],[80,82],[90,68],[8,54],[92,50],[10,34],[88,32],[20,16],[78,14],[50,9]];
+const bub=new Map();
+function hs(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h}
+function bubbles(here){
+  const box=$(".fc-bub");if(!box)return;
+  const want=new Map();here.slice(0,BS.length).forEach(u=>want.set(u.k,u));
+  bub.forEach((b,k)=>{if(!want.has(k)){bub.delete(k);b.el.classList.add("out");setTimeout(()=>b.el.remove(),500)}});
+  want.forEach((u,k)=>{
+    let b=bub.get(k);
+    if(!b){
+      const used=new Set();bub.forEach(x=>used.add(x.slot));
+      let s=hs(k)%BS.length;for(let i=0;i<BS.length&&used.has(s);i++)s=(s+1)%BS.length;
+      const outer=el("div","fc-b"),inner=el("div","fc-bi"),av=el("span","fc-ba"),nm=el("span","fc-bn");
+      outer.style.left=BS[s][0]+"%";outer.style.top=BS[s][1]+"%";
+      const h=hs(k+"f");inner.style.setProperty("--fd",(4+(h%30)/10)+"s");inner.style.setProperty("--fl",(-(h%50)/10)+"s");inner.style.setProperty("--fx",(h%2?3:-3)+"px");
+      inner.appendChild(av);inner.appendChild(nm);outer.appendChild(inner);box.appendChild(outer);
+      b={el:outer,av,nm,slot:s};bub.set(k,b);
+    }
+    b.el.classList.toggle("me",!!u.me);
+    b.av.textContent=ANI[u.a]||"🐻";b.av.style.background=PAST[u.a]||"#eee";b.av.style.setProperty("--ring",ST_COL[u.st]||"#6f8dff");
+    b.nm.textContent=u.n+(u.me?"（我）":"");
+    b.el.firstChild.title=u.n+" · "+(u.g||ST_TXT[u.st]);
+  });
+}
+function boot(){
+  try{
+    restore();
+    build();
+    if(run.st!=="idle"){pushRoom();arm();wlOn();if(run.st==="running")toast("已恢复专注计时")}
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden){if(run.st==="running")wlOn();if(root)tick()}});
+  }catch(e){console.warn("focus.js",e)}
+}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 window.SPMFocus={scenes:()=>SC.map(x=>({id:x.id,n:x.n,m:x.m})),open:id=>{setOpen(true);if(id&&SC.some(x=>x.id===id))pick(id)},close:()=>setOpen(false),state:()=>({st:run.st,left:remain(),scene:P.scene,inRoom:run.inRoom,todayMin:P.min})};
 }catch(err){try{console.warn("focus.js",err)}catch(e){}}

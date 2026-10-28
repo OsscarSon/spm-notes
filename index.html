@@ -2602,6 +2602,13 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-28c",date:"2026-10-28",title:"专注计时更稳了，房间里也有「人气」了 ✨",
+   items:[
+    "⏱️ 刷新页面或手机把 App 杀掉后，专注计时会自动恢复；如果离开期间已经计时结束，会补记分钟数。",
+    "🔔 一轮专注完成时会发系统通知并震动（第一次点「开始专注」时会请求通知权限）。",
+    "🌙 计时期间屏幕不会自动熄灭（需要浏览器支持 Wake Lock）。",
+    "🫧 房间场景里，同房间的人的头像会像小气泡一样在建筑周围轻轻漂浮，进出时淡入淡出。"
+   ]},
 {v:"2026-10-28b",date:"2026-10-28",title:"在线名单里多了「专注房间」🏡",
    items:[
     "🏡 点右上角 👥，面板里多了「专注房间」标签页：樱花书院、温泉小筑、红砖咖啡楼、森林木屋、晨光小筑、月夜书店、街角咖啡、海边灯塔，一共 8 个场景，点卡片就能进去。",
@@ -4291,7 +4298,7 @@ setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mod
 <script src="starmap.js?v=2026-10-25c" defer></script>
 <script src="labs.js?v=2026-10-26f" defer></script>
 <script src="online.js?v=2026-10-28b" defer></script>
-<script src="focus.js?v=2026-10-28b" defer></script>
+<script src="focus.js?v=2026-10-28d" defer></script>
 
 </body>
 </html>
