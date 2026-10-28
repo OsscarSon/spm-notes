@@ -43,7 +43,7 @@ let lastAct=Date.now(),hiddenAt=document.hidden?Date.now():0,idleNow=false;
 function isIdle(){const n=Date.now();return idleNow=!!((document.hidden&&hiddenAt&&n-hiddenAt>=IDLE_HIDE)||n-lastAct>=IDLE_ACT)}
 function myStatus(){try{const p=window.SPMMusic&&window.SPMMusic.pomo&&window.SPMMusic.pomo();if(p){idleNow=false;return p.phase==="rest"?"rest":"focus"}}catch(e){}return isIdle()?"idle":"study"}
 /* 专注房间（focus.js）接入：房间 id、目标、阶段。没进房间时 ext.r 为空，对原有功能零影响 */
-const ROOMS=["sakura","onsen","brick","cabin","sunny","night","cafe"];
+const ROOMS=["sakura","onsen","brick","cabin","sunny","night","cafe","lighthouse"];
 const ext={r:"",g:"",ph:"",hold:false};
 function cleanGoal(s){return cleanNick(s).slice(0,24)}
 function myStatus0(){return myStatus()}
@@ -198,7 +198,7 @@ const CSS=`#btnOnline{position:relative;flex:none;white-space:nowrap;padding-lef
 #onPanel .on-bn>div{flex:1;min-width:0}
 #onPanel .on-bn button{flex:none;border:0;border-radius:12px;height:34px;padding:0 14px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,#6f5cf0,#5a7bff);font-family:inherit}
 #onPanel .on-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#onPanel .on-rc{position:relative;display:block;padding:0;border:0;border-radius:20px;overflow:hidden;aspect-ratio:1/.96;cursor:pointer;background:var(--sheet2,#f1f4fb);box-shadow:0 10px 22px -14px rgba(10,20,50,.6);transition:transform .2s,box-shadow .2s;font-family:inherit;text-align:left}
+#onPanel .on-rc{position:relative;display:block;padding:0;border:0;border-radius:20px;overflow:hidden;aspect-ratio:1/.96;cursor:pointer;background:linear-gradient(135deg,#8d83f5,#ff9ec6);box-shadow:0 10px 22px -14px rgba(10,20,50,.6);transition:transform .2s,box-shadow .2s;font-family:inherit;text-align:left}
 #onPanel .on-rc:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 16px 26px -14px rgba(10,20,50,.7)}
 #onPanel .on-rc:focus-visible{outline:2px solid #ff9ec6;outline-offset:2px}
 #onPanel .on-rc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -302,6 +302,7 @@ function rooms(){
     sc.forEach(r=>{
       const b=el("button","on-rc");b.type="button";b.dataset.id=r.id;b.setAttribute("aria-label","进入"+r.n);
       const im=el("img");im.src="img/focus/"+r.id+"-m.webp";im.alt="";im.loading="lazy";im.decoding="async";
+      im.onerror=()=>{if(!im.dataset.f){im.dataset.f="1";im.src="img/focus/"+r.id+".webp"}else im.style.display="none"};
       const t=el("span","on-rt");t.appendChild(el("b","",r.n));t.appendChild(el("small","",r.m));
       b.appendChild(im);b.appendChild(t);b.appendChild(el("span","on-rb"));
       b.addEventListener("click",()=>{setOpen(false);f.open(r.id)});G.appendChild(b);

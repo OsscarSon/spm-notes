@@ -15,7 +15,8 @@ const SC=[
   {id:"cabin",n:"森林木屋",m:"松林与炉火，安静沉浸",fx:"steam",bg:"#eed4ae"},
   {id:"sunny",n:"晨光小筑",m:"明亮、积极向上的早晨",fx:"mote",bg:"#f5e7c4"},
   {id:"night",n:"月夜书店",m:"星空下的深夜书香",fx:"star",bg:"#26264a"},
-  {id:"cafe",n:"街角咖啡",m:"温暖的背景白噪",fx:"mote",bg:"#b5c2bd"}
+  {id:"cafe",n:"街角咖啡",m:"温暖的背景白噪",fx:"mote",bg:"#b5c2bd"},
+  {id:"lighthouse",n:"海边灯塔",m:"晚霞、海浪与远航的专注",fx:"mote",bg:"#c995a6"}
 ];
 const ANI=["🐻","🦊","🐱","🐶","🐧","🐬","🦉","🐰","🦌","🐿️","🐳","🐼"];
 const PAST=["#ffd9d9","#ffe6c7","#fff3b8","#d9f2c4","#c6f0e6","#c9e7ff","#d9d6ff","#f3d4ff","#ffd1ea","#ffe0cc","#cfeaff","#e2e6ee"];
