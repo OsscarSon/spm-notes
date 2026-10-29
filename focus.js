@@ -221,9 +221,10 @@ const CSS=`#btnFocus{flex:none;white-space:nowrap;padding-left:10px;padding-righ
 .fc-b.me .fc-ba{width:42px;height:42px}
 .fc-b:not(.me) .fc-bi{cursor:pointer}
 .fc-b.pop .fc-ba{animation:fcBoing .6s cubic-bezier(.3,1.6,.5,1)}
-.fc-pk{position:absolute;z-index:4;display:none;gap:2px;padding:5px 7px;border-radius:999px;background:rgba(255,255,255,.96);box-shadow:0 8px 22px -8px rgba(0,0,0,.45);transform:translate(-50%,-100%);animation:fcBubIn .22s both}
+.fc-pk{position:absolute;z-index:4;display:none;gap:2px;width:max-content;max-width:calc(100% - 16px);flex-wrap:wrap;justify-content:center;padding:5px 7px;border-radius:999px;background:rgba(255,255,255,.96);box-shadow:0 8px 22px -8px rgba(0,0,0,.45);transform:none;transform-origin:50% 100%;animation:fcPkIn .22s both}
 .fc-pk.on{display:flex}
-.fc-pk.dn{transform:translate(-50%,0)}
+.fc-pk.dn{transform-origin:50% 0}
+@keyframes fcPkIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
 .fc-pk button{border:0;background:none;font-size:22px;line-height:1;width:34px;height:34px;border-radius:50%;cursor:pointer;transition:transform .15s,background .15s;font-family:inherit}
 .fc-pk button:hover{background:#f1ecff;transform:scale(1.2)}
 .fc-pk small{position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);white-space:nowrap;font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:999px;background:rgba(29,42,64,.82);color:#fff}
@@ -456,17 +457,29 @@ function bubbles(here){
 /* ---------- 小礼物：点同房间的人，送一个可爱 emoji（无文字、白名单、6 秒一次） ---------- */
 let pkFor="",pkT=0,lastIn={};
 function pkHide(){const p=root&&$(".fc-pk");if(p)p.classList.remove("on");pkFor=""}
+/* 把选择条放在头像旁边，但一定留在画面里：按实际宽高夹在边界内，上面放不下就放到下面 */
+function placePk(pk,x,y){
+  const par=pk.parentNode,vw=par.clientWidth,vh=par.clientHeight,pw=pk.offsetWidth,ph=pk.offsetHeight,M=8,HINT=24;
+  const left=Math.min(vw-pw-M,Math.max(M,x/100*vw-pw/2)),cy=y/100*vh;
+  let dn=y<32;
+  const upTop=cy-.06*vh-ph,dnTop=cy+.08*vh;
+  if(!dn&&upTop<M)dn=true;
+  else if(dn&&dnTop+ph+M>vh&&upTop>=M)dn=false;
+  pk.classList.toggle("dn",dn);
+  const top=dn?Math.max(M+HINT,Math.min(dnTop,vh-ph-M)):Math.max(M,Math.min(upTop,vh-ph-M-HINT));
+  pk.style.left=left+"px";pk.style.top=top+"px";
+}
+window.addEventListener("resize",()=>pkHide());
 function pickGift(k){
   const o=OB(),pk=$(".fc-pk"),b=bub.get(k);if(!o||!pk||!b||!o.hiList)return;
   if(pkFor===k){pkHide();return}
   pkFor=k;pk.textContent="";
   o.hiList.forEach(e=>{const c=el("button","",e);c.type="button";c.setAttribute("aria-label","送 "+e);c.addEventListener("click",ev=>{ev.stopPropagation();sendGift(k,e)});pk.appendChild(c)});
-  const x=BS[b.slot][0],y=BS[b.slot][1],dn=y<32;
-  pk.style.left=Math.min(84,Math.max(16,x))+"%";pk.style.top=(dn?y+8:y-6)+"%";
-  pk.classList.toggle("dn",dn);
+  const x=BS[b.slot][0],y=BS[b.slot][1];
   const hint=!run.inRoom?"进入房间后才能送小礼物":o.conn()!=="on"?"在线服务连上后才能送":"";
   pk.appendChild(el("small","",hint));
-  pk.classList.add("on");
+  pk.classList.add("on");           /* 先显示出来才能量尺寸 */
+  placePk(pk,x,y);
   clearTimeout(pkT);pkT=setTimeout(pkHide,6000);
 }
 function slotXY(k){const b=bub.get(k);return b?BS[b.slot]:null}
