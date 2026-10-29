@@ -215,6 +215,22 @@ const CSS=`#btnFocus{flex:none;white-space:nowrap;padding-left:10px;padding-righ
 .fc-bn{display:none;max-width:76px;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.92);color:#1d2a40;box-shadow:0 2px 6px -2px rgba(0,0,0,.3)}
 .fc-b.me .fc-bn,.fc-bi:hover .fc-bn{display:block}
 .fc-b.me .fc-ba{width:42px;height:42px}
+.fc-b:not(.me) .fc-bi{cursor:pointer}
+.fc-b.pop .fc-ba{animation:fcBoing .6s cubic-bezier(.3,1.6,.5,1)}
+.fc-pk{position:absolute;z-index:4;display:none;gap:2px;padding:5px 7px;border-radius:999px;background:rgba(255,255,255,.96);box-shadow:0 8px 22px -8px rgba(0,0,0,.45);transform:translate(-50%,-100%);animation:fcBubIn .22s both}
+.fc-pk.on{display:flex}
+.fc-pk.dn{transform:translate(-50%,0)}
+.fc-pk button{border:0;background:none;font-size:22px;line-height:1;width:34px;height:34px;border-radius:50%;cursor:pointer;transition:transform .15s,background .15s;font-family:inherit}
+.fc-pk button:hover{background:#f1ecff;transform:scale(1.2)}
+.fc-pk small{position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);white-space:nowrap;font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:999px;background:rgba(29,42,64,.82);color:#fff}
+.fc-pk.dn small{bottom:auto;top:-22px}
+.fc-pk small:empty{display:none}
+.fc-hi{position:absolute;z-index:6;font-size:26px;line-height:1;pointer-events:none;transform:translate(-50%,-50%);transition:left 1.1s cubic-bezier(.45,.05,.3,1),top 1.1s cubic-bezier(.45,-.4,.3,1),opacity .5s,transform 1.1s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3))}
+.fc-hi.land{transform:translate(-50%,-50%) scale(1.5)}
+.fc-hi.gone{opacity:0;transform:translate(-50%,-90%) scale(1.1);transition:opacity .6s,transform .9s}
+.fc-rip{position:absolute;z-index:5;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid rgba(255,255,255,.95);pointer-events:none;animation:fcRip .9s ease-out both}
+@keyframes fcRip{from{opacity:.9;transform:scale(.4)}to{opacity:0;transform:scale(2.2)}}
+@keyframes fcBoing{0%{transform:scale(1)}35%{transform:scale(1.28) rotate(-8deg)}65%{transform:scale(.94) rotate(5deg)}100%{transform:scale(1)}}
 @keyframes fcBubIn{from{opacity:0;transform:scale(.3) translateY(10px)}to{opacity:1;transform:none}}
 @keyframes fcFloat{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(calc(-50% + var(--fx,3px)),calc(-50% - 7px))}}
 @media (max-width:860px){.fc-ba{width:32px;height:32px;font-size:17px}.fc-b.me .fc-ba{width:36px;height:36px}}
@@ -248,7 +264,7 @@ function build(){
   <button type="button" class="fc-x" aria-label="关闭">✕</button>
   <div class="fc-main">
     <div class="fc-top"><div class="fc-pill"><span class="fc-sname"></span></div><div class="fc-pill fc-live" style="margin-right:44px"><span class="fc-avs"></span><span class="fc-livet"></span></div></div>
-    <div class="fc-view"><div class="fc-bg"></div><img class="fc-hero" alt="" draggable="false"><div class="fc-fx" aria-hidden="true"></div><div class="fc-bub"></div></div>
+    <div class="fc-view"><div class="fc-bg"></div><img class="fc-hero" alt="" draggable="false"><div class="fc-fx" aria-hidden="true"></div><div class="fc-bub"></div><div class="fc-pk" role="menu" aria-label="送小礼物"></div></div>
     <div class="fc-timer">
       <div class="fc-ring"><svg viewBox="0 0 72 72" aria-hidden="true"><circle class="bg" cx="36" cy="36" r="31"/><circle class="fg" cx="36" cy="36" r="31"/></svg><b class="fc-clock">25:00</b></div>
       <div class="fc-tt"><small>专注计时</small><b class="fc-gt"></b><span class="fc-sub"></span></div>
@@ -290,6 +306,7 @@ function build(){
   $(".fc-x").addEventListener("click",()=>setOpen(false));
   root.addEventListener("click",e=>{if(e.target===root)setOpen(false)});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&open)setOpen(false)});
+  $(".fc-view").addEventListener("click",pkHide);
   document.addEventListener("spm-online-change",()=>{if(rafP)return;rafP=requestAnimationFrame(()=>{rafP=0;people()})});
 
   scene();prep();tick();people();
@@ -382,6 +399,7 @@ function people(){
     row.style.animationDelay=Math.min(i,10)*30+"ms";a.style.background=PAST[u.a]||"#eee";a.style.boxShadow="0 0 0 2px "+ST_COL[u.st];
     const info=el("div","fc-pn"),nm=el("div","",u.n+(u.me?"（我）":""));
     info.appendChild(nm);info.appendChild(el("small","",u.g?u.g+" · "+ST_TXT[u.st]:ST_TXT[u.st]));
+    if(!u.me){row.style.cursor="pointer";row.title="点一下送小礼物";row.addEventListener("click",()=>pickGift(u.k))}
     row.appendChild(a);row.appendChild(info);pl.appendChild(row);
   });
   if(here.length>30)pl.appendChild(el("div","fc-empty","还有 "+(here.length-30)+" 人"));
@@ -407,14 +425,64 @@ function bubbles(here){
       outer.style.left=BS[s][0]+"%";outer.style.top=BS[s][1]+"%";
       const h=hs(k+"f");inner.style.setProperty("--fd",(4+(h%30)/10)+"s");inner.style.setProperty("--fl",(-(h%50)/10)+"s");inner.style.setProperty("--fx",(h%2?3:-3)+"px");
       inner.appendChild(av);inner.appendChild(nm);outer.appendChild(inner);box.appendChild(outer);
+      inner.addEventListener("click",ev=>{ev.stopPropagation();if(!outer.classList.contains("me"))pickGift(k)});
       b={el:outer,av,nm,slot:s};bub.set(k,b);
     }
     b.el.classList.toggle("me",!!u.me);
     b.av.textContent=ANI[u.a]||"🐻";b.av.style.background=PAST[u.a]||"#eee";b.av.style.setProperty("--ring",ST_COL[u.st]||"#6f8dff");
     b.nm.textContent=u.n+(u.me?"（我）":"");
-    b.el.firstChild.title=u.n+" · "+(u.g||ST_TXT[u.st]);
+    b.el.firstChild.title=u.n+" · "+(u.g||ST_TXT[u.st])+(u.me?"":" · 点一下送小礼物");
   });
 }
+/* ---------- 小礼物：点同房间的人，送一个可爱 emoji（无文字、白名单、6 秒一次） ---------- */
+let pkFor="",pkT=0,lastIn={};
+function pkHide(){const p=root&&$(".fc-pk");if(p)p.classList.remove("on");pkFor=""}
+function pickGift(k){
+  const o=OB(),pk=$(".fc-pk"),b=bub.get(k);if(!o||!pk||!b||!o.hiList)return;
+  if(pkFor===k){pkHide();return}
+  pkFor=k;pk.textContent="";
+  o.hiList.forEach(e=>{const c=el("button","",e);c.type="button";c.setAttribute("aria-label","送 "+e);c.addEventListener("click",ev=>{ev.stopPropagation();sendGift(k,e)});pk.appendChild(c)});
+  const x=BS[b.slot][0],y=BS[b.slot][1],dn=y<32;
+  pk.style.left=Math.min(84,Math.max(16,x))+"%";pk.style.top=(dn?y+8:y-6)+"%";
+  pk.classList.toggle("dn",dn);
+  const hint=!run.inRoom?"进入房间后才能送小礼物":o.conn()!=="on"?"在线服务连上后才能送":"";
+  pk.appendChild(el("small","",hint));
+  pk.classList.add("on");
+  clearTimeout(pkT);pkT=setTimeout(pkHide,6000);
+}
+function slotXY(k){const b=bub.get(k);return b?BS[b.slot]:null}
+function fly(fromK,toK,emo){
+  const box=$(".fc-bub");if(!box)return;
+  const A=slotXY(fromK)||[50,102],B=slotXY(toK)||[50,102];
+  const e=el("span","fc-hi",emo);e.style.left=A[0]+"%";e.style.top=A[1]+"%";box.appendChild(e);
+  void e.offsetWidth;
+  requestAnimationFrame(()=>{e.style.left=B[0]+"%";e.style.top=B[1]+"%";e.classList.add("land")});
+  setTimeout(()=>{
+    const r=el("span","fc-rip");r.style.left=B[0]+"%";r.style.top=B[1]+"%";box.appendChild(r);setTimeout(()=>r.remove(),1000);
+    const t=bub.get(toK);if(t){t.el.classList.remove("pop");void t.el.offsetWidth;t.el.classList.add("pop")}
+    e.classList.add("gone");setTimeout(()=>e.remove(),1400);
+  },1100);
+}
+function meKey(){try{const o=OB();return o?o.me().dev:""}catch(e){return""}}
+function sendGift(k,emo){
+  const o=OB();pkHide();if(!o||!o.hi)return;
+  if(!run.inRoom){toast("先进入房间，再给大家送小礼物吧 🏡");return}
+  if(o.conn()!=="on"){toast("在线服务还没连上，稍后再试 🌙");return}
+  const w=o.hiWait?o.hiWait():0;
+  if(w>0){toast("慢一点～ "+Math.ceil(w/1000)+" 秒后再送 "+emo);return}
+  if(o.hi(k,emo)){fly(meKey(),k,emo)}
+}
+document.addEventListener("spm-online-hi",ev=>{
+  try{
+    const d=ev.detail||{},o=OB();if(!o||!run.inRoom)return;
+    const u=o.list().find(x=>x.k===d.from);
+    if(!u||u.r!==P.scene)return;
+    const now=Date.now();if(now-(lastIn[d.from]||0)<3000)return;lastIn[d.from]=now;
+    if(open&&root){fly(d.from,meKey(),d.e)}
+    else toast(d.e+" "+u.n+" 给你送了一份小礼物");
+  }catch(e){}
+});
+
 function boot(){
   try{
     restore();

@@ -43,6 +43,8 @@ let lastAct=Date.now(),hiddenAt=document.hidden?Date.now():0,idleNow=false;
 function isIdle(){const n=Date.now();return idleNow=!!((document.hidden&&hiddenAt&&n-hiddenAt>=IDLE_HIDE)||n-lastAct>=IDLE_ACT)}
 function myStatus(){try{const p=window.SPMMusic&&window.SPMMusic.pomo&&window.SPMMusic.pomo();if(p){idleNow=false;return p.phase==="rest"?"rest":"focus"}}catch(e){}return isIdle()?"idle":"study"}
 /* 专注房间（focus.js）接入：房间 id、目标、阶段。没进房间时 ext.r 为空，对原有功能零影响 */
+const HI=["🧋","🍵","💪","🌸","🥰","🍡"];
+let lastHi=0;
 const ROOMS=["sakura","onsen","brick","cabin","sunny","night","cafe","lighthouse"];
 const ext={r:"",g:"",ph:"",hold:false};
 function cleanGoal(s){return cleanNick(s).slice(0,24)}
@@ -99,6 +101,13 @@ function start(){
     sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:5}}});
     const mine=ch=sb.channel(CHAN,{config:{presence:{key:me.dev}}});
     mine.on("presence",{event:"sync"},()=>{if(mine!==ch)return;list=readState();ui()});
+    /* 小礼物：只收「发给我」的、白名单里的 emoji；不含任何文字 */
+    mine.on("broadcast",{event:"hi"},m=>{
+      if(mine!==ch)return;
+      const p=m&&m.payload;
+      if(!p||p.to!==me.dev||typeof p.f!=="string"||HI.indexOf(p.e)<0)return;
+      try{document.dispatchEvent(new CustomEvent("spm-online-hi",{detail:{from:p.f.slice(0,40),e:p.e}}))}catch(e){}
+    });
     mine.subscribe((status,err)=>{
       if(mine!==ch)return;
       if(status==="SUBSCRIBED"){state="on";errKind="";lastKey="";if(me.share||ext.r)track(true);startPoll();ui()}
@@ -361,6 +370,14 @@ window.SPMOnline={open:()=>setOpen(true),close:()=>setOpen(false),state:()=>({st
   rooms:ROOMS,list:()=>list.slice(),conn:()=>state,qpos:()=>qpos,
   me:()=>({nick:me.nick,av:me.av,dev:me.dev,share:me.share}),
   hold:v=>{ext.hold=!!v;sync()},
+  /* 送小礼物（只能送白名单 emoji，6 秒一次）。成功发出返回 true */
+  hiList:HI,
+  hi:(to,e)=>{
+    if(state!=="on"||!ch||typeof to!=="string"||HI.indexOf(e)<0||Date.now()-lastHi<6000)return false;
+    lastHi=Date.now();
+    try{Promise.resolve(ch.send({type:"broadcast",event:"hi",payload:{to:to.slice(0,40),e:e,f:me.dev}})).catch(()=>{})}catch(x){return false}
+    return true},
+  hiWait:()=>Math.max(0,6000-(Date.now()-lastHi)),
   setRoom:(r,g,ph)=>{
     const was=ext.r;ext.r=ROOMS.indexOf(r)>=0?r:"";ext.g=ext.r?cleanGoal(g):"";ext.ph=ext.r?(ph||""):"";
     if(ext.r){if(state==="on")track(true);else sync()}
