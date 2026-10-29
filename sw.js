@@ -1,5 +1,5 @@
 // 改了网站内容后，把版本号 +1 (spm-v6、v7...)，用户就会收到「有新版本」提示
-const CACHE = 'spm-v63';
+const CACHE = 'spm-v64';
 const PRECACHE = ['./', './index.html', './music.js', './online.js', './focus.js', './img/focus/sakura.webp', './img/focus/sakura-s.webp', './img/focus/sakura-m.webp', './img/focus/onsen.webp', './img/focus/onsen-s.webp', './img/focus/onsen-m.webp', './img/focus/brick.webp', './img/focus/brick-s.webp', './img/focus/brick-m.webp', './img/focus/cabin.webp', './img/focus/cabin-s.webp', './img/focus/cabin-m.webp', './img/focus/sunny.webp', './img/focus/sunny-s.webp', './img/focus/sunny-m.webp', './img/focus/night.webp', './img/focus/night-s.webp', './img/focus/night-m.webp', './img/focus/cafe.webp', './img/focus/cafe-s.webp', './img/focus/cafe-m.webp', './img/focus/lighthouse.webp', './img/focus/lighthouse-s.webp', './img/focus/lighthouse-m.webp', './starmap.js', './labs.js', './lab-ptable.js', './lab-plot.js', './lab-physics.js', './lab-geo.js', './lab-mol.js', './lab-phet.js', './lab-mmap.js', './lab-ocr.js', './lab-mathin.js', './lab-cas.js', './lab-mermaid.js', './lab-space.js', './lab-m3d.js', './lab-bio3d.js', './data/sej.js', './data/bio.js', './data/kim.js', './data/fiz.js', './data/mat.js', './data/sci.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -33,6 +33,8 @@ self.addEventListener('fetch', e => {
 
     // 自己网站的文件：有网就拿最新的，没网 / 很慢就用缓存
     if (url.origin === self.location.origin) {
+      // 图片：有缓存就直接用（文件名不变内容就不变；换图时把 CACHE 版本号 +1），切换场景不用等网络
+      if (cached && /\.(webp|png|jpe?g|gif|svg)$/i.test(url.pathname)) return cached;
       const net = fetch(req).then(res => {
         if (res && res.ok) cache.put(req, res.clone());
         return res;

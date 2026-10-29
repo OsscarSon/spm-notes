@@ -9,14 +9,14 @@
 try{
 const LS="spm-focus-v1";
 const SC=[
-  {id:"sakura",n:"樱花书院",m:"春风与花瓣，轻柔而专注",fx:"petal",bg:"#eed8ca"},
-  {id:"onsen",n:"温泉小筑",m:"低压力的放松与重启",fx:"steam",bg:"#e7dbd0"},
-  {id:"brick",n:"红砖咖啡楼",m:"暖灯、猫咪和屋顶露台",fx:"mote",bg:"#c7b8bf"},
-  {id:"cabin",n:"森林木屋",m:"松林与炉火，安静沉浸",fx:"steam",bg:"#eed4ae"},
-  {id:"sunny",n:"晨光小筑",m:"明亮、积极向上的早晨",fx:"mote",bg:"#f5e7c4"},
-  {id:"night",n:"月夜书店",m:"星空下的深夜书香",fx:"star",bg:"#26264a"},
-  {id:"cafe",n:"街角咖啡",m:"温暖的背景白噪",fx:"mote",bg:"#b5c2bd"},
-  {id:"lighthouse",n:"海边灯塔",m:"晚霞、海浪与远航的专注",fx:"mote",bg:"#c995a6"}
+  {id:"sakura",n:"樱花书院",m:"春风与花瓣，轻柔而专注",fx:"petal",bg:"#eed8ca",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAaUlEQVR42gXBTQrCQAwG0PzNUEQpiLju/U/gITyGC+mmKJLFJPPF9/j1fETaSHF0Zz2m2Pm6RshIVnQjqRRr/cJKnIxpYF6CrIhRNVEJBPOIsjl+X8fhtbvuQe8PbLoukFunU2t3pW2lP9T+ODwRUlcFAAAAAElFTkSuQmCC"},
+  {id:"onsen",n:"温泉小筑",m:"低压力的放松与重启",fx:"steam",bg:"#e7dbd0",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAYElEQVR42gXBSRKCQBAEwOoFxVBDD/z/OR68+hRGCIepLjPt83qH02GSBJlGPpcId6+QSpBxyuvl7F7GkAgQVHoAAgc4UFX8IdG5H2wrvnvfem8NeYxtCtxn3E4SwEf+ATWkOErVo40PAAAAAElFTkSuQmCC"},
+  {id:"brick",n:"红砖咖啡楼",m:"暖灯、猫咪和屋顶露台",fx:"mote",bg:"#c7b8bf",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAZUlEQVR42gXBsRHCQAwEwNNJfgYYHBFQgQsnoALKIgIH/pdeYleer/fF0oSG6uAo2rbayaCqIuzUoxZ73NlYFIhIlzwira23pZzpQGV5TLdIHyNizB66O74/2v6hQohSw7lNXPkHPpYuQFd50YIAAAAASUVORK5CYII="},
+  {id:"cabin",n:"森林木屋",m:"松林与炉火，安静沉浸",fx:"steam",bg:"#eed4ae",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAaElEQVR42gXBWwrCMBAAwM0+Eqz0QwTp0T2Jx/AmCkIqSffVmfJ+PdcWNcOi9YG/v/B225ZLSMmRzFrwKLw+7ksLhKgOZFmnM0UHF3BRZT3EJrDudZpo1K+Wj1M3430QAmIiuV0hG4wT4rA2Q7u25AAAAAAASUVORK5CYII="},
+  {id:"sunny",n:"晨光小筑",m:"明亮、积极向上的早晨",fx:"mote",bg:"#f5e7c4",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAZUlEQVR42gXBWw7CMAwEwI2zbqJCEfc/COfhHyGk8mgV1zYzZb3f/IA70uIY3QYp/SrudE8xpU4TCJ4pjhJhA6IuQStdakgiq1JbQdKkfn/2Wcfz8d4Sr31ng50aLosuPqPrhvkPChExjnSD8UoAAAAASUVORK5CYII="},
+  {id:"night",n:"月夜书店",m:"星空下的深夜书香",fx:"star",bg:"#26264a",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAbElEQVR42gXBMRKCQAwF0PxPWFFpdCxsoKIVvYX3P4aFBeOMK2w28T2crzNdAYaEiFuEXk6DsjGnM0DP7nqf5tQyF1YG21is6vNxS50sWTa6pPraio5jvz/g/cFKYQp8Tcv6O3ZoDEmxg/SwPwtPK9mquXWcAAAAAElFTkSuQmCC"},
+  {id:"cafe",n:"街角咖啡",m:"温暖的背景白噪",fx:"mote",bg:"#b5c2bd",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAaElEQVR42gXBOxLCMAwFQD9ZtoxnGBro0tBwWs6QOtejCE6MPuzivW6tSa9UQG5hmvi53HorlwJOlNRCnV+PqwhLBhyuFj/je+21UKYwg/p0Ck56TE9mvo8Y4zy+J++fSYLIMQETB8cfuYA0dni7M24AAAAASUVORK5CYII="},
+  {id:"lighthouse",n:"海边灯塔",m:"晚霞、海浪与远航的专注",fx:"mote",bg:"#c995a6",g:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAaUlEQVR42gXBQQ6CMBAF0Pmd31KNrDTpinN7Ddbcxz2oIRU6Hd/D/FxKqFNay2XV+xuPRv/tFs+D7UQXRAVZv9tmFn0PsYZX1yv4MXWDumYqLaYDLIPk7qP0MRuTDEl4Y4e5u1iAS5KGPzFBLnIGozg5AAAAAElFTkSuQmCC"}
 ];
 const ANI=["🐻","🦊","🐱","🐶","🐧","🐬","🦉","🐰","🦌","🐿️","🐳","🐼"];
 const PAST=["#ffd9d9","#ffe6c7","#fff3b8","#d9f2c4","#c6f0e6","#c9e7ff","#d9d6ff","#f3d4ff","#ffd1ea","#ffe0cc","#cfeaff","#e2e6ee"];
@@ -145,8 +145,12 @@ const CSS=`#btnFocus{flex:none;white-space:nowrap;padding-left:10px;padding-righ
 .fc-avs i:first-child{margin-left:0}
 .fc-livet{font-weight:600;font-size:12.5px;color:#4b5970}
 .fc-view{position:relative;flex:1;min-height:200px;border-radius:20px;overflow:hidden}
-.fc-bg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(38px) saturate(1.1);transform:scale(1.15);opacity:.9;transition:opacity .5s}
-.fc-hero{position:absolute;left:50%;top:50%;height:100%;width:auto;aspect-ratio:1/1;max-width:none;transform:translate(-50%,-50%);-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent),linear-gradient(180deg,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent),linear-gradient(180deg,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect;animation:fcSwap .55s both;user-select:none;-webkit-user-drag:none}
+.fc-sls{position:absolute;inset:0}
+.fc-sl{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+.fc-sl.on{opacity:1}
+.fc-bgc{position:absolute;inset:-36px;background-repeat:no-repeat;background-size:100% 100%;filter:blur(26px)}
+.fc-hero{position:absolute;left:50%;top:50%;height:100%;width:auto;aspect-ratio:1/1;max-width:none;transform:translate(-50%,-50%) scale(.965);opacity:0;transition:opacity .6s ease,transform .9s cubic-bezier(.2,.8,.2,1);-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent),linear-gradient(180deg,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent),linear-gradient(180deg,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect;user-select:none;-webkit-user-drag:none}
+.fc-sl.rdy .fc-hero{opacity:1;transform:translate(-50%,-50%)}
 .fc-fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .fc-fx span{position:absolute;display:block;opacity:0;animation-iteration-count:infinite;animation-timing-function:linear}
 .fc-fx .petal{width:9px;height:7px;background:#ffb7cf;border-radius:80% 0 80% 0;animation-name:fcPetal}
@@ -264,7 +268,7 @@ function build(){
   <button type="button" class="fc-x" aria-label="关闭">✕</button>
   <div class="fc-main">
     <div class="fc-top"><div class="fc-pill"><span class="fc-sname"></span></div><div class="fc-pill fc-live" style="margin-right:44px"><span class="fc-avs"></span><span class="fc-livet"></span></div></div>
-    <div class="fc-view"><div class="fc-bg"></div><img class="fc-hero" alt="" draggable="false"><div class="fc-fx" aria-hidden="true"></div><div class="fc-bub"></div><div class="fc-pk" role="menu" aria-label="送小礼物"></div></div>
+    <div class="fc-view"><div class="fc-sls"></div><div class="fc-fx" aria-hidden="true"></div><div class="fc-bub"></div><div class="fc-pk" role="menu" aria-label="送小礼物"></div></div>
     <div class="fc-timer">
       <div class="fc-ring"><svg viewBox="0 0 72 72" aria-hidden="true"><circle class="bg" cx="36" cy="36" r="31"/><circle class="fg" cx="36" cy="36" r="31"/></svg><b class="fc-clock">25:00</b></div>
       <div class="fc-tt"><small>专注计时</small><b class="fc-gt"></b><span class="fc-sub"></span></div>
@@ -284,6 +288,8 @@ function build(){
     <div class="fc-net"></div>
   </aside></div>`;
   document.body.appendChild(root);
+  const sls=$(".fc-sls");
+  SC.forEach(sc_=>{const l=el("div","fc-sl"),g=el("div","fc-bgc"),im=el("img","fc-hero");l.dataset.id=sc_.id;g.style.backgroundImage="url("+sc_.g+")";im.alt="";im.draggable=false;im.decoding="async";l.appendChild(g);l.appendChild(im);sls.appendChild(l);LAY[sc_.id]={l:l,im:im,p:null}});
 
   const sl=$(".fc-scenes");
   SC.forEach(s=>{
@@ -315,6 +321,7 @@ function build(){
 
 function setOpen(v){
   open=!!v;root.classList.toggle("open",open);
+  if(open&&!preDone){preDone=true;setTimeout(preloadAll,700)}
   document.documentElement.style.overflow=open?"hidden":"";
   const o=OB();
   if(open){
@@ -326,6 +333,24 @@ function setOpen(v){
   }else if(o&&!run.inRoom){try{o.hold(false)}catch(e){}}
 }
 
+/* ---------- 场景切换：新图解码好之前一直显示旧场景，好了再交叉淡入，不会闪空白 ---------- */
+const LAY={};let shown="",preDone=false;
+function loadLayer(id){
+  const L=LAY[id];if(!L)return Promise.resolve();
+  if(!L.p)L.p=new Promise(res=>{
+    const fin=()=>{(L.im.decode?L.im.decode():Promise.resolve()).catch(()=>{}).then(res)};
+    L.im.addEventListener("load",fin,{once:true});L.im.addEventListener("error",()=>res(),{once:true});
+    L.im.src=IMG+id+".webp";if(L.im.complete&&L.im.naturalWidth)fin();
+  });
+  return L.p;
+}
+function showScene(s){
+  const L=LAY[s.id];if(!L)return;
+  if(!shown)L.l.classList.add("on");               /* 第一次：渐变底色立刻出现，插画随后淡入 */
+  const go=()=>{if(P.scene!==s.id)return;shown=s.id;L.im.alt=s.n+"场景插画";L.l.classList.add("on","rdy");for(const k in LAY)if(k!==s.id)LAY[k].l.classList.remove("on")};
+  if(L.p&&L.im.complete&&L.im.naturalWidth)go();else loadLayer(s.id).then(go);
+}
+function preloadAll(){const ids=SC.map(x=>x.id);let i=0;const next=()=>{if(i>=ids.length)return;loadLayer(ids[i++]).then(()=>setTimeout(next,150))};next()}
 function pick(id){
   if(P.scene===id)return;
   P.scene=id;save();scene();pushRoom();people();
@@ -334,13 +359,7 @@ function scene(){
   const s=sc(),root_=root;
   $(".fc-sname").textContent="🏡 "+s.n;
   const main=$(".fc-main");main.style.setProperty("--fcbg",s.bg);
-  const url=IMG+s.id+".webp";
-  const im=$(".fc-hero");
-  if(im.getAttribute("data-id")!==s.id){
-    im.style.animation="none";void im.offsetWidth;im.style.animation="";
-    im.src=url;im.alt=s.n+"场景插画";im.setAttribute("data-id",s.id);
-    $(".fc-bg").style.backgroundImage="url("+url+")";
-  }
+  showScene(s);
   root_.querySelectorAll(".fc-sn").forEach(b=>{const on=b.dataset.id===s.id;b.classList.toggle("sel",on);b.setAttribute("aria-checked",on?"true":"false")});
   if(fxFor!==s.id){fxFor=s.id;fx(s.fx)}
 }
