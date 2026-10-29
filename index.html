@@ -15,6 +15,9 @@
 <link rel="icon" href="icons/icon-192.png">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"></noscript>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/mhchem.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
@@ -25,10 +28,10 @@
   --paper:#f3f6fc;--dot:rgba(58,88,160,.16);--glass:rgba(255,255,255,.74);--glass-line:rgba(255,255,255,.9);--hover:rgba(255,255,255,.6);
   --shadow:0 0 0 1px rgba(23,38,63,.06),0 28px 60px -30px rgba(40,64,128,.38);
   --sheet:#ffffff;--sheet2:#f1f4fb;--ink:#17263f;--muted:#5d6b7c;--line:#d3dbe8;--margin:rgba(235,110,110,.42);
-  --hl:#ffe45e;--accent:#17263f;--accent-ink:#ffffff;--ok:#1b7f55;--ok-soft:#d9f0e4;--bad:#c23b32;--bad-soft:#fadcd9;--warn:#8a5a00;--warn-soft:#fff1c9;
+  --accent:#17263f;--accent-ink:#ffffff;--ok:#1b7f55;--ok-soft:#d9f0e4;--bad:#c23b32;--bad-soft:#fadcd9;--warn:#8a5a00;--warn-soft:#fff1c9;
   --blue:#2f55d4;--blue-soft:#e4eafc;
   --a1:#9ec1ff;--a2:#c3b3ff;--a3:#a9ecd9;--glow:.62;
-  --kai:"Kaiti SC","STKaiti","KaiTi","楷体","AR PL UKai CN","Noto Serif SC",serif;
+  --kai:"LXGW WenKai","Kaiti SC","STKaiti","KaiTi","楷体","AR PL UKai CN","Noto Serif SC",serif;
   --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans SC","Segoe UI",Roboto,sans-serif;
   --mx:36px;--pl:54px;
 }
@@ -39,6 +42,11 @@ body[data-theme="night"],body[data-theme="auto"].dark{--paper:#0b1420;--dot:rgba
 body[data-theme="sakura"]{--paper:#fff5f8;--dot:rgba(200,90,130,.14);--a1:#ff9fc2;--a2:#ffcf9e;--a3:#b9c8ff}
 body[data-theme="mint"]{--paper:#f1fbf6;--dot:rgba(40,130,100,.14);--a1:#74e3d1;--a2:#c9ef93;--a3:#8fcfff}
 body[data-theme="paper"]{--paper:#f6efdf;--dot:rgba(150,110,50,.14);--glass:rgba(255,250,238,.78);--a1:#ffd96b;--a2:#ffb98a;--a3:#a7e3a0}
+/* Catppuccin 主题 (MIT) https://github.com/catppuccin/catppuccin */
+body[data-theme="ctp-latte"]{color-scheme:light;--paper:#e6e9ef;--dot:rgba(114,135,253,0.22);--glass:rgba(239,241,245,0.76);--glass-line:rgba(255,255,255,.9);--hover:rgba(76,79,105,.07);--shadow:0 0 0 1px rgba(76,79,105,.07),0 28px 60px -30px rgba(114,135,253,.4);--sheet:#eff1f5;--sheet2:#e2e5ec;--ink:#4c4f69;--muted:#6c6f85;--line:#ccd0da;--margin:rgba(210,15,57,.38);--accent:#8839ef;--accent-ink:#ffffff;--ok:#2f8a1f;--ok-soft:color-mix(in srgb,var(--ok) 20%,var(--sheet));--bad:#d20f39;--bad-soft:color-mix(in srgb,var(--bad) 20%,var(--sheet));--warn:#9a5b00;--warn-soft:color-mix(in srgb,var(--warn) 12%,var(--sheet));--blue:#1e66f5;--blue-soft:color-mix(in srgb,var(--blue) 18%,var(--sheet));--a1:#8839ef;--a2:#ea76cb;--a3:#04a5e5;--glow:0.4}
+body[data-theme="ctp-frappe"]{color-scheme:dark;--paper:#292c3c;--dot:rgba(186,187,241,0.14);--glass:rgba(48,52,70,0.7);--glass-line:rgba(255,255,255,.08);--hover:rgba(198,208,245,.07);--shadow:0 0 0 1px rgba(255,255,255,.04),0 30px 70px -30px rgba(0,0,0,.7);--sheet:#303446;--sheet2:#414559;--ink:#c6d0f5;--muted:#a5adce;--line:#51576d;--margin:rgba(231,130,132,.38);--accent:#ca9ee6;--accent-ink:#232634;--ok:#a6d189;--ok-soft:color-mix(in srgb,var(--ok) 20%,var(--sheet));--bad:#e78284;--bad-soft:color-mix(in srgb,var(--bad) 20%,var(--sheet));--warn:#e5c890;--warn-soft:color-mix(in srgb,var(--warn) 22%,var(--sheet));--blue:#8caaee;--blue-soft:color-mix(in srgb,var(--blue) 18%,var(--sheet));--a1:#ca9ee6;--a2:#f4b8e4;--a3:#99d1db;--glow:0.34}
+body[data-theme="ctp-macchiato"]{color-scheme:dark;--paper:#1e2030;--dot:rgba(183,189,248,0.14);--glass:rgba(36,39,58,0.7);--glass-line:rgba(255,255,255,.08);--hover:rgba(202,211,245,.07);--shadow:0 0 0 1px rgba(255,255,255,.04),0 30px 70px -30px rgba(0,0,0,.7);--sheet:#24273a;--sheet2:#363a4f;--ink:#cad3f5;--muted:#a5adcb;--line:#494d64;--margin:rgba(237,135,150,.38);--accent:#c6a0f6;--accent-ink:#181926;--ok:#a6da95;--ok-soft:color-mix(in srgb,var(--ok) 20%,var(--sheet));--bad:#ed8796;--bad-soft:color-mix(in srgb,var(--bad) 20%,var(--sheet));--warn:#eed49f;--warn-soft:color-mix(in srgb,var(--warn) 22%,var(--sheet));--blue:#8aadf4;--blue-soft:color-mix(in srgb,var(--blue) 18%,var(--sheet));--a1:#c6a0f6;--a2:#f5bde6;--a3:#91d7e3;--glow:0.34}
+body[data-theme="ctp-mocha"]{color-scheme:dark;--paper:#181825;--dot:rgba(180,190,254,0.14);--glass:rgba(30,30,46,0.7);--glass-line:rgba(255,255,255,.08);--hover:rgba(205,214,244,.07);--shadow:0 0 0 1px rgba(255,255,255,.04),0 30px 70px -30px rgba(0,0,0,.7);--sheet:#1e1e2e;--sheet2:#313244;--ink:#cdd6f4;--muted:#a6adc8;--line:#45475a;--margin:rgba(243,139,168,.38);--accent:#cba6f7;--accent-ink:#11111b;--ok:#a6e3a1;--ok-soft:color-mix(in srgb,var(--ok) 20%,var(--sheet));--bad:#f38ba8;--bad-soft:color-mix(in srgb,var(--bad) 20%,var(--sheet));--warn:#f9e2af;--warn-soft:color-mix(in srgb,var(--warn) 22%,var(--sheet));--blue:#89b4fa;--blue-soft:color-mix(in srgb,var(--blue) 18%,var(--sheet));--a1:#cba6f7;--a2:#f5c2e7;--a3:#89dceb;--glow:0.34}
 @media (prefers-color-scheme:dark){body[data-theme="auto"]{--paper:#0b1420;--dot:rgba(170,200,255,.11);--glass:rgba(21,33,47,.68);--glass-line:rgba(255,255,255,.09);--hover:rgba(255,255,255,.07);
   --shadow:0 0 0 1px rgba(255,255,255,.04),0 30px 70px -30px rgba(0,0,0,.7);--sheet:#172331;--sheet2:#1e2c3d;--ink:#e6edf6;--muted:#9fb0c3;--line:#2b3b4f;--margin:rgba(255,130,130,.35);
   --accent:#e6edf6;--accent-ink:#0b1420;--ok:#6fd1a2;--ok-soft:#163a2c;--bad:#ff8f84;--bad-soft:#43211e;--warn:#f0c46a;--warn-soft:#3a2f14;--blue:#9db0ff;--blue-soft:#222d57;--glow:.34;
@@ -174,7 +182,7 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 .md{line-height:1.8}
 .md h2{font-size:19px;display:block;width:fit-content;max-width:100%;padding:.18em .7em;margin:1.5em 0 .7em;border-radius:10px;background:rgba(255,228,94,.62);color:#17263f;box-shadow:0 1px 0 rgba(0,0,0,.06)}
 .md h2 .katex{color:inherit}
-body[data-theme="night"] .md h2,body[data-theme="auto"].dark .md h2{background:rgba(255,228,94,.2);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(255,228,94,.35)}
+body[data-theme="night"] .md h2,body[data-theme="auto"].dark .md h2,body[data-theme="ctp-frappe"] .md h2,body[data-theme="ctp-macchiato"] .md h2,body[data-theme="ctp-mocha"] .md h2{background:rgba(255,228,94,.2);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(255,228,94,.35)}
 .md h3{font-size:17px;padding:.1em 0 .1em 11px;margin:1.3em 0 .5em;border-left:5px solid var(--a1);border-radius:2px}
 .md h4{font-size:15.5px;margin:1.1em 0 .4em;color:var(--blue)}
 .md li::marker{color:var(--a1)}
@@ -2602,10 +2610,10 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
-{v:"2026-10-29a",date:"2026-10-29",title:"房间里可以互相送小礼物啦 🧋",
+{v:"2026-10-29b",date:"2026-10-29",title:"换上文楷字体 + 4 个 Catppuccin 新主题 🎨",
    items:[
-    "🫧 在专注房间里点一下同房间别人的头像气泡（或右边名单），选一个可爱的 emoji：🧋 🍵 💪 🌸 🥰 🍡，它会飞到对方身边，轻轻弹一下。",
-    "🔒 只有 emoji，没有文字；只有同房间的人才收得到，6 秒可以送一次。需要先「进入房间」。"
+    "🖋️ 标题、时钟等「手写感」的字改用开源的霞鹜文楷，iPhone、安卓、电脑上看到的字体终于一样了。字体按需下载，第一次打开会慢一点点，之后有缓存。",
+    "🎨 设置 → 外观里多了 4 个主题：拿铁 ☕（浅）、弗拉佩 🍮、玛奇朵 🍫、摩卡 🌙（深）。配色来自开源的 Catppuccin，手机顶部状态栏也会跟着变色。"
    ]},
 {v:"2026-10-28c",date:"2026-10-28",title:"专注计时更稳了，房间里也有「人气」了 ✨",
    items:[
@@ -3443,12 +3451,16 @@ async function syncPull(manual){
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&syncOn()&&Date.now()-lastPull>60000)syncPull(false);else if(document.visibilityState==="hidden"&&syncOn()){clearTimeout(syncTimer);syncPush()}});
 
 /* ---- 设置 ---- */
-function applyTheme(){document.body.dataset.theme=S.theme||"auto"}
+function applyTheme(){
+  document.body.dataset.theme=S.theme||"auto";
+  /* Catppuccin 主题：手机浏览器顶部状态栏跟着变色；其他主题保持原色 */
+  try{const m=document.querySelector('meta[name="theme-color"]');if(m){const t=String(S.theme||"");m.content=t.indexOf("ctp-")===0?getComputedStyle(document.body).getPropertyValue("--paper").trim()||"#17263f":"#17263f"}}catch(e){}
+}
 function petUI(){const P=(window.petState&&window.petState())||{on:true,kind:"dog"};
   const K=[["dog","🐶 小狗"],["cat","🐱 小猫"],["rabbit","🐰 小兔"],["panda","🐼 熊猫"],["bear","🐻 小熊"]];
   return `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><h3 style="margin:0 0 6px">小宠物</h3><div class="controls"><label class="grow">种类<select id="petKind">${K.map(k=>`<option value="${k[0]}" ${P.kind===k[0]?"selected":""}>${k[1]}</option>`).join("")}</select></label><label class="grow">显示<select id="petSel"><option value="on" ${P.on?"selected":""}>陪我复习</option><option value="off" ${P.on?"":"selected"}>不要出现</option></select></label></div><p class="fine muted" style="margin:6px 0 0">默认是小狗，住在页面右下角。点点它会有反应，可以拖到别处；一分钟没人理它会睡着，点一下就醒。</p></div>`}
 function rSet(){
-  const themes=[["auto","跟随系统"],["light","浅色"],["night","夜间"],["sakura","樱花"],["mint","薄荷"],["paper","纸张"]];
+  const themes=[["auto","跟随系统"],["light","浅色"],["night","夜间"],["sakura","樱花"],["mint","薄荷"],["paper","纸张"],["ctp-latte","拿铁 ☕"],["ctp-frappe","弗拉佩 🍮"],["ctp-macchiato","玛奇朵 🍫"],["ctp-mocha","摩卡 🌙"]];
   $("#sheet").innerHTML=`<h2>设置</h2>
   <details class="chap" id="guide" ${aiOK()?"":"open"} style="margin-bottom:14px"><summary><span class="t">🌱 新手指南 (第一次用，看这里)</span></summary><div class="body">
     <ol style="margin:0 0 8px;padding-left:20px;line-height:1.7">
@@ -4302,8 +4314,8 @@ setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mod
 <script src="music.js?v=2026-10-26g" defer></script>
 <script src="starmap.js?v=2026-10-25c" defer></script>
 <script src="labs.js?v=2026-10-26f" defer></script>
-<script src="online.js?v=2026-10-29a" defer></script>
-<script src="focus.js?v=2026-10-29a" defer></script>
+<script src="online.js?v=2026-10-28b" defer></script>
+<script src="focus.js?v=2026-10-28d" defer></script>
 
 </body>
 </html>
