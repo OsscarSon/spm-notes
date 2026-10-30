@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SPM 备考本 新手手册</title>
+<script>try{var o=JSON.parse(localStorage.getItem("spm-notes-v2")||"{}"),th=o.theme||"auto",D={night:1,"ctp-frappe":1,"ctp-macchiato":1,"ctp-mocha":1};if(th!=="auto")document.documentElement.setAttribute("data-theme",D[th]?"dark":"light")}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+:root{--paper:#eef2fa;--card:#fff;--ink:#17263f;--mute:#56637d;--line:#d3dbea;--blue:#2c47d6;--red:#d33a2c;--hl:#ffe36e;--desk:#dfe6f5;--note:#fff3f1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#0e1626;--card:#16223a;--ink:#e8eef9;--mute:#9aa8c4;--line:#2a3a58;--blue:#8fa4ff;--red:#ff8576;--hl:#6b5a00;--desk:#1b2945;--note:#2b1d24;color-scheme:dark}}
+:root[data-theme=dark]{--paper:#0e1626;--card:#16223a;--ink:#e8eef9;--mute:#9aa8c4;--line:#2a3a58;--blue:#8fa4ff;--red:#ff8576;--hl:#6b5a00;--desk:#1b2945;--note:#2b1d24;color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--paper);z-index:19}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--paper);border-bottom:1px solid var(--line);font-size:14px;line-height:1.4}
+.bar a{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--ink);text-decoration:none;font-weight:500}
+.bar a.pri{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.85 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:"Noto Serif SC","Songti SC",serif;line-height:1.35;margin:0}
+a{color:var(--blue)}
+.hero{padding:56px 22px 40px;max-width:1080px;margin:0 auto;display:grid;gap:28px;grid-template-columns:1fr;align-items:center}
+.hero h1{font-size:clamp(38px,8vw,68px);font-weight:900;letter-spacing:.02em}
+.hero p.lead{font-size:18px;max-width:34em;margin:14px 0 0;color:var(--mute)}
+.omr{display:flex;gap:10px;margin:22px 0 0}.omr i{width:34px;height:34px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center;font:700 13px/1 "Noto Sans SC",sans-serif;font-style:normal}
+.omr i.on{background:var(--ink);color:var(--paper)}
+.three{margin:26px 0 0;padding:0;list-style:none;display:grid;gap:10px;max-width:36em}
+.three li{padding:10px 14px;background:var(--card);border-left:4px solid var(--red);border-radius:0 10px 10px 0;font-size:15px;line-height:1.7}
+.layout{max-width:1080px;margin:0 auto;padding:0 22px 80px;display:grid;grid-template-columns:1fr;gap:28px}
+nav.toc{font-size:14px}nav.toc ol{list-style:none;margin:0;padding:0;display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+nav.toc a{display:block;white-space:nowrap;padding:6px 12px;border:1px solid var(--line);border-radius:99px;text-decoration:none;color:var(--ink);background:var(--card)}
+nav.toc a[aria-current=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+nav.toc b{display:none}
+main section{padding-top:34px}
+main h2{font-size:clamp(26px,4.4vw,34px);font-weight:900;margin-bottom:10px}
+main h3{font-size:19px;font-weight:600;margin:24px 0 6px}
+p{margin:8px 0}.mute{color:var(--mute)}
+ul.k{padding-left:1.2em;margin:8px 0}ul.k li{margin:5px 0}
+.note{margin:14px 0;padding:10px 14px;background:var(--note);border-left:4px solid var(--red);border-radius:0 10px 10px 0;font-size:15px;line-height:1.75}
+mark{background:var(--hl);color:inherit;padding:0 .2em;border-radius:3px}
+ol.steps{list-style:none;counter-reset:s;margin:16px 0;padding:0;display:grid;gap:14px}
+ol.steps>li{counter-increment:s;position:relative;padding:16px 16px 16px 64px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+ol.steps>li::before{content:counter(s);position:absolute;left:16px;top:14px;width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:900 18px "Noto Serif SC",serif}
+ol.steps h3{margin:0 0 4px;font-size:18px}
+dl.map{display:grid;grid-template-columns:auto 1fr;gap:0;margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+dl.map dt,dl.map dd{margin:0;padding:10px 14px;border-top:1px solid var(--line);font-size:15px;line-height:1.6}
+dl.map dt{font-weight:700;border-right:1px solid var(--line)}dl.map dt:first-of-type,dl.map dt:first-of-type+dd{border-top:0}
+dl.map a{color:inherit;text-decoration-color:var(--red);text-underline-offset:3px}
+.phones{display:flex;gap:16px;overflow-x:auto;padding:20px;margin:16px -4px 6px;background:var(--desk);border-radius:18px;scroll-snap-type:x proximity}
+figure{margin:0;flex:0 0 auto;width:min(232px,64vw);scroll-snap-align:start}
+.ph{border:6px solid var(--ink);border-radius:28px;overflow:hidden;background:#fff;line-height:0;cursor:zoom-in}
+.ph img{width:100%;display:block}
+figcaption{font-size:13px;line-height:1.55;color:var(--mute);margin-top:8px}
+.mini{display:grid;grid-template-columns:1fr;gap:16px;margin-top:14px}@media(min-width:700px){.mini{grid-template-columns:repeat(2,1fr)}}
+.mini>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;grid-template-columns:104px 1fr;gap:14px;align-items:start}
+.mini .ph{border-width:4px;border-radius:18px}.mini h3{margin:0 0 4px;font-size:17px}.mini p{font-size:14px;line-height:1.65;margin:0}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:2px 16px}
+summary{cursor:pointer;padding:12px 0;font-weight:700}details p{margin:0 0 12px}
+footer{max-width:1080px;margin:0 auto;padding:0 22px 60px;font-size:13px;color:var(--mute)}
+dialog{border:0;padding:0;background:transparent;max-width:92vw;max-height:92vh}dialog::backdrop{background:rgba(8,14,28,.8)}
+dialog img{max-height:90vh;max-width:90vw;border-radius:18px;display:block;cursor:zoom-out}
+a:focus-visible,summary:focus-visible,.ph:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+@media(min-width:900px){
+.hero{grid-template-columns:1.15fr .85fr;padding-top:80px}
+.layout{grid-template-columns:190px 1fr;gap:48px}
+nav.toc{position:sticky;top:76px;align-self:start}nav.toc ol{flex-direction:column;overflow:visible;gap:2px}
+nav.toc a{border:0;border-left:3px solid var(--line);border-radius:0;background:none;padding:5px 12px;white-space:normal}
+nav.toc a[aria-current=true]{background:none;color:var(--ink);border-left-color:var(--red);font-weight:700}
+nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute);margin:14px 0 4px 15px}
+.phones{flex-wrap:wrap;overflow:visible}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="bar"><a href="./">← 回到备考本</a><a class="pri" href="./?tour=1">🧭 带我逛一遍 App</a></div>
+<header class="hero">
+<div>
+<h1>SPM 备考本<br>新手手册</h1>
+<p class="lead">课本要点、AI 笔记、刷题、模拟卷和问答，都在一个网页 App 里。这份手册陪你从第一次打开，走到做完第一套模拟卷。</p>
+<div class="omr" aria-hidden="true"><i>A</i><i class="on">B</i><i>C</i><i>D</i></div>
+<ul class="three">
+<li>内置笔记、内置题库和闪卡不用 key 就能看；要 AI 生成笔记、出题、批改、问答，才需要你自己的免费 Gemini key。</li>
+<li>进度、笔记和错题存在你自己的浏览器里；AI 功能会把你的提问内容发给对应的 AI 服务，所以别输入个人资料。</li>
+<li>AI 整理的内容可能有错，仅供复习，请以课本和老师为准。</li>
+</ul>
+</div>
+<figure style="width:min(270px,70vw);justify-self:center"><div class="ph"><img src="img/guide/g01.webp" width="520" height="1125" alt="今日页面" loading="eager"></div></figure>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="目录"><ol>
+<li><b>开始前</b><a href="#start">先做这三步</a></li>
+<li><b>七个分页</b><a href="#today">今日</a></li><li><a href="#notes">笔记</a></li><li><a href="#flash">闪卡</a></li><li><a href="#drill">刷题</a></li><li><a href="#exam">模拟卷</a></li><li><a href="#chat">问答</a></li><li><a href="#res">资料</a></li>
+<li><b>更多</b><a href="#extras">好用的小功能</a></li><li><a href="#quota">额度与备用 AI</a></li><li><a href="#sync">备份与同步</a></li><li><a href="#faq">常见问题</a></li>
+</ol></nav>
+
+<main>
+<section id="start">
+<h2>先做这三步</h2>
+<p class="mute">只想先看内置笔记，可以跳过第 2、3 步。</p>
+<ol class="steps">
+<li><h3>把它装成 App</h3>
+<p>点右上角的 📲，按提示操作：安卓点浏览器右上角 ⋮ → 安装应用；iPhone 用 Safari，点底部分享按钮 → 添加到主屏幕 → 添加；电脑用 Chrome 或 Edge，点地址栏最右边的安装图标。装好后桌面会有「SPM备考」图标。</p>
+<div class="note">从聊天软件点开链接时，常常落在 App 内置的小浏览器里。那里不能安装 App，填好的 key 也可能下次就不见了，请先改用 Safari 或 Chrome 打开。</div></li>
+<li><h3>申请免费的 Gemini key</h3>
+<p>打开 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>，登录后点「Create API key」，复制那一长串字符。</p>
+<ul class="k"><li>请用<mark>自己的 Gmail</mark>，不要用学校账号：学校账号可能被管理员限制或停用，key 也会跟着失效。</li><li>打不开时先检查账号年龄是否已超过 18 岁；用手机时别在 Google 的应用里登录，改用 Chrome。</li></ul>
+<div class="note">key 只保存在你的浏览器里。不要发给别人，也不要截图。</div></li>
+<li><h3>贴进设置，再选科目</h3>
+<p>点右上角「设置」，把 key 贴进「Gemini API key」那一栏，点「保存」，模型不用改。接着在「我考的科目 &amp; 信心」勾选你考的科目，给每一科打 1 到 5 分：1 是没把握，5 是很稳。越没把握，越常排进今天的重点。笔试开始日默认是 2026-11-23，不一样再改。</p></li>
+</ol>
+<div class="phones">
+<figure><div class="ph"><img src="img/guide/g02.webp" width="520" height="1125" alt="安装成 App 的提示" loading="lazy"></div><figcaption>点 📲 后弹出的安装说明。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g03.webp" width="520" height="1125" alt="设置页的 API key 栏" loading="lazy"></div><figcaption>设置页：把 key 贴进去并保存（图中为示例）。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g04.webp" width="520" height="1125" alt="选科目与信心" loading="lazy"></div><figcaption>勾选科目，给每科选信心。</figcaption></figure>
+</div>
+<h3>七个分页一览</h3>
+<dl class="map">
+<dt><a href="#today">今日</a></dt><dd>倒计时、今天该读什么、清单和考试资讯</dd>
+<dt><a href="#notes">笔记</a></dt><dd>每章内置要点，还能让 AI 生成整章笔记</dd>
+<dt><a href="#flash">闪卡</a></dt><dd>翻面背诵，连续答对 3 次算掌握</dd>
+<dt><a href="#drill">刷题</a></dt><dd>选择题、作答题、阅卷官、听力、作文、错题本</dd>
+<dt><a href="#exam">模拟卷</a></dt><dd>按历届结构出整份卷，限时作答，交卷批改</dd>
+<dt><a href="#chat">问答</a></dt><dd>问任何题目，可以附照片</dd>
+<dt><a href="#res">资料</a></dt><dd>上传 Trial 卷和笔记，官方真题入口</dd>
+</dl>
+</section>
+
+<section id="today">
+<h2>今日</h2>
+<p>打开 App 先到这里。顶部那一排圈像 OMR 答题卡：每过一天涂掉一个圈，红色是今天，蓝色粗边是笔试第一天。</p>
+<ul class="k">
+<li><b>今天的重点</b>每天排 2 科，按你设的信心自动挑。必须及格的科目（如历史）和快要考的科目会排得更多，每科都附「下一章」的链接。</li>
+<li><b>今日清单</b>自己加事项，打勾或删除。</li>
+<li><b>各科进度</b>在笔记里给章节勾「已复习」，进度条就会前进。</li>
+<li><b>各科考试日期</b>已按官方 JWP 时间表设好，也可以手动改；往下还有考试时间线、目标成绩点数估算和考试日清单。</li>
+</ul>
+<div class="note">成绩点数只是估算，真实成绩以 LP 公布为准。</div>
+<div class="phones">
+<figure><div class="ph"><img src="img/guide/g05.webp" width="520" height="1125" alt="各科进度" loading="lazy"></div><figcaption>各科进度，点一科直接进它的笔记。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g06.webp" width="520" height="1125" alt="各科考试日期" loading="lazy"></div><figcaption>各科考试日期，第一个就是离你最近的考试。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g07.webp" width="520" height="1125" alt="考试资讯" loading="lazy"></div><figcaption>SPM 2026 时间线和考试须知。</figcaption></figure>
+</div>
+</section>
+
+<section id="notes">
+<h2>笔记</h2>
+<p>先在顶部选科目，再点一章展开。每章都有内置要点，不用 key 就能看。</p>
+<ul class="k">
+<li><b>章节要求</b>：在每章的输入框里写老师划的范围，例如「1.2 只考定义和公式」。AI 生成笔记、出题、回答时都会参考它。</li>
+<li><b>✨ AI 生成这一章的笔记</b>：生成后会标明由哪个模型完成。不满意可以重新生成，旧版本会收进「历史版本」，随时恢复。</li>
+<li><b>批量生成本科笔记</b>：一次生成整科，很耗额度，建议先配好备用 AI（见「额度与备用 AI」）。</li>
+<li><b>高亮</b>：在 AI 笔记里选中文字，点出现的「🖍 高亮」；选中已高亮的字可以擦除。</li>
+<li><b>搜索</b>：顶部搜索框会搜遍所有科目的笔记，拼写差一点也能找到。</li>
+</ul>
+<div class="phones">
+<figure><div class="ph"><img src="img/guide/g08.webp" width="520" height="1125" alt="笔记页" loading="lazy"></div><figcaption>笔记页：搜索、批量生成、章节列表。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g09.webp" width="520" height="1125" alt="AI 笔记与高亮" loading="lazy"></div><figcaption>AI 笔记，黄色是自己划的重点。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g10.webp" width="520" height="1125" alt="章节下方的按钮" loading="lazy"></div><figcaption>章节底部的按钮：重新生成、PPT、打印、问 AI、出闪卡、出题。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g11.webp" width="520" height="1125" alt="搜索结果" loading="lazy"></div><figcaption>搜索「Merdeka」的结果。</figcaption></figure>
+</div>
+</section>
+
+<section id="flash">
+<h2>闪卡</h2>
+<p>点卡片或「显示答案」翻面，再选「记得」或「不记得」。同一张卡连续答对 3 次算掌握，不记得的会进错题本。也可以让 AI 按章节生成 6、10 或 15 张，或自己添加。</p>
+<div class="phones">
+<figure><div class="ph"><img src="img/guide/g12.webp" width="520" height="1125" alt="闪卡正面" loading="lazy"></div><figcaption>先看问题，自己想一遍。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g13.webp" width="520" height="1125" alt="闪卡背面" loading="lazy"></div><figcaption>翻面看答案和华文解释。</figcaption></figure>
+</div>
+</section>
+
+<section id="drill">
+<h2>刷题</h2>
+<p>顶部的小标签切换玩法。题源可以选 AI 按章节出题（难度有基础、SPM 中等、KBAT 偏难），或用内置题库（仅选择题，附华文翻译）。</p>
+<ul class="k">
+<li><b>选择题 / 作答题 / 混合</b>：作答题一题一题做，写完点「提交批改」，AI 马上给分和评语。</li>
+<li><b>阅卷官</b>：自己贴上题目、评分要点和你的答案（也可以拍照），AI 按得分点逐点给分。</li>
+<li><b>听力</b>（国语、英文）：AI 写好对话或广播稿，用手机语音朗读。设备没有对应语音时只能看原文。</li>
+<li><b>作文</b>（国语、英文、华文）：AI 按内容、语言、结构、词汇四项评分（华文最后一项是书写规范）。</li>
+<li><b>错题本</b>：答错或失分的题自动进来，可以点「AI 讲解」弄懂为什么错。</li>
+</ul>
+<div class="note">AI 出的题可能有错，可疑的请对照课本。</div>
+<div class="phones">
+<figure><div class="ph"><img src="img/guide/g14.webp" width="520" height="1125" alt="刷题设置" loading="lazy"></div><figcaption>选题源、章节、题数和难度。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g15.webp" width="520" height="1125" alt="选择题作答后" loading="lazy"></div><figcaption>选完立刻显示对错和解析。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g16.webp" width="520" height="1125" alt="阅卷官" loading="lazy"></div><figcaption>阅卷官：把自己的答案交给 AI 批改。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g17.webp" width="520" height="1125" alt="听力" loading="lazy"></div><figcaption>听力练习（国语、英文）。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g18.webp" width="520" height="1125" alt="作文" loading="lazy"></div><figcaption>作文批改。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g19.webp" width="520" height="1125" alt="错题本" loading="lazy"></div><figcaption>错题本。</figcaption></figure>
+</div>
+</section>
+
+<section id="exam">
+<h2>模拟卷</h2>
+<p>AI 按 KSSM 和 SPM 的风格出整份卷，你在页面里作答，交卷后按评分要点批改并写评语。这是仿真练习，不是某一年的真题。</p>
+<ul class="k">
+<li>选卷别后，题数、难度和限时默认「跟历届一样」，也可以自定义，还能只选几章。</li>
+<li>作答中有倒计时；中途关掉页面，草稿会自动保存。</li>
+<li>想更像 Trial，先到「资料」页上传一份 Trial 卷并勾选，AI 会模仿题型、设问方式和分值分布，但不会照抄原题。</li>
+<li>做完的成绩会记在「成绩记录」，也可以手动补记外部真题的成绩。</li>
+</ul>
+<div class="phones">
+<figure><div class="ph"><img src="img/guide/g20.webp" width="520" height="1125" alt="模拟卷设置" loading="lazy"></div><figcaption>出卷设置。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g21.webp" width="520" height="1125" alt="成绩记录" loading="lazy"></div><figcaption>成绩记录和各科平均（演示数据）。</figcaption></figure>
+</div>
+</section>
+
+<section id="chat">
+<h2>问答</h2>
+<p>把不懂的题打进去，或点「📷 上传题目图片」拍照问。范围可以选整科，也可以锁定某一章；勾上「只依据我的资料回答」后，资料里没有的内容会标成 [通用知识]，不会冒充课本原文。每个回答下面会写明参考了哪些章节、由哪个模型回答。</p>
+<div class="phones"><figure><div class="ph"><img src="img/guide/g22.webp" width="520" height="1125" alt="问答页" loading="lazy"></div><figcaption>问答页（对话为演示内容）。</figcaption></figure></div>
+</section>
+
+<section id="res">
+<h2>资料</h2>
+<p>上传 PDF、图片或文本，勾选后，问答、出题和出卷都会参考它们。下面还有 LP 官方、各科真题和 Trial 卷的入口。</p>
+<div class="note">超过 14 MB 的大文件会先上传到 Google，需要有 Gemini key。备用 AI 读不了你上传的文件和图片。</div>
+<div class="phones"><figure><div class="ph"><img src="img/guide/g23.webp" width="520" height="1125" alt="资料页" loading="lazy"></div><figcaption>上传区和官方入口。</figcaption></figure></div>
+</section>
+
+<section id="extras">
+<h2>好用的小功能</h2>
+<div class="mini">
+<div><div class="ph"><img src="img/guide/g24.webp" width="520" height="1125" alt="PPT 模式" loading="lazy"></div><span><h3>PPT 模式</h3><p>章节旁点「📊 PPT」，用幻灯片复习内置要点，方向键或按钮翻页，Esc 关闭。</p></span></div>
+<div><div class="ph"><img src="img/guide/g25.webp" width="520" height="1125" alt="互动周期表" loading="lazy"></div><span><h3>互动实验室</h3><p>笔记页底部有周期表、函数图像、几何画板、分子结构、思维导图、拍照识字等，点开才下载。</p></span></div>
+<div><div class="ph"><img src="img/guide/g26.webp" width="520" height="1125" alt="读书音乐" loading="lazy"></div><span><h3>读书音乐</h3><p>右上角 🎧：雨声、海浪、咖啡馆等，还有番茄钟。声音全是现场合成的。</p></span></div>
+<div><div class="ph"><img src="img/guide/g27.webp" width="520" height="1125" alt="在线名单" loading="lazy"></div><span><h3>在线名单</h3><p>右上角 👥，看现在谁在读书。别人只能看到昵称、头像、科目和专注状态，可随时取消「让别人看到我」。需要联网。</p></span></div>
+<div><div class="ph"><img src="img/guide/g28.webp" width="520" height="1125" alt="专注房间" loading="lazy"></div><span><h3>专注房间</h3><p>在 👥 面板里切到「专注房间」，选一个场景，比如樱花书院、温泉小筑、红砖咖啡楼、森林木屋，设个目标，点「进入」开始第一轮。</p></span></div>
+<div><div class="ph"><img src="img/guide/g29.webp" width="520" height="1125" alt="成就" loading="lazy"></div><span><h3>成就</h3><p>复习章节、刷题、连续学习都会解锁成就，点小奖杯查看。</p></span></div>
+<div><div class="ph"><img src="img/guide/g30.webp" width="520" height="1125" alt="小宠物" loading="lazy"></div><span><h3>小宠物</h3><p>住在页面角落，可以摸、可以拖动；在设置里换种类或关掉。</p></span></div>
+<div><div class="ph"><img src="img/guide/g31.webp" width="520" height="1125" alt="外观设置" loading="lazy"></div><span><h3>外观与壁纸</h3><p>设置里有 10 种主题，壁纸可选小狗、Minecraft 或自己的图片。</p></span></div>
+</div>
+<p class="mute" style="margin-top:14px">笔记也能「🖨 打印 / 存 PDF」：在打印窗口的目的地选「另存为 PDF」。</p>
+</section>
+
+<section id="quota">
+<h2>额度与备用 AI</h2>
+<p>免费 key 的额度有限，用完会提示「太频繁」。等一两分钟或隔天再试，也可以多申请两个免费 key 当后备：<a href="https://console.groq.com/keys" target="_blank" rel="noopener">Groq</a> 和 <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a>，填在设置的「备用 AI」。</p>
+<ul class="k">
+<li>默认开着「自动选择最合适的 AI」：每次生成前，按任务类型、各家今天的额度和有没有被限流来挑，不是等 Gemini 用完才换。</li>
+<li>要读你上传的 PDF 或图片时，一定用 Gemini。</li>
+<li>免费模型的名字常常改。提示「找不到模型」时，到该服务的网站查最新名字，再填进模型栏。</li>
+</ul>
+<div class="phones"><figure><div class="ph"><img src="img/guide/g32.webp" width="520" height="1125" alt="备用 AI 设置" loading="lazy"></div><figcaption>设置里的「备用 AI 与生图」。</figcaption></figure></div>
+</section>
+
+<section id="sync">
+<h2>备份与同步</h2>
+<p>你的进度、AI 笔记和错题只在这个浏览器里。换设备或清缓存前，到设置最下面的「备份」点「导出 JSON」（文件不含 key，也不含上传的资料），到新设备再「导入 JSON」。</p>
+<p>想让手机和电脑自动保持一致，可以开「云端同步」：用你自己免费的 Cloudflare 账号建一个 KV 和一个 Worker，把网址填进设置。设置页里有逐步图文说明，不用绑信用卡。</p>
+<div class="note">同步靠 API key 认人：每台设备必须填完全一样的 key，多一个空格都不行。换了 key 就等于换了一个新的同步空间。</div>
+<div class="phones">
+<figure><div class="ph"><img src="img/guide/g33.webp" width="520" height="1125" alt="备份" loading="lazy"></div><figcaption>备份：导出和导入。</figcaption></figure>
+<figure><div class="ph"><img src="img/guide/g34.webp" width="520" height="1125" alt="云端同步" loading="lazy"></div><figcaption>云端同步：填 Worker 网址后保存并同步。</figcaption></figure>
+</div>
+</section>
+
+<section id="faq">
+<h2>常见问题</h2>
+<details><summary>AI 的按钮是灰色的</summary><p>还没有填 key。页面上方会出现黄色的「先设置 API key」提示，到设置页填好并保存就行。</p></details>
+<details><summary>提示太频繁，或今天额度用完了</summary><p>等一两分钟，或隔天再试。经常遇到的话，配上 Groq 和 OpenRouter 的备用 key。</p></details>
+<details><summary>打不开 AI Studio，申请不了 key</summary><p>先确认 Google 账号的年龄已超过 18 岁；用手机时别在 Google 的应用里登录，改用 Chrome。不要用学校账号。</p></details>
+<details><summary>换了手机，资料不见了</summary><p>资料存在浏览器里，换设备不会自动带过去。换之前先导出备份，或开云端同步。</p></details>
+<details><summary>有新内容，但页面没变化</summary><p>看右上角 🔔 的更新记录；底部出现「有新版本了」时点「刷新」。</p></details>
+<details><summary>笔记和答案可靠吗</summary><p>它们由 AI 整理，仅供复习。遇到可疑的地方，请对照课本和老师的讲解。</p></details>
+</section>
+</main>
+</div>
+<footer>截图来自当前版本的 App，使用演示数据（key 与学习记录都是示例）。具体界面与功能以实际 App 为准。</footer>
+<dialog id="lb"><img alt=""></dialog>
+<script>
+(function(){var lb=document.getElementById('lb'),im=lb.querySelector('img');
+document.addEventListener('click',function(e){var p=e.target.closest('.ph');if(p){var s=p.querySelector('img');im.src=s.src;im.alt=s.alt;lb.showModal()}else if(e.target===lb||e.target===im){lb.close()}});
+document.querySelectorAll('.ph').forEach(function(p){p.tabIndex=0;p.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();p.click()}})});
+var links=[].slice.call(document.querySelectorAll('nav.toc a')),secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
+if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){links.forEach(function(a){a.removeAttribute('aria-current')});var a=links[secs.indexOf(en.target)];if(a)a.setAttribute('aria-current','true')}})},{rootMargin:'-20% 0px -70% 0px'});secs.forEach(function(s){s&&io.observe(s)})}
+})();
+</script>
+</body>
+</html>

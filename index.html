@@ -1805,7 +1805,7 @@ let vKey="";function vTrans(){const k=S.tab+"|"+(S.sub||"");if(k===vKey)return;v
 /* 骨架屏：AI 生成笔记时，在按钮下面显示闪光占位条 */
 function skelOn(btn){skelOff();try{const h=btn&&btn.parentElement;if(!h)return;const d=document.createElement("div");d.id="noteSkel";d.className="skelBox";d.innerHTML='<div class="skel t"></div><div class="skel" style="width:96%"></div><div class="skel" style="width:88%"></div><div class="skel" style="width:92%"></div><div class="skel" style="width:60%"></div><div class="fine muted">AI 正在整理笔记，请稍等…</div>';h.insertAdjacentElement("afterend",d)}catch(e){}}
 function skelOff(){const d=document.getElementById("noteSkel");if(d)d.remove()}
-function needKey(){return aiOK()?"":`<div class="notice warn"><b>先设置 API key</b><p>AI 功能（生成笔记、出题、模拟卷、问答）要用你自己的 API key (Gemini，或设置里的备用 AI)，Gemini 免费申请：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>。</p><p class="fine muted">第一次用？到「设置」最上面有新手指南，几步就能开始。</p><button class="btn pri small" data-act="goset">去设置</button></div>`}
+function needKey(){return aiOK()?"":`<div class="notice warn"><b>先设置 API key</b><p>AI 功能（生成笔记、出题、模拟卷、问答）要用你自己的 API key (Gemini，或设置里的备用 AI)，Gemini 免费申请：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>。</p><p class="fine muted">第一次用？到「设置」最上面有新手指南，几步就能开始；也可以看<a href="guide.html">图文新手手册</a>。</p><button class="btn pri small" data-act="goset">去设置</button></div>`}
 
 /* ---- SPM 2026 官方时间表 (JWP 18 Ogos 2026，据 LP 公布整理) ---- */
 const JWP={
@@ -2610,6 +2610,12 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-30a",date:"2026-10-30",title:"新增图文「新手手册」和 30 秒新手指引 📖",
+   items:[
+    "📖 新手手册：从申请免费 Gemini key，到七个分页怎么用、备用 AI、备份同步和常见问题，配了 34 张截图。打开方式：设置 → 新手指南 → 「打开完整新手手册」，或今日页最下面的提示。",
+    "🧭 30 秒新手指引：新用户第一次打开会问要不要逛一遍，会依次圈出倒计时、分页、科目栏、设置和更新铃铛。老用户不会被打扰，想看可以到 设置 → 新手指南 → 「30 秒带我逛一遍」。",
+    "📲 更新时记得把 guide.html、tour.js、img/guide 文件夹、index.html 和 sw.js 一起上传。"
+   ]},
 {v:"2026-10-29b",date:"2026-10-29",title:"换上文楷字体 + 4 个 Catppuccin 新主题 🎨",
    items:[
     "🖋️ 标题、时钟等「手写感」的字改用开源的霞鹜文楷，iPhone、安卓、电脑上看到的字体终于一样了。字体按需下载，第一次打开会慢一点点，之后有缓存。",
@@ -3469,6 +3475,7 @@ function rSet(){
       <li><b>开始用</b>：到「笔记」选一章，点「✨ AI 生成这一章的笔记」；「问答」可以问题目 (也能附图片)；「刷题」和「模拟卷」可以出题并批改。</li>
       <li><b>备用 key (可选)</b>：免费额度有限，用完会提示太频繁。可以再申请 Groq、OpenRouter 的免费 key，填在「备用 AI」那一块。填了之后，程序默认会在每次生成前自动判断用哪一家、哪个模型：看任务类型 (要不要读你上传的文件、轻还是重、是不是计算推理题)、各家和各模型今天的额度、最近有没有被限流，不是等 Gemini 用完才换。Gemini 内部也会按任务轻重在 3.8、3.7、3.6 Flash 和 3.5 Flash Lite 之间挑。要读你上传的 PDF 或图片时一定用 Gemini，备用模型看不到这些文件，只能读内置资料。OpenRouter、Groq 的模型栏可以填多个，用逗号分隔，程序按任务挑。生成的笔记和回答下面会写明是哪个模型做的。</li>
     </ol>
+    <div class="controls" style="margin:10px 0 4px"><button class="btn small" type="button" onclick="window.SPMTour&amp;&amp;SPMTour.start()">🧭 30 秒带我逛一遍</button><a class="btn small" href="guide.html">📖 打开完整新手手册（图文）</a></div>
     <p class="fine muted" style="margin:6px 0 0">小提醒：key 只保存在你自己的浏览器里，不要发给别人，也不要截图；Google 免费版的内容可能被用来改进它的产品，所以不要输入个人资料；AI 整理的笔记可能有错，仅供复习，请以课本和老师为准；额度用完等一两分钟或隔天再试。</p></div></details>
   <div class="grid g2"><div class="card"><h3 style="margin-top:0">Gemini API key</h3><p class="fine muted">key 只保存在这个浏览器里，只会发给 Google。到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> 免费生成。</p><p class="fine" style="color:var(--warn)">⚠️ 请使用自己的 Gmail 账号申请，尽量不要用学校账号 (学校账号可能被管理员限制或停用，key 也会跟着失效)。</p><details class="fine" style="color:var(--warn);margin:6px 0"><summary style="cursor:pointer">⚠️ 打不开 AI Studio？点这里看原因</summary><div style="margin-top:4px">申请 key 前先检查两件事：① 到「Manage your Google Account」查看生日资料，确认账号年龄已超过 18 岁；② 用手机时，尽量别直接在 Google 的应用里登录 (每个人的情况不同，有些账号会被 Google 拦下)，被拦下的话，改用 Chrome 浏览器登录就可以了。</div></details>
     <input type="password" id="sKey" placeholder="粘贴 API key" value="${esc(S.ai.key)}" autocomplete="off">
@@ -4317,5 +4324,6 @@ setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mod
 <script src="online.js?v=2026-10-28b" defer></script>
 <script src="focus.js?v=2026-10-28d" defer></script>
 
+<script src="tour.js?v=2026-10-30a" defer></script>
 </body>
 </html>
