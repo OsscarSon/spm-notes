@@ -176,6 +176,11 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 .note ul{margin:.3em 0;padding-left:1.2em}.note li{margin:.2em 0}
 .note table,.md table{border-collapse:collapse;width:100%;margin:8px 0;font-size:.92rem}
 .note th,.note td,.md th,.md td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}
+/* 手机表格：始终撑满同一宽度，不滑动；按「整个单词」换行，只有单词太长才会断开 */
+.note table,.md table{width:100%;table-layout:auto}
+.note th,.note td,.md th,.md td{overflow-wrap:break-word;word-break:normal;hyphens:manual}
+.note th:first-child,.note td:first-child,.md th:first-child,.md td:first-child{white-space:nowrap;width:1%}
+@media (max-width:640px){.note table,.md table{font-size:.82rem}.note th,.note td,.md th,.md td{padding:4px 5px;line-height:1.5}}
 .note th,.md th{background:var(--sheet2)}
 .note code,.md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--sheet2);padding:1px 6px;border-radius:5px;font-size:.88em}
 .md h1,.md h2,.md h3,.md h4{font-family:var(--kai);line-height:1.4;margin:1.2em 0 .4em}
