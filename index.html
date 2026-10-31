@@ -176,10 +176,9 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 .note ul{margin:.3em 0;padding-left:1.2em}.note li{margin:.2em 0}
 .note table,.md table{border-collapse:collapse;width:100%;margin:8px 0;font-size:.92rem}
 .note th,.note td,.md th,.md td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}
-/* 手机表格：始终撑满同一宽度，不滑动；按「整个单词」换行，只有单词太长才会断开 */
-.note table,.md table{width:100%;table-layout:auto}
-.note th,.note td,.md th,.md td{overflow-wrap:break-word;word-break:normal;hyphens:manual}
-.note th:first-child,.note td:first-child,.md th:first-child,.md td:first-child{white-space:nowrap;width:1%}
+/* 手机表格：始终撑满同一宽度，不滑动、不超出屏幕。每列有一个最小宽度，短词(如 Step)不会被拆开；长内容在格子里自动换行 */
+.note table,.md table{width:100%;max-width:100%;table-layout:auto}
+.note th,.note td,.md th,.md td{overflow-wrap:anywhere;word-break:normal;min-width:3.2em}
 @media (max-width:640px){.note table,.md table{font-size:.82rem}.note th,.note td,.md th,.md td{padding:4px 5px;line-height:1.5}}
 .note th,.md th{background:var(--sheet2)}
 .note code,.md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--sheet2);padding:1px 6px;border-radius:5px;font-size:.88em}
@@ -1434,6 +1433,7 @@ function normFig(f){if(!f||typeof f!=="object")return null;const k=String(f.k||"
   if(k==="plot")return{k,c};if(k==="svg")return/<svg[\s>]/i.test(c)?{k,c}:null;if(k==="image"||k==="img")return{k:"image",c};return null}
 function figBox(f){return f&&f.k?figHTML(f.k,f.c):""}
 function figHTML(kind,body){
+  if(/^(solve|timer|cards|quiz|go|mermaid)$/.test(kind))return window.Tools?Tools.fig(kind,body):'<div class="fig fine muted">(工具卡片加载中，稍后重新打开问答页)</div>';
   if(kind==="calc")return calcHTML(body);
   if(kind==="image")return imgSlot(body);
   let svg=kind==="plot"?plotSVG(body):(/<svg[\s>]/i.test(body)?body:"");
@@ -1441,7 +1441,7 @@ function figHTML(kind,body){
   return svg?`<div class="fig">${svg}</div>`:`<div class="fig fine muted">(这张图没画成功，请再问一次，或让 AI 换个画法)</div>`}
 function md(t){
   const figs=[],mths=[];
-  t=String(t==null?"":t).replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$|\\\([\s\S]*?\\\)/g,m=>{mths.push(m);return"MATHPLACE"+(mths.length-1)+"X"}).replace(/```(svg|plot|image|calc)[ \t]*\r?\n([\s\S]*?)```/gi,(m,k,b)=>{figs.push(figHTML(k.toLowerCase(),b));return"\n\nFIGPLACE"+(figs.length-1)+"X\n\n"});
+  t=String(t==null?"":t).replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$|\\\([\s\S]*?\\\)/g,m=>{mths.push(m);return"MATHPLACE"+(mths.length-1)+"X"}).replace(/```(svg|plot|image|calc|solve|timer|cards|quiz|go|mermaid)[ \t]*\r?\n([\s\S]*?)```/gi,(m,k,b)=>{figs.push(figHTML(k.toLowerCase(),b));return"\n\nFIGPLACE"+(figs.length-1)+"X\n\n"});
   let h;try{if(window.marked&&window.DOMPurify)h=DOMPurify.sanitize(marked.parse(t,{breaks:true}))}catch(e){}
   if(h===undefined){md.fb=true;h=esc(t).replace(/\n/g,"<br>")}
   h=h.replace(/<p>(\s*(?:华文|中文|华语)[：:])/g,'<p class="zhp">$1');
@@ -2615,6 +2615,19 @@ ${e.text.trim()||"(见照片)"}
 /* ===================== 阅卷官 + 更新提醒 (小铃铛) ===================== */
 /* ---- 更新记录：每次更新 index.html 时，在最上面加一条 (最新的放最前面)。v 是版本号，改了它，朋友的小铃铛就会亮红点 ---- */
 const CHANGELOG=[
+{v:"2026-10-31c",date:"2026-10-31",title:"问答新增「AI 工具卡片」和「思考轨迹」🧰",
+   items:[
+    "🧰 问答里的 AI 现在会自己挑工具，让回答里直接出现能点的卡片：🧩 解方程 (程序自己算根和判别式)、❓ 小测验 (点选项马上看对错)、🗂 闪卡 (一键加入闪卡)、⏱ 专注计时器 (时间到会响铃)、🔀 流程图/时间线/概念图、🧭 快捷入口按钮。例如问「考考我判别式」「画细胞分裂的流程」「帮我开 25 分钟专注」。",
+    "🧭 每条回答上方多了「思考轨迹」小标签，点开能看到这次做了什么：找了哪些章节、用了哪个 AI、有没有自动重试或换模型，以及用了哪些卡片和耗时。回答生成中也会实时显示进度。",
+    "⚙️ 问答页的范围旁边多了一个开关「允许 AI 用工具卡片」，不想要可以关掉。所有卡片都在你的手机/电脑上本地运行，不会多花 AI 额度；原来的函数图像、计算核对、示意图照常使用。",
+    "📲 更新时记得把 index.html、tools.js 和 sw.js 一起上传 (多了一个 tools.js)，刷新两次就能看到。"
+   ]},
+{v:"2026-10-31b",date:"2026-10-31",title:"手机表格不再超出屏幕 📱",
+   items:[
+    "📱 修好了手机上有些表格 (例如 3 列、标题比较长的速记表) 右边会超出屏幕的问题。现在表格始终在屏幕宽度里，长内容会在格子里自动换行。",
+    "🔤 每一列都有最小宽度，所以 Step 这类很短的字不会再被拆成一个字母一行。",
+    "📲 更新时记得把 index.html 和 sw.js 一起上传。"
+   ]},
 {v:"2026-10-31a",date:"2026-10-31",title:"修好手机上的表格排版 📱",
    items:[
     "📱 手机上笔记里的表格，文字不会再被拆成一个字母一行 (例如 Step 变成 S、t、e、p)。现在会按整个单词换行，表格仍然撑满同一个宽度，不用左右滑动。",
@@ -3257,15 +3270,16 @@ function rChat(){
   const sid=S.sub,h=S.chat[sid]||[],cs=chapsOf(sid).filter(c=>c.core);let nFiles=0;
   $("#sheet").innerHTML=`${needKey()}<div class="row" style="margin-bottom:8px"><h2 style="margin:0">${esc(subj(sid).name)} 问答</h2><span class="spacer"></span><button class="btn small" id="chClr">清空对话</button></div>
   <div class="controls"><label class="grow">范围<select id="chScope"><option value="">整科 (自动找相关章节)</option>${cs.map(c=>`<option value="${esc(c.k)}" ${S.scope[sid]===c.k?"selected":""}>${esc(c.t)}</option>`).join("")}</select></label>
-   <label class="chk" style="color:var(--ink);font-size:14px"><input type="checkbox" id="chStrict" ${S.strict?"checked":""}> 只依据我的资料回答</label></div>
+   <label class="chk" style="color:var(--ink);font-size:14px"><input type="checkbox" id="chStrict" ${S.strict?"checked":""}> 只依据我的资料回答</label>
+   <label class="chk" style="color:var(--ink);font-size:14px"><input type="checkbox" id="chTools" ${S.tools!==false?"checked":""}> 允许 AI 用工具卡片 (解方程、小测验、计时器…)</label></div>
   <div class="fine muted" id="chInfo" style="margin-bottom:8px"><span class="tag blue">回答语言：${langLabel(sid)}</span> 回答会参考：章节要求、内置要点、AI 笔记，以及你在「资料」页勾选的上传文件。</div>
-  <div id="msgs">${h.length?h.map(m=>`<div class="msg ${m.r}">${m.r==="user"?esc(m.t).replace(/\n/g,"<br>")+(m.img?'<div class="fine muted">(附了一张图片)</div>':""):`<div class="md">${md(m.t)}</div>${m.src&&m.src.length?`<div class="fine muted" style="margin-top:6px">参考：${esc(m.src.join("、"))}</div>`:""}${m.by?`<div class="fine muted" style="margin-top:4px">由 ${esc(m.by)} 回答</div>`:""}`}</div>`).join(""):`<div class="empty">例如：「讲一下判别式，再出 3 道练习」<br>「Kadar tindak balas 为什么升温变快？」<br>拍下不会的题，点下面的 📷 上传。</div>`}${chatBusy?`<div class="msg model"><div class="skel" style="width:78%"></div><div class="skel" style="width:94%"></div><div class="skel" style="width:52%"></div><div class="fine muted"><span class="spin"></span>思考中…</div></div>`:""}${chatErr?`<div class="notice error">${esc(chatErr)}</div>`:""}</div>
+  <div id="msgs">${h.length?h.map(m=>`<div class="msg ${m.r}">${m.r==="user"?esc(m.t).replace(/\n/g,"<br>")+(m.img?'<div class="fine muted">(附了一张图片)</div>':""):`${m.trace&&window.Tools?Tools.traceHTML(m.trace):""}<div class="md">${md(m.t)}</div>${m.src&&m.src.length?`<div class="fine muted" style="margin-top:6px">参考：${esc(m.src.join("、"))}</div>`:""}${m.by?`<div class="fine muted" style="margin-top:4px">由 ${esc(m.by)} 回答</div>`:""}`}</div>`).join(""):`<div class="empty">例如：「讲一下判别式，再出 3 道练习」<br>「Kadar tindak balas 为什么升温变快？」<br>拍下不会的题，点下面的 📷 上传。</div>`}${chatBusy?`<div class="msg model"><div class="skel" style="width:78%"></div><div class="skel" style="width:94%"></div><div class="skel" style="width:52%"></div><div class="fine muted"><span class="spin"></span>思考中…</div><div id="chLive" class="fine muted tl-live"></div></div>`:""}${chatErr?`<div class="notice error">${esc(chatErr)}</div>`:""}</div>
   <div class="card" style="margin-top:10px">${chatImg?`<div class="fine" style="margin-bottom:6px">已附图片 <button class="btn small" id="chImgX">移除</button></div>`:""}
    <textarea id="chIn" placeholder="输入问题，Ctrl/⌘+Enter 发送" ${chatBusy?"disabled":""}></textarea>
    <div class="row" style="margin-top:8px"><label class="btn small">📷 上传题目图片<input type="file" id="chFile" accept="image/*" hidden></label><span class="spacer"></span><button class="btn pri" id="chSend" ${chatBusy?"disabled":""}>发送</button></div></div>`;
   const last=$("#msgs").lastElementChild;if(last&&h.length)last.scrollIntoView({block:"nearest"});
   $("#chClr").onclick=()=>{S.chat[sid]=[];chatErr="";save();rChat()};
-  $("#chScope").onchange=e=>{S.scope[sid]=e.target.value||undefined;save()};$("#chStrict").onchange=e=>{S.strict=e.target.checked;save()};
+  $("#chScope").onchange=e=>{S.scope[sid]=e.target.value||undefined;save()};$("#chStrict").onchange=e=>{S.strict=e.target.checked;save()};$("#chTools").onchange=e=>{S.tools=e.target.checked;save()};if(window.Tools)Tools.paintLive();
   $("#chFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{chatImg=await prepImg(f);rChat()}catch(x){toast("图片读取失败")}};
   if($("#chImgX"))$("#chImgX").onclick=()=>{chatImg=null;rChat()};
   const send=()=>{const v=$("#chIn").value.trim();if(v||chatImg)ask(v||"请讲解这张图片里的题目。")};
@@ -3273,13 +3287,19 @@ function rChat(){
   if(chatPending){const q=chatPending;chatPending=null;ask(q)}}
 async function ask(text){
   if(chatBusy)return;const sid=S.sub,h=S.chat[sid]=S.chat[sid]||[];const img=chatImg;chatImg=null;chatErr="";
+  const tr=window.Tools?Tools.newTrace():null;if(tr)tr.step("📝","收到问题");
   h.push({r:"user",t:text,img:!!img});chatBusy=true;if(S.tab==="chat")rChat();
   try{const ctx=await buildCtx(sid,text);
+    if(tr)tr.step("🔍","整理上下文："+(ctx.used.length?ctx.used.join("、"):"没有匹配的章节，只带整科目录")+(ctx.files.length?"；上传资料："+ctx.files.join("、"):""));
     const hist=h.slice(-14).map((m,i,a)=>({role:m.r==="user"?"user":"model",parts:[{text:m.t}]}));
     const lastParts=hist[hist.length-1].parts;if(img)lastParts.unshift({inline_data:{mime_type:"image/jpeg",data:img}});ctx.parts.forEach((p,i)=>lastParts.splice(i,0,p));
-    const out=await gem(hist,ctx.system+calcRule(sid)+(img?"\n学生附了题目图片：先准确读出题目，字迹看不清的地方要说明，再解答。":""),8192);
-    h.push({r:"model",t:out,src:ctx.used.concat(ctx.files),by:aiLabel()})}
-  catch(e){h.pop();chatErr=e.message}
+    if(tr)tr.step("🤖","AI 思考中…");
+    const toolRule=tr&&S.tools!==false?Tools.rule():"";
+    const out=await gem(hist,ctx.system+calcRule(sid)+toolRule+(img?"\n学生附了题目图片：先准确读出题目，字迹看不清的地方要说明，再解答。":""),8192,tr?{onPhase:k=>tr.phase(k)}:undefined);
+    const msg={r:"model",t:out,src:ctx.used.concat(ctx.files),by:aiLabel()};
+    if(tr){tr.step("✍️","回答完成"+(msg.by?"（"+msg.by+"）":""));Tools.scan(out).forEach(x=>tr.step(x[0],x[1]));msg.trace=tr.out()}
+    h.push(msg)}
+  catch(e){h.pop();chatErr=e.message;if(tr)tr.out()}
   chatBusy=false;if(h.length>40)S.chat[sid]=h.slice(-40);save();if(S.tab==="chat"&&S.sub===sid)rChat()}
 
 /* ---- 资料 ---- */
@@ -4334,6 +4354,7 @@ setTimeout(function(){try{A();last=snap();var m=localStorage.getItem("spm-wp-mod
 <script src="labs.js?v=2026-10-26f" defer></script>
 <script src="online.js?v=2026-10-28b" defer></script>
 <script src="focus.js?v=2026-10-28d" defer></script>
+<script src="tools.js?v=2026-10-31c" defer></script>
 
 <script src="tour.js?v=2026-10-30a" defer></script>
 </body>
