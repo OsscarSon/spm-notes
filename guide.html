@@ -17,6 +17,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--paper);border-bottom:1px solid var(--line);font-size:14px;line-height:1.4}
 .bar a{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--ink);text-decoration:none;font-weight:500}
 .bar a.pri{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ph img{height:auto}
 body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.85 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;-webkit-text-size-adjust:100%}
 h1,h2,h3{font-family:"Noto Serif SC","Songti SC",serif;line-height:1.35;margin:0}
 a{color:var(--blue)}
@@ -47,10 +48,10 @@ dl.map{display:grid;grid-template-columns:auto 1fr;gap:0;margin:14px 0;backgroun
 dl.map dt,dl.map dd{margin:0;padding:10px 14px;border-top:1px solid var(--line);font-size:15px;line-height:1.6}
 dl.map dt{font-weight:700;border-right:1px solid var(--line)}dl.map dt:first-of-type,dl.map dt:first-of-type+dd{border-top:0}
 dl.map a{color:inherit;text-decoration-color:var(--red);text-underline-offset:3px}
-.phones{display:flex;gap:16px;overflow-x:auto;padding:20px;margin:16px -4px 6px;background:var(--desk);border-radius:18px;scroll-snap-type:x proximity}
+.phones{display:flex;gap:16px;overflow-x:auto;padding:20px;margin:16px 0 6px;background:var(--desk);border-radius:18px;scroll-snap-type:x proximity}
 figure{margin:0;flex:0 0 auto;width:min(232px,64vw);scroll-snap-align:start}
 .ph{border:6px solid var(--ink);border-radius:28px;overflow:hidden;background:#fff;line-height:0;cursor:zoom-in}
-.ph img{width:100%;height:auto;display:block}
+.ph img{width:100%;display:block}
 figcaption{font-size:13px;line-height:1.55;color:var(--mute);margin-top:8px}
 .mini{display:grid;grid-template-columns:1fr;gap:16px;margin-top:14px}@media(min-width:700px){.mini{grid-template-columns:repeat(2,1fr)}}
 .mini>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;grid-template-columns:104px 1fr;gap:14px;align-items:start}
@@ -71,6 +72,46 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 .phones{flex-wrap:wrap;overflow:visible}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{background-image:radial-gradient(circle at 1px 1px,color-mix(in srgb,var(--ink) 10%,transparent) 1px,transparent 0);background-size:22px 22px}
+.hero{position:relative;isolation:isolate;overflow-x:clip}
+.hero::before{content:"";position:absolute;inset:-30px 0 auto;height:560px;z-index:-1;pointer-events:none;background:radial-gradient(38% 50% at 78% 32%,color-mix(in srgb,var(--blue) 24%,transparent),transparent 70%),radial-gradient(32% 42% at 12% 75%,color-mix(in srgb,var(--red) 13%,transparent),transparent 70%),radial-gradient(28% 36% at 55% 8%,color-mix(in srgb,var(--hl) 40%,transparent),transparent 70%)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
+.chips span{padding:5px 14px;border-radius:99px;background:var(--card);border:1.5px solid var(--ink);font:500 13px/1.5 "Noto Sans SC",sans-serif;box-shadow:2px 2px 0 var(--ink);transform:rotate(-2deg)}
+.chips span:nth-child(2){transform:rotate(1.5deg)}.chips span:nth-child(3){transform:rotate(-1deg)}
+.hero figure{position:relative}.pencil{position:absolute;right:-30px;bottom:26px;width:34px;transform:rotate(24deg);filter:drop-shadow(2px 4px 3px rgba(0,0,0,.25))}
+.phones figure::before,.hero figure::before{content:"";position:absolute;top:-8px;left:50%;width:62px;height:20px;margin-left:-31px;background:color-mix(in srgb,var(--hl) 82%,transparent);transform:rotate(-3deg);z-index:2;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.phones figure:nth-child(even)::before{transform:rotate(3deg)}
+.phones figure{position:relative}
+.ph{box-shadow:0 12px 26px rgba(23,38,63,.25)}
+.phones{background:radial-gradient(circle at 1px 1px,color-mix(in srgb,var(--ink) 14%,transparent) 1px,transparent 0) 0 0/16px 16px,var(--desk);padding-top:26px}
+main h2::after{content:"";display:block;width:76px;height:8px;margin-top:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='8'%3E%3Cpath d='M1 4Q7 0 13 4T25 4 37 4 49 4 61 4 75 4' fill='none' stroke='%23d33a2c' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat}
+.ic{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:14px;font-size:24px;line-height:1;margin-right:12px;vertical-align:middle;font-style:normal;background:color-mix(in srgb,var(--c) 16%,var(--card));border:1.5px solid color-mix(in srgb,var(--c) 50%,transparent)}
+main section+section{position:relative;margin-top:36px;border-top:2px dashed var(--line)}
+main section+section::before{content:"✂";position:absolute;left:14px;top:-14px;padding:0 8px;background:var(--paper);color:var(--mute);font-size:17px}
+.note{position:relative;padding-left:46px}.note::before{content:"✎";position:absolute;left:16px;top:9px;color:var(--red);font-size:19px}
+ol.steps>li{box-shadow:0 3px 0 var(--line)}
+.mini>div{box-shadow:0 3px 0 var(--line)}
+details[open]{border-color:var(--red)}
+.end{margin:56px 0 0;text-align:center;font:600 22px/1.6 "Noto Serif SC",serif}.end small{display:block;font:400 14px "Noto Sans SC",sans-serif;color:var(--mute)}
+.end .omr{justify-content:center;margin-bottom:14px}
+#prog{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:4px;width:0;background:var(--red);z-index:25}
+#top{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--card);color:var(--ink);font:700 20px/1 sans-serif;cursor:pointer;display:none;z-index:40;box-shadow:2px 3px 0 var(--ink)}
+#top.on{display:block}
+
+.eb{display:block;font:700 12px/1 "Noto Sans SC",sans-serif;letter-spacing:.28em;color:var(--red);margin:0 0 12px}
+dl.map dt::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:var(--c,var(--ink))}
+dl.map dt:nth-of-type(1){--c:#e0584a}dl.map dt:nth-of-type(2){--c:#2c47d6}dl.map dt:nth-of-type(3){--c:#f08c2e}dl.map dt:nth-of-type(4){--c:#2e9e6b}dl.map dt:nth-of-type(5){--c:#7a5af8}dl.map dt:nth-of-type(6){--c:#1f9bb0}dl.map dt:nth-of-type(7){--c:#a8743a}
+ol.steps>li:not(:last-child)::after{content:"";position:absolute;left:33px;bottom:-16px;height:18px;border-left:2px dashed var(--mute)}
+.mini>div{border-top:4px solid var(--a,var(--red))}
+.mini>div:nth-child(4n+2){--a:#2c47d6}.mini>div:nth-child(4n+3){--a:#2e9e6b}.mini>div:nth-child(4n){--a:#f08c2e}
+.phones figure,.mini>div{transition:transform .2s ease}
+.phones figure:hover{transform:translateY(-5px) rotate(-.7deg)}.mini>div:hover{transform:translateY(-3px)}
+.stk{display:inline-block;margin-top:14px;padding:4px 12px;background:var(--hl);color:#17263f;border-radius:4px;font:500 13px/1.5 "Noto Sans SC",sans-serif;transform:rotate(-2deg);box-shadow:1px 2px 0 rgba(0,0,0,.2)}
+footer{text-align:center;border-top:2px dashed var(--line);padding-top:22px}
+@media(prefers-reduced-motion:reduce){.phones figure,.mini>div{transition:none}.phones figure:hover,.mini>div:hover{transform:none}}
+.layout>*{min-width:0}
+body{overflow-x:clip}
 </style>
 </head>
 <body>
@@ -79,6 +120,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 <div>
 <h1>SPM 备考本<br>新手手册</h1>
 <p class="lead">课本要点、AI 笔记、刷题、模拟卷和问答，都在一个网页 App 里。这份手册陪你从第一次打开，走到做完第一套模拟卷。</p>
+<div class="chips"><span>11 个科目</span><span>免费 Gemini key</span><span>可装成手机 App</span></div>
 <div class="omr" aria-hidden="true"><i>A</i><i class="on">B</i><i>C</i><i>D</i></div>
 <ul class="three">
 <li>内置笔记、内置题库和闪卡不用 key 就能看；要 AI 生成笔记、出题、批改、问答，才需要你自己的免费 Gemini key。</li>
@@ -86,7 +128,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 <li>AI 整理的内容可能有错，仅供复习，请以课本和老师为准。</li>
 </ul>
 </div>
-<figure style="width:min(270px,70vw);justify-self:center"><div class="ph"><img src="img/guide/g01.webp" width="520" height="1125" alt="今日页面" loading="eager"></div></figure>
+<figure style="width:min(270px,70vw);justify-self:center"><div class="ph"><img src="img/guide/g01.webp" width="520" height="1125" alt="今日页面" loading="eager"></div><span class="stk">点任何截图都能放大</span><svg class="pencil" viewBox="0 0 40 214" aria-hidden="true"><rect x="4" y="0" width="32" height="24" rx="8" fill="#f4a3b5"/><rect x="4" y="22" width="32" height="16" fill="#b8c0cc"/><rect x="4" y="38" width="32" height="128" fill="#f6c945"/><rect x="14" y="38" width="4" height="128" fill="#e0ad1f"/><rect x="24" y="38" width="3" height="128" fill="#ffe27a"/><polygon points="4,166 36,166 20,208" fill="#e8c9a0"/><polygon points="14,192 26,192 20,208" fill="#3b3f4a"/></svg></figure>
 </header>
 
 <div class="layout">
@@ -98,7 +140,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 
 <main>
 <section id="start">
-<h2>先做这三步</h2>
+<small class="eb">GET STARTED</small><h2><i class="ic" style="--c:#17263f">🚀</i>先做这三步</h2>
 <p class="mute">只想先看内置笔记，可以跳过第 2、3 步。</p>
 <ol class="steps">
 <li><h3>把它装成 App</h3>
@@ -129,7 +171,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="today">
-<h2>今日</h2>
+<small class="eb">TODAY</small><h2><i class="ic" style="--c:#e0584a">📅</i>今日</h2>
 <p>打开 App 先到这里。顶部那一排圈像 OMR 答题卡：每过一天涂掉一个圈，红色是今天，蓝色粗边是笔试第一天。</p>
 <ul class="k">
 <li><b>今天的重点</b>每天排 2 科，按你设的信心自动挑。必须及格的科目（如历史）和快要考的科目会排得更多，每科都附「下一章」的链接。</li>
@@ -146,7 +188,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="notes">
-<h2>笔记</h2>
+<small class="eb">NOTES</small><h2><i class="ic" style="--c:#2c47d6">📒</i>笔记</h2>
 <p>先在顶部选科目，再点一章展开。每章都有内置要点，不用 key 就能看。</p>
 <ul class="k">
 <li><b>章节要求</b>：在每章的输入框里写老师划的范围，例如「1.2 只考定义和公式」。AI 生成笔记、出题、回答时都会参考它。</li>
@@ -164,7 +206,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="flash">
-<h2>闪卡</h2>
+<small class="eb">FLASHCARDS</small><h2><i class="ic" style="--c:#f08c2e">🃏</i>闪卡</h2>
 <p>点卡片或「显示答案」翻面，再选「记得」或「不记得」。同一张卡连续答对 3 次算掌握，不记得的会进错题本。也可以让 AI 按章节生成 6、10 或 15 张，或自己添加。</p>
 <div class="phones">
 <figure><div class="ph"><img src="img/guide/g12.webp" width="520" height="1125" alt="闪卡正面" loading="lazy"></div><figcaption>先看问题，自己想一遍。</figcaption></figure>
@@ -173,7 +215,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="drill">
-<h2>刷题</h2>
+<small class="eb">PRACTICE</small><h2><i class="ic" style="--c:#2e9e6b">✏️</i>刷题</h2>
 <p>顶部的小标签切换玩法。题源可以选 AI 按章节出题（难度有基础、SPM 中等、KBAT 偏难），或用内置题库（仅选择题，附华文翻译）。</p>
 <ul class="k">
 <li><b>选择题 / 作答题 / 混合</b>：作答题一题一题做，写完点「提交批改」，AI 马上给分和评语。</li>
@@ -194,7 +236,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="exam">
-<h2>模拟卷</h2>
+<small class="eb">MOCK EXAM</small><h2><i class="ic" style="--c:#7a5af8">📝</i>模拟卷</h2>
 <p>AI 按 KSSM 和 SPM 的风格出整份卷，你在页面里作答，交卷后按评分要点批改并写评语。这是仿真练习，不是某一年的真题。</p>
 <ul class="k">
 <li>选卷别后，题数、难度和限时默认「跟历届一样」，也可以自定义，还能只选几章。</li>
@@ -209,20 +251,20 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="chat">
-<h2>问答</h2>
+<small class="eb">ASK AI</small><h2><i class="ic" style="--c:#1f9bb0">💬</i>问答</h2>
 <p>把不懂的题打进去，或点「📷 上传题目图片」拍照问。范围可以选整科，也可以锁定某一章；勾上「只依据我的资料回答」后，资料里没有的内容会标成 [通用知识]，不会冒充课本原文。每个回答下面会写明参考了哪些章节、由哪个模型回答。</p>
 <div class="phones"><figure><div class="ph"><img src="img/guide/g22.webp" width="520" height="1125" alt="问答页" loading="lazy"></div><figcaption>问答页（对话为演示内容）。</figcaption></figure></div>
 </section>
 
 <section id="res">
-<h2>资料</h2>
+<small class="eb">RESOURCES</small><h2><i class="ic" style="--c:#a8743a">📎</i>资料</h2>
 <p>上传 PDF、图片或文本，勾选后，问答、出题和出卷都会参考它们。下面还有 LP 官方、各科真题和 Trial 卷的入口。</p>
 <div class="note">超过 14 MB 的大文件会先上传到 Google，需要有 Gemini key。备用 AI 读不了你上传的文件和图片。</div>
 <div class="phones"><figure><div class="ph"><img src="img/guide/g23.webp" width="520" height="1125" alt="资料页" loading="lazy"></div><figcaption>上传区和官方入口。</figcaption></figure></div>
 </section>
 
 <section id="extras">
-<h2>好用的小功能</h2>
+<small class="eb">EXTRAS</small><h2><i class="ic" style="--c:#e0559a">✨</i>好用的小功能</h2>
 <div class="mini">
 <div><div class="ph"><img src="img/guide/g24.webp" width="520" height="1125" alt="PPT 模式" loading="lazy"></div><span><h3>PPT 模式</h3><p>章节旁点「📊 PPT」，用幻灯片复习内置要点，方向键或按钮翻页，Esc 关闭。</p></span></div>
 <div><div class="ph"><img src="img/guide/g25.webp" width="520" height="1125" alt="互动周期表" loading="lazy"></div><span><h3>互动实验室</h3><p>笔记页底部有周期表、函数图像、几何画板、分子结构、思维导图、拍照识字等，点开才下载。</p></span></div>
@@ -237,7 +279,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="quota">
-<h2>额度与备用 AI</h2>
+<small class="eb">AI QUOTA</small><h2><i class="ic" style="--c:#d9a400">⚡</i>额度与备用 AI</h2>
 <p>免费 key 的额度有限，用完会提示「太频繁」。等一两分钟或隔天再试，也可以多申请两个免费 key 当后备：<a href="https://console.groq.com/keys" target="_blank" rel="noopener">Groq</a> 和 <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a>，填在设置的「备用 AI」。</p>
 <ul class="k">
 <li>默认开着「自动选择最合适的 AI」：每次生成前，按任务类型、各家今天的额度和有没有被限流来挑，不是等 Gemini 用完才换。</li>
@@ -248,7 +290,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="sync">
-<h2>备份与同步</h2>
+<small class="eb">BACKUP &amp; SYNC</small><h2><i class="ic" style="--c:#3b82f6">☁️</i>备份与同步</h2>
 <p>你的进度、AI 笔记和错题只在这个浏览器里。换设备或清缓存前，到设置最下面的「备份」点「导出 JSON」（文件不含 key，也不含上传的资料），到新设备再「导入 JSON」。</p>
 <p>想让手机和电脑自动保持一致，可以开「云端同步」：用你自己免费的 Cloudflare 账号建一个 KV 和一个 Worker，把网址填进设置。设置页里有逐步图文说明，不用绑信用卡。</p>
 <div class="note">同步靠 API key 认人：每台设备必须填完全一样的 key，多一个空格都不行。换了 key 就等于换了一个新的同步空间。</div>
@@ -259,7 +301,7 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 </section>
 
 <section id="faq">
-<h2>常见问题</h2>
+<small class="eb">FAQ</small><h2><i class="ic" style="--c:#64748b">❓</i>常见问题</h2>
 <details><summary>AI 的按钮是灰色的</summary><p>还没有填 key。页面上方会出现黄色的「先设置 API key」提示，到设置页填好并保存就行。</p></details>
 <details><summary>提示太频繁，或今天额度用完了</summary><p>等一两分钟，或隔天再试。经常遇到的话，配上 Groq 和 OpenRouter 的备用 key。</p></details>
 <details><summary>打不开 AI Studio，申请不了 key</summary><p>先确认 Google 账号的年龄已超过 18 岁；用手机时别在 Google 的应用里登录，改用 Chrome。不要用学校账号。</p></details>
@@ -267,9 +309,11 @@ nav.toc b{display:block;font:600 13px "Noto Sans SC",sans-serif;color:var(--mute
 <details><summary>有新内容，但页面没变化</summary><p>看右上角 🔔 的更新记录；底部出现「有新版本了」时点「刷新」。</p></details>
 <details><summary>笔记和答案可靠吗</summary><p>它们由 AI 整理，仅供复习。遇到可疑的地方，请对照课本和老师的讲解。</p></details>
 </section>
+<div class="end"><div class="omr" aria-hidden="true"><i>A</i><i>B</i><i class="on">C</i><i>D</i></div>祝你 SPM 顺利，每一格都涂对<small>有问题随时回来翻这份手册</small></div>
 </main>
 </div>
 <footer>截图来自当前版本的 App，使用演示数据（key 与学习记录都是示例）。具体界面与功能以实际 App 为准。</footer>
+<div id="prog"></div><button id="top" aria-label="回到顶部">↑</button>
 <dialog id="lb"><img alt=""></dialog>
 <script>
 (function(){var lb=document.getElementById('lb'),im=lb.querySelector('img');
@@ -277,6 +321,7 @@ document.addEventListener('click',function(e){var p=e.target.closest('.ph');if(p
 document.querySelectorAll('.ph').forEach(function(p){p.tabIndex=0;p.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();p.click()}})});
 var links=[].slice.call(document.querySelectorAll('nav.toc a')),secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
 if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){links.forEach(function(a){a.removeAttribute('aria-current')});var a=links[secs.indexOf(en.target)];if(a)a.setAttribute('aria-current','true')}})},{rootMargin:'-20% 0px -70% 0px'});secs.forEach(function(s){s&&io.observe(s)})}
+var bar=document.getElementById("prog"),tb=document.getElementById("top");function sc(){var h=document.documentElement,m=h.scrollHeight-h.clientHeight;bar.style.width=(m>0?h.scrollTop/m*100:0)+"%";tb.classList.toggle("on",h.scrollTop>900)}addEventListener("scroll",sc,{passive:true});sc();tb.onclick=function(){scrollTo({top:0})};
 })();
 </script>
 </body>
