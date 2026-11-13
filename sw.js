@@ -1,53 +1,33 @@
-// 改了网站内容后，把版本号 +1 (spm-v6、v7...)，用户就会收到「有新版本」提示
-const CACHE = 'spm-v69';
-const PRECACHE = ['./', './index.html', './music.js', './online.js', './focus.js', './tools.js', './tour.js', './guide.html', './img/focus/sakura.webp', './img/focus/sakura-s.webp', './img/focus/sakura-m.webp', './img/focus/onsen.webp', './img/focus/onsen-s.webp', './img/focus/onsen-m.webp', './img/focus/brick.webp', './img/focus/brick-s.webp', './img/focus/brick-m.webp', './img/focus/cabin.webp', './img/focus/cabin-s.webp', './img/focus/cabin-m.webp', './img/focus/sunny.webp', './img/focus/sunny-s.webp', './img/focus/sunny-m.webp', './img/focus/night.webp', './img/focus/night-s.webp', './img/focus/night-m.webp', './img/focus/cafe.webp', './img/focus/cafe-s.webp', './img/focus/cafe-m.webp', './img/focus/lighthouse.webp', './img/focus/lighthouse-s.webp', './img/focus/lighthouse-m.webp', './starmap.js', './labs.js', './lab-ptable.js', './lab-plot.js', './lab-physics.js', './lab-geo.js', './lab-mol.js', './lab-phet.js', './lab-mmap.js', './lab-ocr.js', './lab-mathin.js', './lab-cas.js', './lab-mermaid.js', './lab-space.js', './lab-m3d.js', './lab-bio3d.js', './data/sej.js', './data/bio.js', './data/kim.js', './data/fiz.js', './data/mat.js', './data/sci.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
+// Service Worker：让网页版能离线打开，并负责通知点击。
+// 策略：本站文件 = 先给缓存、后台更新（下次打开就是新版）；CDN 脚本 / 字体 = 缓存优先；/api/ 一律走网络，绝不缓存。
+const VER = 'mochi-v9-9-1';
+const SHELL = ['./', 'index.html', 'manifest.json', 'css/style.css', 'css/mochi-life.css', 'css/goals.css', 'css/starter-kits.css', 'css/menu-polish.css', 'css/study-space.css', 'css/spaces.css', 'css/health-space.css', 'assets/buddy/happy.svg', 'assets/buddy/idle.svg', 'css/wrapped2.css', 'css/onboarding-v91.css', 'assets/study-mode.webp', 'assets/work-mode.webp', 'assets/life-mode.webp',
+  'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
+  ...['hook', 'config', 'version', 'install', 'lang-ui', 'lang-msg', 'lang-static', 'i18n', 'sync', 'aisrc', 'api', 'core', 'dates', 'theme', 'recur', 'srs', 'timetable', 'dayview', 'localai', 'icons', 'log', 'study', 'sport', 'sortable', 'health', 'lang-health', 'lang-onb', 'remind', 'store', 'hw',
+      'lessons', 'subjects', 'timepick', 'settings', 'wizard', 'holidays', 'account', 'lang-ocr', 'ocr', 'ai', 'share', 'stats', 'notifyset', 'notify', 'native', 'syscal', 'sched', 'undo', 'agent', 'icsimport', 'search', 'about', 'rate', 'faq', 'app', 'menu', 'lang-new', 'wallpaper', 'langrow', 'mochi-next', 'buddy-art', 'lang-goals', 'lang-study-space', 'goals', 'goals-plan', 'study-space-core', 'study-space', 'lang-spaces', 'spaces-core', 'spaces', 'lang-health-space', 'health-space-core', 'health-space', 'starter-kits', 'wrapped-stats', 'wrapped2'].map(n => 'js/' + n + '.js')];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VER).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
 });
-
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VER).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
-
-/* 点专注完成的通知：回到已打开的 App，没有就打开它 */
+self.addEventListener('fetch', e => {
+  const r = e.request, u = new URL(r.url);
+  if (r.method !== 'GET' || u.pathname.startsWith('/api/') || u.protocol.indexOf('http') !== 0) return;
+  const same = u.origin === self.location.origin;
+  const cdn = /(^|\.)(jsdelivr\.net|googleapis\.com|gstatic\.com)$/.test(u.hostname);
+  if (!same && !cdn) return;
+  if (cdn) {   // 缓存优先
+    e.respondWith(caches.open(VER).then(c => c.match(r).then(hit => hit || fetch(r).then(res => { if (res && (res.ok || res.type === 'opaque')) c.put(r, res.clone()); return res; }))));
+    return;
+  }
+  e.respondWith(caches.open(VER).then(c => c.match(r, { ignoreSearch: true }).then(hit => {
+    const net = fetch(r).then(res => { if (res && res.ok) c.put(r, res.clone()); return res; }).catch(() => hit);
+    return hit || net;
+  })));
+});
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-    for (const c of list) { if ('focus' in c) return c.focus(); }
-    return self.clients.openWindow('./');
-  }));
-});
-
-self.addEventListener('fetch', e => {
-  const req = e.request;
-  if (req.method !== 'GET') return;
-  const url = new URL(req.url);
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
-
-  e.respondWith(caches.open(CACHE).then(async cache => {
-    const cached = await cache.match(req, { ignoreSearch: true });
-
-    // 自己网站的文件：有网就拿最新的，没网 / 很慢就用缓存
-    if (url.origin === self.location.origin) {
-      // 图片：有缓存就直接用（文件名不变内容就不变；换图时把 CACHE 版本号 +1），切换场景不用等网络
-      if (cached && /\.(webp|png|jpe?g|gif|svg)$/i.test(url.pathname)) return cached;
-      const net = fetch(req).then(res => {
-        if (res && res.ok) cache.put(req, res.clone());
-        return res;
-      });
-      if (!cached) return net;
-      return Promise.race([net, new Promise((_, rej) => setTimeout(rej, 4000))]).catch(() => cached);
-    }
-
-    // 公式库等外部文件：先用缓存，后台更新
-    const net = fetch(req).then(res => {
-      if (res && (res.ok || res.type === 'opaque')) cache.put(req, res.clone());
-      return res;
-    }).catch(() => cached);
-    return cached || net;
-  }));
+  e.waitUntil(clients.matchAll({ type: 'window' }).then(l => l.length ? l[0].focus() : clients.openWindow('./')));
 });

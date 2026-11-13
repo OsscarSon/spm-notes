@@ -1,0 +1,43 @@
+{
+  "name": "mochi-timetable",
+  "private": true,
+  "version": "9.9.1",
+  "description": "Mochi 智能时间表。网页版不需要 npm；只有打包手机 App 才用到下面的脚本。",
+  "scripts": {
+    "build:www": "node scripts/build-www.mjs",
+    "sync": "npm run build:www && npx cap sync",
+    "android": "npm run sync && npx cap open android",
+    "ios": "npm run sync && npx cap open ios",
+    "android:widget": "node scripts/android-widget.mjs",
+    "android:setup": "node scripts/android-setup.mjs",
+    "check": "node scripts/check.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@ebarooni/capacitor-calendar": "latest-7"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "dayjs": "1.11.13",
+    "fuse.js": "7.0.0",
+    "sortablejs": "1.15.2",
+    "ical.js": "1.5.0",
+    "rough-notation": "0.5.1",
+    "rrule": "2.8.1",
+    "ts-fsrs": "^4.4.0",
+    "dexie": "4.0.10",
+    "@supabase/supabase-js": "2.45.4",
+    "chart.js": "4.4.1",
+    "lz-string": "1.5.0",
+    "qrcode-generator": "1.4.4",
+    "lucide": "0.468.0",
+    "lxgw-wenkai-webfont": "1.7.0",
+    "driver.js": "1.4.0",
+    "chrono-node": "2.9.0",
+    "esbuild": "^0.25.0"
+  }
+}

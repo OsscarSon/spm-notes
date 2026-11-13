@@ -1,0 +1,132 @@
+/* Health Space（v9.9.1）：所有选择器都以 .health-space- 开头（外层容器 #v-hs 例外）。
+   颜色全部来自 style.css 的主题变量（color-mix 调出蜜桃 / 暖棕的色调），所以深色模式 / 主题色自动跟随；不写死任何深色背景，也没有全屏遮罩。 */
+#v-hs.card.st{background:transparent;border:0;box-shadow:none;padding:0;gap:12px}
+#v-hs{--hs-soft:color-mix(in srgb,var(--pri) 10%,var(--card));--hs-hero:linear-gradient(135deg,color-mix(in srgb,var(--peach) 72%,var(--card)),color-mix(in srgb,var(--pink) 42%,var(--card)) 62%,color-mix(in srgb,var(--pri) 16%,var(--card)))}
+.health-space-root{display:flex;flex-direction:column;gap:12px;color:var(--ink);min-width:0}
+.health-space-root *{box-sizing:border-box}
+.health-space-root button,.health-space-root select,.health-space-root input{font:inherit;color:inherit}
+.health-space-root button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.health-space-root :focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.health-space-root h1,.health-space-root h2,.health-space-root p{margin:0}
+
+/* 分段标签 */
+.health-space-tabs{display:flex;gap:6px;padding:4px;background:var(--card);border:1.5px solid var(--line);border-radius:999px;align-self:flex-start;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.health-space-tabs::-webkit-scrollbar{display:none}
+.health-space-tabb{flex:0 0 auto;border:0;background:transparent;border-radius:999px;padding:8px 14px;min-height:40px;font-weight:700;color:var(--soft);white-space:nowrap}
+.health-space-tabb.health-space-on{background:var(--pri);color:var(--onpri)}
+
+/* 横幅 */
+.health-space-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:150px;padding:18px;border-radius:26px;border:1.5px solid var(--line);background:var(--hs-hero);overflow:hidden}
+.health-space-hero-t{min-width:0;flex:1}
+.health-space-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--pri-ink);margin-bottom:4px}
+.health-space-h{font-size:22px;line-height:1.2;font-weight:800;letter-spacing:-.02em;outline-offset:4px;overflow-wrap:anywhere}
+.health-space-sub{margin:4px 0 0;color:var(--soft);font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.health-space-hero .health-space-sub{max-width:34em}
+.health-space-hero-img{flex:0 0 auto;width:104px;height:104px;object-fit:contain}
+
+/* 统计 */
+.health-space-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.health-space-stat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:11px 12px;min-width:0;min-height:96px}
+.health-space-tag{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--pri-ink);background:var(--hs-soft);border-radius:999px;padding:2px 8px;max-width:100%;overflow-wrap:anywhere}
+.health-space-num{font-size:24px;line-height:1.15;font-weight:800;overflow-wrap:anywhere}
+.health-space-lbl{font-size:12px;color:var(--soft);font-weight:700;overflow-wrap:anywhere}
+.health-space-sub2{font-size:11px;color:var(--soft);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* 卡片与布局 */
+.health-space-cols,.health-space-cols2{display:grid;grid-template-columns:1fr;gap:12px;min-width:0}
+.health-space-card{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.health-space-card.health-space-soft{background:var(--hs-soft)}
+.health-space-head{display:flex;flex-direction:column;gap:2px}
+.health-space-h2{font-size:17px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+.health-space-empty{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:14px;border:1.5px dashed var(--line);border-radius:16px}
+.health-space-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:16px;padding:9px 10px;min-width:0}
+.health-space-tile{flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:var(--hs-soft);display:flex;align-items:center;justify-content:center;font-size:20px}
+.health-space-row-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.health-space-row-n{font-size:14px;overflow-wrap:anywhere}
+.health-space-row-m{font-size:12px;color:var(--soft);overflow-wrap:anywhere}
+
+/* 按钮 */
+.health-space-btn{border:0;background:var(--pri);color:var(--onpri);border-radius:14px;padding:9px 16px;min-height:42px;font-weight:800}
+.health-space-btn.health-space-ghost{background:var(--bg);color:var(--ink);border:1.5px solid var(--line)}
+.health-space-btn.health-space-sm{min-height:40px;padding:6px 12px;flex:0 0 auto}
+.health-space-btn:disabled{opacity:.55;cursor:default}
+.health-space-icon{flex:0 0 auto;min-width:40px;min-height:40px;border:0;background:transparent;border-radius:12px;font-size:20px;line-height:1;color:var(--soft)}
+.health-space-link{border:0;background:transparent;color:var(--pri-ink);font-weight:800;text-decoration:underline;padding:8px 4px;min-height:40px}
+.health-space-foot{display:flex;justify-content:flex-start}
+
+/* 进度条 */
+.health-space-bar{height:9px;border-radius:99px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
+.health-space-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pri),var(--pri2))}
+
+/* 勾选行 */
+.health-space-step{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:16px;padding:4px 6px 4px 10px;min-width:0}
+.health-space-chk{display:flex;align-items:center;gap:10px;flex:1;min-width:0;min-height:44px;cursor:pointer}
+.health-space-card>.health-space-chk{background:var(--bg);border-radius:16px;padding:4px 10px}
+.health-space-chk input{flex:0 0 auto;width:22px;height:22px;accent-color:var(--pri);margin:0}
+.health-space-chk-t{display:flex;flex-direction:column;min-width:0}
+.health-space-chk-n{font-size:14px;overflow-wrap:anywhere}
+.health-space-chk-n.health-space-done{text-decoration:line-through;opacity:.6}
+
+/* 运动计划 */
+.health-space-plan{background:var(--bg);border-radius:18px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.health-space-plan-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.health-space-plan-n{flex:1 1 90px;min-width:0;overflow-wrap:anywhere}
+.health-space-select,.health-space-input{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 10px;min-height:42px;min-width:0;width:100%;font-size:14px}
+.health-space-sel-w{flex:0 0 auto;display:block}
+.health-space-sel-w .health-space-select{width:auto}
+.health-space-metric{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;font-size:13px}
+.health-space-metric-s{color:var(--pri-ink);font-weight:700}
+.health-space-metric-s.health-space-ok{color:var(--soft)}
+.health-space-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* 表单 */
+.health-space-addrow{display:flex;gap:8px;align-items:stretch}
+.health-space-addrow .health-space-input{flex:1 1 0}
+.health-space-addrow .health-space-btn{flex:0 0 auto}
+.health-space-chips{display:flex;flex-wrap:wrap;gap:6px}
+.health-space-chip{border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;min-height:40px;text-align:left}
+.health-space-chip.health-space-on{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
+.health-space-live{min-height:1.2em;font-size:13px;color:var(--pri-ink);font-weight:700}
+.health-space-live:empty{display:none}
+
+/* 饮水 */
+.health-space-cups{display:flex;flex-wrap:wrap;gap:6px}
+.health-space-cup{width:44px;height:44px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);font-size:20px;line-height:1;padding:0}
+.health-space-cup.health-space-on{background:var(--hs-soft);border-color:var(--pri)}
+.health-space-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* 目标 */
+.health-space-goalrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.health-space-goal{display:flex;flex-direction:column;gap:4px;min-width:0}
+.health-space-goal-l{font-size:13px;font-weight:700}
+
+/* 最近 7 天 */
+.health-space-weekg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.health-space-wcol{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;border-radius:14px;background:var(--bg);min-width:0}
+.health-space-wcol.health-space-today{background:var(--hs-soft);outline:2px solid var(--pri);outline-offset:-2px}
+.health-space-wd{font-size:11px;font-weight:800;color:var(--soft)}
+.health-space-dot{font-size:13px;line-height:1.3;opacity:.22;filter:grayscale(1)}
+.health-space-dot.health-space-on{opacity:1;filter:none}
+.health-space-note{font-size:12px;color:var(--soft);line-height:1.5;padding:0 4px}
+
+@media(min-width:620px){
+  .health-space-cols{grid-template-columns:1.2fr 1fr}
+  .health-space-cols2{grid-template-columns:1fr 1fr}
+  .health-space-hero{padding:22px 26px}
+  .health-space-h{font-size:26px}
+}
+@media(max-width:520px){
+  .health-space-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-self:stretch;border-radius:20px;overflow:visible}
+  .health-space-tabb{white-space:normal;text-align:center;padding:8px 10px;line-height:1.2}
+}
+@media(max-width:380px){
+  .health-space-hero{padding:14px;min-height:130px}
+  .health-space-hero-img{width:72px;height:72px}
+  .health-space-h{font-size:19px}
+  .health-space-num{font-size:21px}
+  .health-space-addrow{flex-wrap:wrap}
+  .health-space-addrow .health-space-btn{flex:1 1 100%}
+  .health-space-cup{width:40px;height:40px}
+}
+@media(prefers-reduced-motion:no-preference){.health-space-btn,.health-space-stat,.health-space-tabb,.health-space-cup,.health-space-fill{transition:transform .15s,background-color .15s,width .25s}.health-space-btn:active,.health-space-cup:active{transform:scale(.97)}}
+@media(prefers-reduced-motion:reduce){.health-space-root *{transition:none!important;animation:none!important}}
